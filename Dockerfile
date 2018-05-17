@@ -1,6 +1,6 @@
 FROM golang:1.10
 
-ADD . /go/src/github.com/briansimoni/stereodose
+COPY . /go/src/github.com/briansimoni/stereodose
 
 WORKDIR /go/src/github.com/briansimoni/stereodose
 
@@ -8,9 +8,12 @@ RUN go get -u github.com/golang/dep/cmd/dep
 
 RUN dep ensure
 
-RUN go install
-
 # Only for dev purposes
 RUN go get github.com/codegangsta/gin
 
-CMD stereodose
+# RUN go get github.com/canthefason/go-watcher
+# RUN go install github.com/canthefason/go-watcher/cmd/watcher
+
+# RUN go get -u github.com/radovskyb/watcher/...
+
+CMD gin --port=3000 --appPort=4000 run

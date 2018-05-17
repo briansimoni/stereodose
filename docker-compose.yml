@@ -4,12 +4,12 @@ services:
   app:
     build: .
     volumes: 
-      - .:/go/src/github/com/briansimoni/stereodose
-    working_dir: /go/src/github/com/briansimoni/stereodose
+      - .:/go/src/github/com/briansimoni/stereodose/
+    working_dir: /go/src/github/com/briansimoni/stereodose/
     ports: 
       - "3000:3000"
-    depends_on: db
-    command: gin --port=3000 --appPort=4000 run main.go
+    depends_on: 
+      - db
 
   db:
     image: postgres
