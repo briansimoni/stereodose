@@ -10,6 +10,12 @@ services:
       - "3000:3000"
     depends_on: 
       - db
+    environment:
+      - STEREODOSE_CLIENT_ID=56d708386314468a84948c2fa9e4b5d2
+      - STEREODOSE_CLIENT_SECRET=f0b6dcb9631c4c8abda69547c12fcdd9
+      - STEREODOSE_REDIRECT_URL=http://localhost:3000/auth/callback
+      - STEREODOSE_ENCRYPTION_KEY=0yIGkhTjryrNl67s3uDaFGRtZAP7C+Os1YHwOsjF6E8ePYK2a0NiCDHr395E3aXj7A4spuZzmy1m7Uct0h43JA==
+      - STEREODOSE_AUTH_KEY=Xm11IcTxGupd5WcOu2TSOsf1mMKU4tKaquh1ggNaZ66BBAE/YmVFuIipypTKxFoNDYHhcABBldjYOGU6TBqmQQ==
     command: watcher
 
 

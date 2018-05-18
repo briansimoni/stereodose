@@ -1,7 +1,9 @@
 package app
 
 import (
+	"encoding/base64"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -12,20 +14,23 @@ import (
 )
 
 func index(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "hello")
+	fmt.Fprint(w, "hello world")
 }
 
 func loggedIn(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "login success")
 }
 
-// func logger() func(http.Handler) http.Handler {
-// 		handlers.CombinedLoggingHandler(os.Stdout, next)
-// 		next.ServeHTTP()
-// }
-
 func InitApp() *mux.Router {
-	var store = sessions.NewCookieStore([]byte("something-very-secret"))
+	authKey, err := base64.StdEncoding.DecodeString(os.Getenv("STEREODOSE_AUTH_KEY"))
+	if err != nil {
+		log.Fatal("Unable to obtain auth key", err.Error())
+	}
+	// encryptionKey, err := base64.StdEncoding.DecodeString(os.Getenv("STEREODOSE_ENCRYPTION_KEY"))
+	// if err != nil {
+	// 	log.Fatal("Unable to obtain encryption key", err.Error())
+	// }
+	var store = sessions.NewCookieStore(authKey)
 
 	app := mux.NewRouter()
 	app.Use(func(next http.Handler) http.Handler {

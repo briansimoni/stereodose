@@ -19,6 +19,8 @@ const sessionName = "_stereodose-session"
 
 var store *sessions.CookieStore
 
+// RegisterHandlers adds the routes and handlers to a router
+// that are needed for authentication purposes
 func RegisterHandlers(cookieStore *sessions.CookieStore, r *mux.Router) {
 	store = cookieStore
 	r.HandleFunc("/login", login)
@@ -73,7 +75,20 @@ func callback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	responseState := r.URL.Query().Get("state")
+	if responseState == "" {
+		log.Println(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	state := s.Values["State"]
+	if state == "" {
+		log.Println(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	if r.URL.Query().Get("state") != state {
 		log.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
