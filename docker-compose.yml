@@ -4,12 +4,14 @@ services:
   app:
     build: .
     volumes: 
-      - .:/go/src/github/com/briansimoni/stereodose/
-    working_dir: /go/src/github/com/briansimoni/stereodose/
+      - ./:/go/src/github.com/briansimoni/stereodose/
+    working_dir: /go/src/github.com/briansimoni/stereodose/
     ports: 
       - "3000:3000"
     depends_on: 
       - db
+    command: watcher
+
 
   db:
     image: postgres
