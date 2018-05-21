@@ -16,8 +16,11 @@ STEREODOSE_AUTH_KEY=somesecretkeythatyoucangenerate
 Obtain the client ID and secret by creating an app in the Spotify developer dashboard, and set the callback to http://localhost:3000/auth/callback
 
 You can generate a random AUTH_KEY by switching to the scripts directory
+
 `go run secret_generator.go`
 
-Once you have the .env file set:
+If you don't want to use a .env file, you can use regular system environment variables instead.
+
+Once you have the variables set:
 `docker-compose up`
 and you're all set to start writing code.
