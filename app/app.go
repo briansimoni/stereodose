@@ -41,6 +41,7 @@ func InitApp() *mux.Router {
 	auth.RegisterHandlers(store, authRouter)
 
 	app.HandleFunc("/", index)
+	app.HandleFunc("/test", auth.Middleware(webPlayerTest))
 
 	notFound := func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "Need to add a 404 page")
