@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -9,6 +10,10 @@ import (
 )
 
 func main() {
+	fmt.Println(os.Getenv("STEREODOSE_CLIENT_ID"))
+	fmt.Println(os.Getenv("STEREODOSE_CLIENT_SECRET"))
+	fmt.Println(os.Getenv("STEREODOSE_AUTH_KEY"))
+	fmt.Println(os.Getenv("STEREODOSE_REDIRECT_URL"))
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "3000"
