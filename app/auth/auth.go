@@ -109,7 +109,8 @@ func callback(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	returnPath := s.Values["return_path"].(string)
+	http.Redirect(w, r, returnPath, http.StatusTemporaryRedirect)
 
 }
 
@@ -125,7 +126,7 @@ func Middleware(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		if s.Values["Access_Token"] == nil {
-			log.Println("access token", s.Values["Access_Token"])
+			s.Values["return_path"] = r.URL.Path
 			http.Redirect(w, r, "/auth/login", http.StatusTemporaryRedirect)
 			return
 		}
