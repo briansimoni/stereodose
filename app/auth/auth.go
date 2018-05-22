@@ -21,7 +21,7 @@ var store *sessions.CookieStore
 
 // RegisterHandlers adds the routes and handlers to a router
 // that are needed for authentication purposes
-func RegisterHandlers(cookieStore *sessions.CookieStore, r *mux.Router) {
+func RegisterHandlers(c *Config, cookieStore *sessions.CookieStore, r *mux.Router) {
 	store = cookieStore
 	r.HandleFunc("/login", login)
 	r.HandleFunc("/callback", callback)
@@ -109,7 +109,12 @@ func callback(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	returnPath, ok := s.Values["return_path"].(string)
+	if !ok {
+		log.Println("not okay")
+		returnPath = "/"
+	}
+	http.Redirect(w, r, returnPath, http.StatusTemporaryRedirect)
 
 }
 
@@ -125,7 +130,8 @@ func Middleware(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		if s.Values["Access_Token"] == nil {
-			log.Println("access token", s.Values["Access_Token"])
+			s.Values["return_path"] = r.URL.Path
+			s.Save(r, w)
 			http.Redirect(w, r, "/auth/login", http.StatusTemporaryRedirect)
 			return
 		}
