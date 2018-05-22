@@ -21,8 +21,8 @@ func loggedIn(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "login success")
 }
 
-func InitApp() *mux.Router {
-	authKey, err := base64.StdEncoding.DecodeString(os.Getenv("STEREODOSE_AUTH_KEY"))
+func InitApp(c *auth.Config) *mux.Router {
+	authKey, err := base64.StdEncoding.DecodeString(c.AuthKey)
 	if err != nil {
 		log.Fatal("Unable to obtain auth key", err.Error())
 	}
@@ -38,7 +38,7 @@ func InitApp() *mux.Router {
 	})
 
 	authRouter := app.PathPrefix("/auth").Subrouter()
-	auth.RegisterHandlers(store, authRouter)
+	auth.RegisterHandlers(c, store, authRouter)
 
 	app.HandleFunc("/", index)
 	app.HandleFunc("/test", auth.Middleware(webPlayerTest))

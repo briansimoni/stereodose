@@ -21,7 +21,7 @@ var store *sessions.CookieStore
 
 // RegisterHandlers adds the routes and handlers to a router
 // that are needed for authentication purposes
-func RegisterHandlers(cookieStore *sessions.CookieStore, r *mux.Router) {
+func RegisterHandlers(c *Config, cookieStore *sessions.CookieStore, r *mux.Router) {
 	store = cookieStore
 	r.HandleFunc("/login", login)
 	r.HandleFunc("/callback", callback)
