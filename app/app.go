@@ -21,6 +21,10 @@ func loggedIn(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "login success")
 }
 
+const sessionName = "_stereodose-session"
+
+var store *sessions.CookieStore
+
 func InitApp(c *auth.Config) *mux.Router {
 	authKey, err := base64.StdEncoding.DecodeString(c.AuthKey)
 	if err != nil {
@@ -30,7 +34,7 @@ func InitApp(c *auth.Config) *mux.Router {
 	// if err != nil {
 	// 	log.Fatal("Unable to obtain encryption key", err.Error())
 	// }
-	var store = sessions.NewCookieStore(authKey)
+	store = sessions.NewCookieStore(authKey)
 
 	app := mux.NewRouter()
 	app.Use(func(next http.Handler) http.Handler {

@@ -31,7 +31,7 @@ var conf = &oauth2.Config{
 	ClientID:     os.Getenv("STEREODOSE_CLIENT_ID"),
 	ClientSecret: os.Getenv("STEREODOSE_CLIENT_SECRET"),
 	RedirectURL:  os.Getenv("STEREODOSE_REDIRECT_URL"),
-	Scopes:       []string{"playlist-modify-public"},
+	Scopes:       []string{"playlist-modify-public", "streaming", "user-read-birthdate", "user-read-email", "user-read-private"},
 	Endpoint:     spotify.Endpoint,
 }
 
