@@ -85,19 +85,19 @@ func callback(w http.ResponseWriter, r *http.Request) {
 	state := s.Values["State"]
 	if state == "" {
 		log.Println(err.Error())
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Unabble to obtain state from session"+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if r.URL.Query().Get("state") != state {
 		log.Println(err.Error())
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "State from query params did not match session state"+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	tok, err := conf.Exchange(r.Context(), r.URL.Query().Get("code"))
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Error obtaining getting token from Spotify"+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	s.Values["Access_Token"] = tok.AccessToken

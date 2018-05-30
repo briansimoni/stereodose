@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/briansimoni/stereodose/app/auth"
+	"github.com/briansimoni/stereodose/app/models"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
@@ -53,5 +54,10 @@ func InitApp(c *auth.Config) *mux.Router {
 	app.NotFoundHandler = http.HandlerFunc(notFound)
 
 	app.HandleFunc("/other", auth.Middleware(loggedIn))
+
+	app.HandleFunc("/gorm", func(w http.ResponseWriter, r *http.Request) {
+		users.HelloWorld()
+		fmt.Fprint(w, "hi")
+	})
 	return app
 }
