@@ -6,15 +6,21 @@ import (
 	"os"
 
 	"github.com/briansimoni/stereodose/app"
-	"github.com/briansimoni/stereodose/app/auth"
+	"github.com/briansimoni/stereodose/config"
 )
 
 func main() {
-	c := &auth.Config{
-		ClientID:     os.Getenv("STEREODOSE_CLIENT_ID"),
-		ClientSecret: os.Getenv("STEREODOSE_CLIENT_SECRET"),
-		AuthKey:      os.Getenv("STEREODOSE_AUTH_KEY"),
-		RedirectURL:  os.Getenv("STEREODOSE_REDIRECT_URL"),
+	dbString := os.Getenv("STEREODOSE_DB_STRING")
+	if dbString == "" {
+		// docker-compose default
+		dbString = "postgresql://postgres:development@db:5432/stereodose?sslmode=disable"
+	}
+	c := &config.Config{
+		ClientID:           os.Getenv("STEREODOSE_CLIENT_ID"),
+		ClientSecret:       os.Getenv("STEREODOSE_CLIENT_SECRET"),
+		AuthKey:            os.Getenv("STEREODOSE_AUTH_KEY"),
+		RedirectURL:        os.Getenv("STEREODOSE_REDIRECT_URL"),
+		DBConnectionString: dbString,
 	}
 	err := c.Verify()
 	if err != nil {

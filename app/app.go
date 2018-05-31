@@ -8,10 +8,13 @@ import (
 	"os"
 
 	"github.com/briansimoni/stereodose/app/auth"
+	"github.com/briansimoni/stereodose/app/controllers"
 	"github.com/briansimoni/stereodose/app/models"
+	"github.com/briansimoni/stereodose/config"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
+	"github.com/jinzhu/gorm"
 )
 
 func index(w http.ResponseWriter, r *http.Request) {
@@ -25,8 +28,15 @@ func loggedIn(w http.ResponseWriter, r *http.Request) {
 const sessionName = "_stereodose-session"
 
 var store *sessions.CookieStore
+var db *gorm.DB
 
-func InitApp(c *auth.Config) *mux.Router {
+func InitApp(c *config.Config) *mux.Router {
+	var err error
+	db, err = gorm.Open("postgres", c.DBConnectionString)
+	if err != nil {
+		panic(err.Error())
+	}
+
 	authKey, err := base64.StdEncoding.DecodeString(c.AuthKey)
 	if err != nil {
 		log.Fatal("Unable to obtain auth key", err.Error())
@@ -56,8 +66,10 @@ func InitApp(c *auth.Config) *mux.Router {
 	app.HandleFunc("/other", auth.Middleware(loggedIn))
 
 	app.HandleFunc("/gorm", func(w http.ResponseWriter, r *http.Request) {
-		users.HelloWorld()
+		models.HelloWorld()
 		fmt.Fprint(w, "hi")
 	})
+
+	app.HandleFunc("/createuser", controllers.CreateUser(db))
 	return app
 }

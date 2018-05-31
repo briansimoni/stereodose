@@ -12,6 +12,16 @@ type Product struct {
 	Booty string
 }
 
+type User struct {
+	gorm.Model
+	Email string
+}
+
+func (u *User) CreateNewUser(db *gorm.DB, email string) error {
+	db.Create(u)
+	return nil
+}
+
 func HelloWorld() {
 	db, err := gorm.Open("postgres", connectionString)
 	if err != nil {

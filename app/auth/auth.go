@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/briansimoni/stereodose/config"
 	"github.com/gorilla/mux"
 
 	"golang.org/x/oauth2"
@@ -21,7 +22,7 @@ var store *sessions.CookieStore
 
 // RegisterHandlers adds the routes and handlers to a router
 // that are needed for authentication purposes
-func RegisterHandlers(c *Config, cookieStore *sessions.CookieStore, r *mux.Router) {
+func RegisterHandlers(c *config.Config, cookieStore *sessions.CookieStore, r *mux.Router) {
 	store = cookieStore
 	r.HandleFunc("/login", login)
 	r.HandleFunc("/callback", callback)
