@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/briansimoni/stereodose/app/auth"
 	"github.com/briansimoni/stereodose/app/controllers"
+	"github.com/briansimoni/stereodose/app/controllers/auth"
 	"github.com/briansimoni/stereodose/app/models"
 	"github.com/briansimoni/stereodose/config"
 	"github.com/gorilla/handlers"
@@ -32,10 +32,12 @@ var db *gorm.DB
 
 func InitApp(c *config.Config) *mux.Router {
 	var err error
+	log.Println(c.DBConnectionString)
 	db, err = gorm.Open("postgres", c.DBConnectionString)
 	if err != nil {
 		panic(err.Error())
 	}
+	stereoDoseDB := models.NewStereodoseDB(db)
 
 	authKey, err := base64.StdEncoding.DecodeString(c.AuthKey)
 	if err != nil {
@@ -65,11 +67,6 @@ func InitApp(c *config.Config) *mux.Router {
 
 	app.HandleFunc("/other", auth.Middleware(loggedIn))
 
-	app.HandleFunc("/gorm", func(w http.ResponseWriter, r *http.Request) {
-		models.HelloWorld()
-		fmt.Fprint(w, "hi")
-	})
-
-	app.HandleFunc("/createuser", controllers.CreateUser(db))
+	app.HandleFunc("/createuser", controllers.CreateUser(stereoDoseDB, store))
 	return app
 }

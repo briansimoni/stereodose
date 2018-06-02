@@ -1,49 +1,66 @@
 package models
 
 import (
+	"log"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
-type Product struct {
-	gorm.Model
-	Code  string
-	Price uint
-	Booty string
+type UserService interface {
+	GetUser(ID string) (*User, error)
+	CreateUser(spotifyID string) error
+}
+
+type StereodoseUserService struct {
+	db *gorm.DB
+}
+
+// spotifyUser represents the json returend from the /me endpoint
+type spotifyUser struct {
+	Birthdate    string      `json:"birthdate"`
+	Country      string      `json:"country"`
+	DisplayName  interface{} `json:"display_name"`
+	Email        string      `json:"email"`
+	ExternalUrls struct {
+		Spotify string `json:"spotify"`
+	} `json:"external_urls"`
+	Followers struct {
+		Href  interface{} `json:"href"`
+		Total int         `json:"total"`
+	} `json:"followers"`
+	Href    string        `json:"href"`
+	ID      string        `json:"id"`
+	Images  []interface{} `json:"images"`
+	Product string        `json:"product"`
+	Type    string        `json:"type"`
+	URI     string        `json:"uri"`
 }
 
 type User struct {
 	gorm.Model
-	Email string
+	Birthdate   string
+	DisplayName string
+	Email       string
+	SpotifyID   string
+	//Images      []string
 }
 
-func (u *User) CreateNewUser(db *gorm.DB, email string) error {
-	db.Create(u)
-	return nil
+// GetUser will retrieve the user from the DB by ID
+// If the user does not exist, it will be created
+func (u *StereodoseUserService) GetUser(id string) (*User, error) {
+	var user *User
+	u.db.Where(&User{SpotifyID: id}).First(user)
+	return user, nil
 }
 
-func HelloWorld() {
-	db, err := gorm.Open("postgres", connectionString)
-	if err != nil {
-		panic(err.Error())
+func (u *StereodoseUserService) CreateUser(spotifyID string) error {
+	user := &User{
+		SpotifyID: spotifyID,
 	}
-	defer db.Close()
-
-	// Migrate the schema
-	db.AutoMigrate(&Product{})
-
-	// Create
-	db.Create(&Product{Code: "L1212", Price: 1000})
-
-	// Read
-	var product Product
-	db.First(&product, 1)                   // find product with id 1
-	db.First(&product, "code = ?", "L1212") // find product with code l1212
-
-	// Update - update product's price to 2000
-	db.Model(&product).Update("Price", 2000)
-
-	// Delete - delete product
-	db.Delete(&product)
-
+	u.db.Create(user)
+	var retval User
+	u.db.First(&retval)
+	log.Println(retval)
+	return nil
 }

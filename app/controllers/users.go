@@ -5,15 +5,21 @@ import (
 	"net/http"
 
 	"github.com/briansimoni/stereodose/app/models"
-	"github.com/jinzhu/gorm"
+	"github.com/gorilla/sessions"
 )
 
-func CreateUser(db *gorm.DB) http.HandlerFunc {
+func CreateUser(db *models.StereoDoseDB, store *sessions.CookieStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		u := models.User{}
-		u.CreateNewUser(db, "test@test.com")
-		fromDB := models.User{}
-		db.First(&fromDB)
-		fmt.Fprintf(w, "%+v", fromDB)
+
+		// s, err := store.Get(r, "_stereodose_session")
+		// if err != nil {
+		// 	log.Println(err.Error())
+		// 	http.Error(w, err.Error(), http.StatusInternalServerError)
+		// 	return
+		// }
+
+		db.Users.CreateUser("staticID")
+		// fmt.Fprintf(w, "%+v", interface{})
+		fmt.Fprintf(w, "maybe created")
 	}
 }
