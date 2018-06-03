@@ -3,6 +3,7 @@ package auth
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/json"
 	"log"
 	"net/http"
 	"os"
@@ -19,6 +20,26 @@ import (
 const sessionName = "_stereodose-session"
 
 var store *sessions.CookieStore
+
+type spotifyUser struct {
+	Birthdate    string      `json:"birthdate"`
+	Country      string      `json:"country"`
+	DisplayName  interface{} `json:"display_name"`
+	Email        string      `json:"email"`
+	ExternalUrls struct {
+		Spotify string `json:"spotify"`
+	} `json:"external_urls"`
+	Followers struct {
+		Href  interface{} `json:"href"`
+		Total int         `json:"total"`
+	} `json:"followers"`
+	Href    string        `json:"href"`
+	ID      string        `json:"id"`
+	Images  []interface{} `json:"images"`
+	Product string        `json:"product"`
+	Type    string        `json:"type"`
+	URI     string        `json:"uri"`
+}
 
 // RegisterHandlers adds the routes and handlers to a router
 // that are needed for authentication purposes
@@ -110,6 +131,14 @@ func callback(w http.ResponseWriter, r *http.Request) {
 	s.Values["Access_Token"] = tok.AccessToken
 	s.Values["Expiry"] = tok.Expiry.String()
 	s.Values["Refresh_Token"] = tok.RefreshToken
+	user, err := GetUserData(tok.AccessToken)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	s.Values["Spotify_UserID"] = user.ID
+	log.Println("USER ID:", user.ID)
 	err = s.Save(r, w)
 	if err != nil {
 		log.Println(err.Error())
@@ -118,11 +147,30 @@ func callback(w http.ResponseWriter, r *http.Request) {
 	}
 	returnPath, ok := s.Values["return_path"].(string)
 	if !ok {
-		log.Println("not okay")
 		returnPath = "/"
 	}
 	http.Redirect(w, r, returnPath, http.StatusTemporaryRedirect)
 
+}
+
+func GetUserData(accessToken string) (*spotifyUser, error) {
+	req, err := http.NewRequest(http.MethodGet, "https://api.spotify.com/v1/me", nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Authorization", "Bearer "+accessToken)
+	// TODO: do not use default client
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+	var u spotifyUser
+	err = json.NewDecoder(res.Body).Decode(&u)
+	if err != nil {
+		return nil, err
+	}
+	return &u, nil
 }
 
 // Middleware checks to see if the user is logged in before
