@@ -1,11 +1,15 @@
 package models
 
-import "github.com/jinzhu/gorm"
+import (
+	"github.com/gorilla/sessions"
+	"github.com/jinzhu/gorm"
+)
 
 const connectionString = "postgresql://postgres:development@db:5432/stereodose?sslmode=disable"
 
 type StereoDoseDB struct {
 	db    *gorm.DB
+	store *sessions.CookieStore
 	Users UserService
 }
 
@@ -15,17 +19,6 @@ func NewStereodoseDB(db *gorm.DB) *StereoDoseDB {
 	db.AutoMigrate(User{})
 	database := &StereoDoseDB{}
 	database.db = db
-	database.Users = &StereodoseUserService{db}
+	database.Users = &StereodoseUserService{db: db}
 	return database
 }
-
-// func GetDB() *gorm.DB {
-// 	if db != nil {
-// 		return db
-// 	}
-// 	db, err := gorm.Open("postgres", connectionString)
-// 	if err != nil {
-// 		panic(err.Error())
-// 	}
-// 	return db
-// }

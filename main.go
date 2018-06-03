@@ -7,22 +7,27 @@ import (
 
 	"github.com/briansimoni/stereodose/app"
 	"github.com/briansimoni/stereodose/config"
+	"github.com/jinzhu/gorm"
 )
 
 func main() {
-	dbString := os.Getenv("STEREODOSE_DB_STRING")
-	if dbString == "" {
+	connectionString := os.Getenv("STEREODOSE_DB_STRING")
+	if connectionString == "" {
 		// docker-compose default
-		dbString = "postgresql://postgres:development@db:5432/stereodose?sslmode=disable"
+		connectionString = "postgresql://postgres:development@db:5432/stereodose?sslmode=disable"
 	}
+	db, err := gorm.Open("postgres", connectionString)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer db.Close()
 	c := &config.Config{
-		ClientID:           os.Getenv("STEREODOSE_CLIENT_ID"),
-		ClientSecret:       os.Getenv("STEREODOSE_CLIENT_SECRET"),
-		AuthKey:            os.Getenv("STEREODOSE_AUTH_KEY"),
-		RedirectURL:        os.Getenv("STEREODOSE_REDIRECT_URL"),
-		DBConnectionString: dbString,
+		ClientID:     os.Getenv("STEREODOSE_CLIENT_ID"),
+		ClientSecret: os.Getenv("STEREODOSE_CLIENT_SECRET"),
+		AuthKey:      os.Getenv("STEREODOSE_AUTH_KEY"),
+		RedirectURL:  os.Getenv("STEREODOSE_REDIRECT_URL"),
 	}
-	err := c.Verify()
+	err = c.Verify()
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -30,7 +35,7 @@ func main() {
 	if port == "" {
 		port = "3000"
 	}
-	stereodose := app.InitApp(c)
+	stereodose := app.InitApp(c, db)
 	log.Println("Starting stereodose app on port", port)
 	log.Fatal(http.ListenAndServe(":"+port, stereodose))
 }

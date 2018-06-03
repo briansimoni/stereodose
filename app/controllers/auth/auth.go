@@ -21,6 +21,7 @@ const sessionName = "_stereodose-session"
 
 var store *sessions.CookieStore
 
+// spotifyUser struct is used when querying the /me API endpoint
 type spotifyUser struct {
 	Birthdate    string      `json:"birthdate"`
 	Country      string      `json:"country"`
@@ -45,8 +46,8 @@ type spotifyUser struct {
 // that are needed for authentication purposes
 func RegisterHandlers(c *config.Config, cookieStore *sessions.CookieStore, r *mux.Router) {
 	store = cookieStore
-	r.HandleFunc("/login", login)
-	r.HandleFunc("/callback", callback)
+	r.HandleFunc("/login", login).Methods(http.MethodGet)
+	r.HandleFunc("/callback", callback).Methods(http.MethodGet)
 }
 
 var conf = &oauth2.Config{
@@ -138,7 +139,6 @@ func callback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.Values["Spotify_UserID"] = user.ID
-	log.Println("USER ID:", user.ID)
 	err = s.Save(r, w)
 	if err != nil {
 		log.Println(err.Error())

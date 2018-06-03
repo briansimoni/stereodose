@@ -5,12 +5,11 @@ import "errors"
 // Config contains all of the variables that
 // are needed for Stereodose to function
 type Config struct {
-	ClientID           string
-	ClientSecret       string
-	RedirectURL        string
-	AuthKey            string
-	EncryptionKey      string
-	DBConnectionString string
+	ClientID      string
+	ClientSecret  string
+	RedirectURL   string
+	AuthKey       string
+	EncryptionKey string
 }
 
 // Verify can be used to conveniently check

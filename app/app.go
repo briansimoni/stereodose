@@ -30,13 +30,8 @@ const sessionName = "_stereodose-session"
 var store *sessions.CookieStore
 var db *gorm.DB
 
-func InitApp(c *config.Config) *mux.Router {
+func InitApp(c *config.Config, db *gorm.DB) *mux.Router {
 	var err error
-	log.Println(c.DBConnectionString)
-	db, err = gorm.Open("postgres", c.DBConnectionString)
-	if err != nil {
-		panic(err.Error())
-	}
 	stereoDoseDB := models.NewStereodoseDB(db)
 
 	authKey, err := base64.StdEncoding.DecodeString(c.AuthKey)

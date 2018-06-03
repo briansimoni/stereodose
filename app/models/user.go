@@ -3,6 +3,7 @@ package models
 import (
 	"log"
 
+	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
@@ -13,28 +14,8 @@ type UserService interface {
 }
 
 type StereodoseUserService struct {
-	db *gorm.DB
-}
-
-// spotifyUser represents the json returend from the /me endpoint
-type spotifyUser struct {
-	Birthdate    string      `json:"birthdate"`
-	Country      string      `json:"country"`
-	DisplayName  interface{} `json:"display_name"`
-	Email        string      `json:"email"`
-	ExternalUrls struct {
-		Spotify string `json:"spotify"`
-	} `json:"external_urls"`
-	Followers struct {
-		Href  interface{} `json:"href"`
-		Total int         `json:"total"`
-	} `json:"followers"`
-	Href    string        `json:"href"`
-	ID      string        `json:"id"`
-	Images  []interface{} `json:"images"`
-	Product string        `json:"product"`
-	Type    string        `json:"type"`
-	URI     string        `json:"uri"`
+	store *sessions.CookieStore
+	db    *gorm.DB
 }
 
 type User struct {
@@ -42,7 +23,7 @@ type User struct {
 	Birthdate   string
 	DisplayName string
 	Email       string
-	SpotifyID   string
+	SpotifyID   string `gorm:"AUTO_INCREMENT"`
 	//Images      []string
 }
 
