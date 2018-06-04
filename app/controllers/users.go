@@ -18,7 +18,7 @@ func CreateUser(db *models.StereoDoseDB, store *sessions.CookieStore) http.Handl
 		// 	return
 		// }
 
-		db.Users.CreateUser("staticID")
+		db.Users.CreateUser(r)
 		// fmt.Fprintf(w, "%+v", interface{})
 		fmt.Fprintf(w, "maybe created")
 	}

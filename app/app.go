@@ -32,7 +32,6 @@ var db *gorm.DB
 
 func InitApp(c *config.Config, db *gorm.DB) *mux.Router {
 	var err error
-	stereoDoseDB := models.NewStereodoseDB(db)
 
 	authKey, err := base64.StdEncoding.DecodeString(c.AuthKey)
 	if err != nil {
@@ -43,6 +42,8 @@ func InitApp(c *config.Config, db *gorm.DB) *mux.Router {
 	// 	log.Fatal("Unable to obtain encryption key", err.Error())
 	// }
 	store = sessions.NewCookieStore(authKey)
+
+	stereoDoseDB := models.NewStereodoseDB(db, store)
 
 	app := mux.NewRouter()
 	app.Use(func(next http.Handler) http.Handler {

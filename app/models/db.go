@@ -15,10 +15,11 @@ type StereoDoseDB struct {
 
 // NewStereodoseDB takes a reference to gorm and returns
 // an abstraction for use throughout the app
-func NewStereodoseDB(db *gorm.DB) *StereoDoseDB {
+func NewStereodoseDB(db *gorm.DB, s *sessions.CookieStore) *StereoDoseDB {
 	db.AutoMigrate(User{})
 	database := &StereoDoseDB{}
 	database.db = db
-	database.Users = &StereodoseUserService{db: db}
+	database.store = s
+	database.Users = &StereodoseUserService{db: db, store: s}
 	return database
 }
