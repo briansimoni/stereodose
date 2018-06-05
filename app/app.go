@@ -50,6 +50,8 @@ func InitApp(c *config.Config, db *gorm.DB) *mux.Router {
 		return handlers.LoggingHandler(os.Stdout, next)
 	})
 
+	app.Use(SpotifyIDMiddleware)
+
 	authRouter := app.PathPrefix("/auth").Subrouter()
 	auth.RegisterHandlers(c, store, authRouter)
 
@@ -63,6 +65,9 @@ func InitApp(c *config.Config, db *gorm.DB) *mux.Router {
 
 	app.HandleFunc("/other", auth.Middleware(loggedIn))
 
-	app.HandleFunc("/getuser", controllers.GetUser(stereoDoseDB, store))
+	users := controllers.UsersController{
+		DB: stereoDoseDB,
+	}
+	app.HandleFunc("/me", auth.Middleware(users.Me())).Methods(http.MethodGet)
 	return app
 }

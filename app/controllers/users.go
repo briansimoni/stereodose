@@ -5,12 +5,15 @@ import (
 	"net/http"
 
 	"github.com/briansimoni/stereodose/app/models"
-	"github.com/gorilla/sessions"
 )
 
-func GetUser(db *models.StereoDoseDB, store *sessions.CookieStore) http.HandlerFunc {
+type UsersController struct {
+	DB *models.StereoDoseDB
+}
+
+func (u *UsersController) Me() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		user, err := db.Users.GetUser(r)
+		user, err := u.DB.Users.Me(r)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}

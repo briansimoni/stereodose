@@ -1,17 +1,16 @@
 package models
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-
-	"github.com/briansimoni/stereodose/app/util"
 )
 
 type UserService interface {
-	GetUser(req *http.Request) (*User, error)
+	Me(req *http.Request) (*User, error)
 }
 
 type StereodoseUserService struct {
@@ -30,16 +29,23 @@ type User struct {
 
 // GetUser first checks to see if the user already exists
 // if it doesn't it creates one, otherwise it returns a pointer to user
-func (u *StereodoseUserService) GetUser(req *http.Request) (*User, error) {
-	s, err := util.GetSessionInfo(u.store, req)
-	if err != nil {
-		return nil, err
+func (u *StereodoseUserService) Me(req *http.Request) (*User, error) {
+	// s, err := util.GetSessionInfo(u.store, req)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	spotifyID, ok := req.Context().Value("SpotifyID").(string)
+	if !ok {
+		return nil, errors.New("Unable to obtain SpotifyID from context")
 	}
+	// user := &User{
+	// 	SpotifyID: s.SpotifyUserID,
+	// }
 	user := &User{
-		SpotifyID: s.SpotifyUserID,
+		SpotifyID: spotifyID,
 	}
 
-	err = u.db.FirstOrCreate(user, "spotify_id = ?", s.SpotifyUserID).Error
+	err := u.db.FirstOrCreate(user, "spotify_id = ?", spotifyID).Error
 	if err != nil {
 		return nil, err
 	}
