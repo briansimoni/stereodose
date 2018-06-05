@@ -1,7 +1,6 @@
 package models
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gorilla/sessions"
@@ -12,8 +11,7 @@ import (
 )
 
 type UserService interface {
-	GetUser(ID string) (*User, error)
-	CreateUser(req *http.Request) (*User, error)
+	GetUser(req *http.Request) (*User, error)
 }
 
 type StereodoseUserService struct {
@@ -30,17 +28,9 @@ type User struct {
 	//Images      []string
 }
 
-// GetUser will retrieve the user from the DB by ID
-// If the user does not exist, it will be created
-func (u *StereodoseUserService) GetUser(id string) (*User, error) {
-	var user *User
-	u.db.Where(&User{SpotifyID: id}).First(user)
-	return user, nil
-}
-
-// CreateUser first checks to see if the user already exists
+// GetUser first checks to see if the user already exists
 // if it doesn't it creates one, otherwise it returns a pointer to user
-func (u *StereodoseUserService) CreateUser(req *http.Request) (*User, error) {
+func (u *StereodoseUserService) GetUser(req *http.Request) (*User, error) {
 	s, err := util.GetSessionInfo(u.store, req)
 	if err != nil {
 		return nil, err
@@ -49,11 +39,9 @@ func (u *StereodoseUserService) CreateUser(req *http.Request) (*User, error) {
 		SpotifyID: s.SpotifyUserID,
 	}
 
-	u.db.FirstOrCreate(user, "spotify_id = ?", s.SpotifyUserID)
-	log.Println("logging the USER", user)
-
-	var retval User
-	u.db.Where("spotify_id = ?", s.SpotifyUserID).First(user)
-	log.Println(retval)
-	return nil, nil
+	err = u.db.FirstOrCreate(user, "spotify_id = ?", s.SpotifyUserID).Error
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }

@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	b := make([]byte, 64)
+	b := make([]byte, 32)
 	_, err := rand.Read(b)
 	if err != nil {
 		log.Fatal(err.Error())

@@ -37,11 +37,11 @@ func InitApp(c *config.Config, db *gorm.DB) *mux.Router {
 	if err != nil {
 		log.Fatal("Unable to obtain auth key", err.Error())
 	}
-	// encryptionKey, err := base64.StdEncoding.DecodeString(os.Getenv("STEREODOSE_ENCRYPTION_KEY"))
-	// if err != nil {
-	// 	log.Fatal("Unable to obtain encryption key", err.Error())
-	// }
-	store = sessions.NewCookieStore(authKey)
+	encryptionKey, err := base64.StdEncoding.DecodeString(c.EncryptionKey)
+	if err != nil {
+		log.Fatal("Unable to obtain encryption key", err.Error())
+	}
+	store = sessions.NewCookieStore(authKey, encryptionKey)
 
 	stereoDoseDB := models.NewStereodoseDB(db, store)
 
@@ -63,6 +63,6 @@ func InitApp(c *config.Config, db *gorm.DB) *mux.Router {
 
 	app.HandleFunc("/other", auth.Middleware(loggedIn))
 
-	app.HandleFunc("/createuser", controllers.CreateUser(stereoDoseDB, store))
+	app.HandleFunc("/getuser", controllers.GetUser(stereoDoseDB, store))
 	return app
 }
