@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"log"
 	"net/http"
 )
 
@@ -14,6 +15,7 @@ func SpotifyIDMiddleware(next http.Handler) http.Handler {
 		s, err := store.Get(r, sessionName)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 
 		spotifyID, ok := s.Values["Spotify_UserID"].(string)
@@ -21,7 +23,15 @@ func SpotifyIDMiddleware(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 			return
 		}
-		ctx := context.WithValue(r.Context(), "SpotifyID", spotifyID)
+		user, err := stereoDoseDB.Users.Me(spotifyID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		log.Println(user)
+		// We dereference the pointer and store the value in the context
+		// instead of storing a pointer to the user
+		ctx := context.WithValue(r.Context(), "User", *user)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	}
 	return http.HandlerFunc(f)

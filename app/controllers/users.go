@@ -13,9 +13,10 @@ type UsersController struct {
 
 func (u *UsersController) Me() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		user, err := u.DB.Users.Me(r)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		user, ok := r.Context().Value("User").(models.User)
+		if !ok {
+			http.Error(w, "Unable to obtain user from session", http.StatusInternalServerError)
+			return
 		}
 		fmt.Fprintf(w, "%+v", user)
 	}

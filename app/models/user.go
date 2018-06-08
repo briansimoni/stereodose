@@ -1,16 +1,13 @@
 package models
 
 import (
-	"errors"
-	"net/http"
-
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 type UserService interface {
-	Me(req *http.Request) (*User, error)
+	Me(spotifyID string) (*User, error)
 }
 
 type StereodoseUserService struct {
@@ -27,20 +24,9 @@ type User struct {
 	//Images      []string
 }
 
-// GetUser first checks to see if the user already exists
+// Me first checks to see if the user already exists
 // if it doesn't it creates one, otherwise it returns a pointer to user
-func (u *StereodoseUserService) Me(req *http.Request) (*User, error) {
-	// s, err := util.GetSessionInfo(u.store, req)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	spotifyID, ok := req.Context().Value("SpotifyID").(string)
-	if !ok {
-		return nil, errors.New("Unable to obtain SpotifyID from context")
-	}
-	// user := &User{
-	// 	SpotifyID: s.SpotifyUserID,
-	// }
+func (u *StereodoseUserService) Me(spotifyID string) (*User, error) {
 	user := &User{
 		SpotifyID: spotifyID,
 	}

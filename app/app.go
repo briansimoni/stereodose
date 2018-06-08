@@ -29,6 +29,7 @@ const sessionName = "_stereodose-session"
 
 var store *sessions.CookieStore
 var db *gorm.DB
+var stereoDoseDB *models.StereoDoseDB
 
 func InitApp(c *config.Config, db *gorm.DB) *mux.Router {
 	var err error
@@ -43,7 +44,7 @@ func InitApp(c *config.Config, db *gorm.DB) *mux.Router {
 	}
 	store = sessions.NewCookieStore(authKey, encryptionKey)
 
-	stereoDoseDB := models.NewStereodoseDB(db, store)
+	stereoDoseDB = models.NewStereodoseDB(db, store)
 
 	app := mux.NewRouter()
 	app.Use(func(next http.Handler) http.Handler {
