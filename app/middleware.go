@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"log"
 	"net/http"
 )
 
@@ -28,7 +27,6 @@ func SpotifyIDMiddleware(next http.Handler) http.Handler {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		log.Println(user)
 		// We dereference the pointer and store the value in the context
 		// instead of storing a pointer to the user
 		ctx := context.WithValue(r.Context(), "User", *user)

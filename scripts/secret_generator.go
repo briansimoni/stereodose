@@ -8,11 +8,22 @@ import (
 )
 
 func main() {
-	b := make([]byte, 32)
-	_, err := rand.Read(b)
+	authBytes := make([]byte, 64)
+	_, err := rand.Read(authBytes)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	secret := base64.StdEncoding.EncodeToString(b)
-	fmt.Println(secret)
+	authKey := base64.StdEncoding.EncodeToString(authBytes)
+
+	encBytes := make([]byte, 32)
+	_, err = rand.Read(encBytes)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	encKey := base64.StdEncoding.EncodeToString(encBytes)
+
+	fmt.Println("Auth Key:")
+	fmt.Println(authKey)
+	fmt.Println("\nEncryption Key:")
+	fmt.Println(encKey)
 }

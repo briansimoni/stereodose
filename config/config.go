@@ -27,5 +27,8 @@ func (c *Config) Verify() error {
 	if c.AuthKey == "" {
 		return errors.New("STEREODOSE_AUTH_KEY was empty string")
 	}
+	if c.EncryptionKey == "" {
+		return errors.New("STEREODOSE_ENCRYPTION_KEY was empty string")
+	}
 	return nil
 }

@@ -113,14 +113,12 @@ func callback(w http.ResponseWriter, r *http.Request) {
 
 	state := s.Values["State"]
 	if state == "" {
-		log.Println(err.Error())
-		http.Error(w, "Unabble to obtain state from session"+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Unabble to obtain state from session", http.StatusInternalServerError)
 		return
 	}
 
 	if r.URL.Query().Get("state") != state {
-		log.Println(err.Error())
-		http.Error(w, "State from query params did not match session state"+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "State from query params did not match session state", http.StatusInternalServerError)
 		return
 	}
 

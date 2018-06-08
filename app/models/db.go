@@ -1,6 +1,8 @@
 package models
 
 import (
+	"log"
+
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
 )
@@ -16,7 +18,10 @@ type StereoDoseDB struct {
 // NewStereodoseDB takes a reference to gorm and returns
 // an abstraction for use throughout the app
 func NewStereodoseDB(db *gorm.DB, s *sessions.CookieStore) *StereoDoseDB {
-	db.AutoMigrate(User{})
+	err := db.AutoMigrate(User{}).Error
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 	database := &StereoDoseDB{}
 	database.db = db
 	database.store = s
