@@ -8,7 +8,6 @@ import (
 	"os"
 
 	"github.com/briansimoni/stereodose/app/controllers"
-	"github.com/briansimoni/stereodose/app/controllers/auth"
 	"github.com/briansimoni/stereodose/app/models"
 	"github.com/briansimoni/stereodose/config"
 	"github.com/gorilla/handlers"
@@ -51,10 +50,18 @@ func InitApp(c *config.Config, db *gorm.DB) *mux.Router {
 		return handlers.LoggingHandler(os.Stdout, next)
 	})
 
+	users := controllers.UsersController{
+		DB: stereoDoseDB,
+	}
+	auth := controllers.AuthController{
+		DB:    stereoDoseDB,
+		Store: store,
+	}
+
 	app.Use(SpotifyIDMiddleware)
 
-	authRouter := app.PathPrefix("/auth").Subrouter()
-	auth.RegisterHandlers(c, store, authRouter)
+	// authRouter := app.PathPrefix("/auth").Subrouter()
+	// auth.RegisterHandlers(c, store, authRouter)
 
 	app.HandleFunc("/", index)
 	app.HandleFunc("/test", auth.Middleware(webPlayerTest))
@@ -66,9 +73,9 @@ func InitApp(c *config.Config, db *gorm.DB) *mux.Router {
 
 	app.HandleFunc("/other", auth.Middleware(loggedIn))
 
-	users := controllers.UsersController{
-		DB: stereoDoseDB,
-	}
+	authRouter := app.PathPrefix("/auth").Subrouter()
+	authRouter.HandleFunc("/login", auth.Login).Methods(http.MethodGet)
+	authRouter.HandleFunc("/callback", auth.Callback).Methods(http.MethodGet)
 	app.HandleFunc("/me", auth.Middleware(users.Me())).Methods(http.MethodGet)
 	return app
 }

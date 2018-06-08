@@ -1,4 +1,4 @@
-package auth
+package controllers
 
 import (
 	"crypto/rand"
@@ -8,8 +8,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/briansimoni/stereodose/config"
-	"github.com/gorilla/mux"
+	"github.com/briansimoni/stereodose/app/models"
 
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/spotify"
@@ -19,7 +18,10 @@ import (
 
 const sessionName = "_stereodose-session"
 
-var store *sessions.CookieStore
+type AuthController struct {
+	DB    *models.StereoDoseDB
+	Store *sessions.CookieStore
+}
 
 // spotifyUser struct is used when querying the /me API endpoint
 type spotifyUser struct {
@@ -44,11 +46,11 @@ type spotifyUser struct {
 
 // RegisterHandlers adds the routes and handlers to a router
 // that are needed for authentication purposes
-func RegisterHandlers(c *config.Config, cookieStore *sessions.CookieStore, r *mux.Router) {
-	store = cookieStore
-	r.HandleFunc("/login", login).Methods(http.MethodGet)
-	r.HandleFunc("/callback", callback).Methods(http.MethodGet)
-}
+// func RegisterHandlers(c *config.Config, cookieStore *sessions.CookieStore, r *mux.Router) {
+// 	store = cookieStore
+// 	r.HandleFunc("/login", login).Methods(http.MethodGet)
+// 	r.HandleFunc("/callback", callback).Methods(http.MethodGet)
+// }
 
 var conf = &oauth2.Config{
 	ClientID:     os.Getenv("STEREODOSE_CLIENT_ID"),
@@ -64,8 +66,8 @@ var conf = &oauth2.Config{
 	Endpoint: spotify.Endpoint,
 }
 
-func login(w http.ResponseWriter, r *http.Request) {
-	s, err := store.Get(r, sessionName)
+func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) {
+	s, err := a.Store.Get(r, sessionName)
 
 	if err != nil {
 		log.Println(err.Error())
@@ -95,9 +97,9 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func callback(w http.ResponseWriter, r *http.Request) {
+func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) {
 
-	s, err := store.Get(r, sessionName)
+	s, err := a.Store.Get(r, sessionName)
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -129,13 +131,13 @@ func callback(w http.ResponseWriter, r *http.Request) {
 	}
 	s.Values["Access_Token"] = tok.AccessToken
 	s.Values["Expiry"] = tok.Expiry.String()
-	s.Values["Refresh_Token"] = tok.RefreshToken
 	user, err := GetUserData(tok.AccessToken)
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	s.Values["Spotify_UserID"] = user.ID
 	err = s.Save(r, w)
 	if err != nil {
@@ -173,9 +175,9 @@ func GetUserData(accessToken string) (*spotifyUser, error) {
 
 // Middleware checks to see if the user is logged in before
 // allowing the request to continue
-func Middleware(next http.HandlerFunc) http.HandlerFunc {
+func (a *AuthController) Middleware(next http.HandlerFunc) http.HandlerFunc {
 	f := func(w http.ResponseWriter, r *http.Request) {
-		s, err := store.Get(r, sessionName)
+		s, err := a.Store.Get(r, sessionName)
 		if err != nil {
 			log.Println(err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
