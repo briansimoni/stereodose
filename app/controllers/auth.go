@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"os"
@@ -98,29 +99,16 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) {
-
 	s, err := a.Store.Get(r, sessionName)
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	responseState := r.URL.Query().Get("state")
-	if responseState == "" {
+	err = checkState(r, s)
+	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	state := s.Values["State"]
-	if state == "" {
-		http.Error(w, "Unabble to obtain state from session", http.StatusInternalServerError)
-		return
-	}
-
-	if r.URL.Query().Get("state") != state {
-		http.Error(w, "State from query params did not match session state", http.StatusInternalServerError)
 		return
 	}
 
@@ -137,8 +125,14 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	sdUser, err := a.saveUserData(tok.RefreshToken, user)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-	s.Values["Spotify_UserID"] = user.ID
+	s.Values["User_ID"] = sdUser.ID
 	err = s.Save(r, w)
 	if err != nil {
 		log.Println(err.Error())
@@ -150,7 +144,45 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) {
 		returnPath = "/"
 	}
 	http.Redirect(w, r, returnPath, http.StatusTemporaryRedirect)
+}
 
+func checkState(r *http.Request, s *sessions.Session) error {
+	responseState := r.URL.Query().Get("state")
+	if responseState == "" {
+		return errors.New("Unable to obtain state from URL query params")
+	}
+
+	state := s.Values["State"]
+	if state == "" {
+		return errors.New("Unable to obtain state from session")
+	}
+
+	if r.URL.Query().Get("state") != state {
+		return errors.New("State from query params did not match session state")
+	}
+	return nil
+}
+
+// TODO: figure out if display name is deterministic or something
+func (a *AuthController) saveUserData(refreshToken string, u *spotifyUser) (*models.User, error) {
+	var displayName string
+	displayName, ok := u.DisplayName.(string)
+	if !ok {
+		displayName = u.ID
+	}
+
+	user := &models.User{
+		Birthdate:    u.Birthdate,
+		DisplayName:  displayName,
+		Email:        u.Email,
+		SpotifyID:    u.ID,
+		RefreshToken: refreshToken,
+	}
+	user, err := a.DB.Users.FirstOrCreate(user)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 func GetUserData(accessToken string) (*spotifyUser, error) {
@@ -183,6 +215,7 @@ func (a *AuthController) Middleware(next http.HandlerFunc) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		// TODO: check token expiration
 
 		if s.Values["Access_Token"] == nil {
 			s.Values["return_path"] = r.URL.Path

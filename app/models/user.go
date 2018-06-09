@@ -7,7 +7,8 @@ import (
 )
 
 type UserService interface {
-	Me(spotifyID string) (*User, error)
+	Me(ID uint) (*User, error)
+	FirstOrCreate(user *User) (*User, error)
 }
 
 type StereodoseUserService struct {
@@ -28,12 +29,10 @@ type User struct {
 // Me first checks to see if the user already exists
 // if it doesn't it creates one, otherwise it returns a pointer to user
 // TODO: probably rethink the name of this method
-func (u *StereodoseUserService) Me(spotifyID string) (*User, error) {
-	user := &User{
-		SpotifyID: spotifyID,
-	}
+func (u *StereodoseUserService) Me(ID uint) (*User, error) {
+	user := &User{}
 
-	err := u.db.FirstOrCreate(user, "spotify_id = ?", spotifyID).Error
+	err := u.db.FirstOrCreate(user, "id = ?", ID).Error
 	if err != nil {
 		return nil, err
 	}
