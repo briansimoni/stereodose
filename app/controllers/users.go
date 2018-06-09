@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -17,5 +18,9 @@ func (u *UsersController) Me(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unable to obtain user from session", http.StatusInternalServerError)
 		return
 	}
-	fmt.Fprintf(w, "%+v", user)
+	data, err := json.MarshalIndent(user, " ", " ")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	fmt.Fprint(w, string(data))
 }

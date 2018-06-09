@@ -23,13 +23,12 @@ type User struct {
 	Email       string
 	// TODO: may want to change this to not unique to handle soft delete cases
 	SpotifyID    string `gorm:"unique;not null"`
-	RefreshToken string
+	RefreshToken string `json:"-"` // Hide the RefreshToken in json responses
 	//Images      []string
 }
 
 // Me first checks to see if the user already exists
 // if it doesn't it creates one, otherwise it returns a pointer to user
-// TODO: probably just get the user by id (not create)
 func (u *StereodoseUserService) ByID(ID uint) (*User, error) {
 	user := &User{}
 

@@ -21,6 +21,8 @@ import (
 
 const sessionName = "_stereodose-session"
 
+var spotifyURL = "https://accounts.spotify.com"
+
 type AuthController struct {
 	DB    *models.StereoDoseDB
 	Store *sessions.CookieStore
@@ -45,6 +47,13 @@ type spotifyUser struct {
 	Product string        `json:"product"`
 	Type    string        `json:"type"`
 	URI     string        `json:"uri"`
+}
+
+type refreshTokenResponse struct {
+	AccessToken string `json:"access_token"`
+	TokenType   string `json:"token_type"`
+	ExpiresIn   int    `json:"expires_in"`
+	Scope       string `json:"scope"`
 }
 
 // RegisterHandlers adds the routes and handlers to a router
@@ -150,48 +159,18 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) {
 
 // Refresh will update the Spotify API Access Token for the user's session
 func (a *AuthController) Refresh(w http.ResponseWriter, r *http.Request) {
-	type RefreshTokenResponse struct {
-		AccessToken string `json:"access_token"`
-		TokenType   string `json:"token_type"`
-		ExpiresIn   int    `json:"expires_in"`
-		Scope       string `json:"scope"`
-	}
-
 	user, ok := r.Context().Value("User").(models.User)
 	if !ok {
 		http.Error(w, "Unable to obtain user from context", http.StatusInternalServerError)
 		return
 	}
-	data := url.Values{}
-	data.Set("grant_type", "refresh_token")
-	data.Set("refresh_token", user.RefreshToken)
-	body := strings.NewReader(data.Encode())
-	creds := conf.ClientID + ":" + conf.ClientSecret
-	basicAuth := base64.StdEncoding.EncodeToString([]byte(creds))
-	req, err := http.NewRequest(http.MethodPost, "https://accounts.spotify.com/api/token", body)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	req.Header.Add("Authorization", "Basic "+basicAuth)
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if res.StatusCode != 200 {
-		http.Error(w, "Response from spotify.com/api/token "+res.Status, http.StatusInternalServerError)
-		return
-	}
-	defer res.Body.Close()
-	var tok RefreshTokenResponse
-	err = json.NewDecoder(res.Body).Decode(&tok)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
 	s, err := a.Store.Get(r, sessionName)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	tok, err := refreshToken(user.RefreshToken)
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -216,6 +195,35 @@ func (a *AuthController) Refresh(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+func refreshToken(refreshToken string) (*refreshTokenResponse, error) {
+	data := url.Values{}
+	data.Set("grant_type", "refresh_token")
+	data.Set("refresh_token", refreshToken)
+	body := strings.NewReader(data.Encode())
+	creds := conf.ClientID + ":" + conf.ClientSecret
+	basicAuth := base64.StdEncoding.EncodeToString([]byte(creds))
+	req, err := http.NewRequest(http.MethodPost, spotifyURL+"/api/token", body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Authorization", "Basic "+basicAuth)
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if res.StatusCode != 200 {
+		return nil, errors.New("Response from spotify.com/api/token " + res.Status)
+	}
+	defer res.Body.Close()
+	var tok refreshTokenResponse
+	err = json.NewDecoder(res.Body).Decode(&tok)
+	if err != nil {
+		return nil, err
+	}
+	return &tok, nil
 }
 
 func checkState(r *http.Request, s *sessions.Session) error {
