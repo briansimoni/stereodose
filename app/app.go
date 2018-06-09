@@ -30,6 +30,7 @@ var store *sessions.CookieStore
 var db *gorm.DB
 var stereoDoseDB *models.StereoDoseDB
 
+// InitApp puts together the Router to use as the app's main HTTP handler
 func InitApp(c *config.Config, db *gorm.DB) *mux.Router {
 	var err error
 
@@ -58,7 +59,7 @@ func InitApp(c *config.Config, db *gorm.DB) *mux.Router {
 		Store: store,
 	}
 
-	app.Use(SpotifyIDMiddleware)
+	app.Use(UserContextMiddleware)
 
 	// authRouter := app.PathPrefix("/auth").Subrouter()
 	// auth.RegisterHandlers(c, store, authRouter)
@@ -76,6 +77,12 @@ func InitApp(c *config.Config, db *gorm.DB) *mux.Router {
 	authRouter := app.PathPrefix("/auth").Subrouter()
 	authRouter.HandleFunc("/login", auth.Login).Methods(http.MethodGet)
 	authRouter.HandleFunc("/callback", auth.Callback).Methods(http.MethodGet)
-	app.HandleFunc("/me", auth.Middleware(users.Me())).Methods(http.MethodGet)
+	authRouter.HandleFunc("/refresh", auth.Refresh).Methods(http.MethodGet)
+	app.HandleFunc("/me", auth.Middleware(users.Me)).Methods(http.MethodGet)
 	return app
 }
+
+// could do this on a subrouter to handle auth for all routes
+// app.Use(func(next http.Handler) http.Handler {
+// 	return auth.Middleware(next.ServeHTTP)
+// })

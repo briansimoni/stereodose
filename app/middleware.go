@@ -6,11 +6,9 @@ import (
 	"net/http"
 )
 
-// SpotifyIDMiddleware inspects the cookie and adds the spotify ID to the context
-// If an error occurs, it just continues to the next handler
-// which basically means, functions that require the spotify ID
-// also need to be behind auth middleware
-func SpotifyIDMiddleware(next http.Handler) http.Handler {
+// UserContextMiddleware inspects the cookie and adds the user to the context
+// For this middleware to work, the user must be authenticated
+func UserContextMiddleware(next http.Handler) http.Handler {
 	f := func(w http.ResponseWriter, r *http.Request) {
 		s, err := store.Get(r, sessionName)
 		if err != nil {
@@ -18,14 +16,15 @@ func SpotifyIDMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		log.Println(s.Values["User_ID"])
 		ID, ok := s.Values["User_ID"].(uint)
 		if !ok {
-			log.Println("NOT OK")
+			// this doesn't work
+			// http.Error(w, "Unable to find User_ID in session", http.StatusInternalServerError)
+			// return
 			next.ServeHTTP(w, r)
 			return
 		}
-		user, err := stereoDoseDB.Users.Me(ID)
+		user, err := stereoDoseDB.Users.ByID(ID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

@@ -7,8 +7,6 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-const connectionString = "postgresql://postgres:development@db:5432/stereodose?sslmode=disable"
-
 type StereoDoseDB struct {
 	db    *gorm.DB
 	store *sessions.CookieStore
