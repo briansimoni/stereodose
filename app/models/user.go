@@ -1,6 +1,10 @@
 package models
 
 import (
+	"encoding/json"
+	"errors"
+	"net/http"
+
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -9,6 +13,7 @@ import (
 type UserService interface {
 	ByID(ID uint) (*User, error)
 	FirstOrCreate(user *User) (*User, error)
+	Update(user *User) error
 }
 
 type StereodoseUserService struct {
@@ -24,7 +29,9 @@ type User struct {
 	// TODO: may want to change this to not unique to handle soft delete cases
 	SpotifyID    string `gorm:"unique;not null"`
 	RefreshToken string `json:"-"` // Hide the RefreshToken in json responses
+	AccessToken  string `json:"-"`
 	//Images      []string
+	Playlists []Playlist
 }
 
 // Me first checks to see if the user already exists
@@ -40,15 +47,19 @@ func (u *StereodoseUserService) ByID(ID uint) (*User, error) {
 }
 
 func (u *StereodoseUserService) FirstOrCreate(user *User) (*User, error) {
-	err := u.db.FirstOrCreate(user).Error
+	err := user.getMyPlaylists()
+	if err != nil {
+		return nil, err
+	}
+	err = u.db.FirstOrCreate(user).Error
 	if err != nil {
 		return nil, err
 	}
 	return user, nil
 }
 
-func (u *StereodoseUserService) UpdateUser(user *User) error {
-	err := u.db.Update(user).Error
+func (u *StereodoseUserService) Update(user *User) error {
+	err := u.db.Save(user).Error
 	if err != nil {
 		return err
 	}
@@ -59,6 +70,35 @@ func (u *StereodoseUserService) DeleteUser(user *User) error {
 	err := u.db.Delete(user).Error
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func (u *User) getMyPlaylists() error {
+	req, err := http.NewRequest(http.MethodGet, "https://api.spotify.com/v1/me/playlists", nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Add("Authorization", "Bearer "+u.AccessToken)
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	if res.StatusCode != 200 {
+		return errors.New("Response was " + res.Status)
+	}
+	defer res.Body.Close()
+	var playlists myPlaylistsResponse
+	err = json.NewDecoder(res.Body).Decode(&playlists)
+	if err != nil {
+		return err
+	}
+	// probably am going to need to compare and only add if its not there
+	for _, playlist := range playlists.Items {
+		myPlaylist := Playlist{
+			Href: playlist.Href,
+		}
+		u.Playlists = append(u.Playlists, myPlaylist)
 	}
 	return nil
 }

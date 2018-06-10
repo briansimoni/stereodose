@@ -136,7 +136,7 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	sdUser, err := a.saveUserData(tok.RefreshToken, user)
+	sdUser, err := a.saveUserData(tok, user)
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -173,6 +173,12 @@ func (a *AuthController) Refresh(w http.ResponseWriter, r *http.Request) {
 	tok, err := refreshToken(user.RefreshToken)
 	if err != nil {
 		log.Println(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	user.AccessToken = tok.AccessToken
+	err = a.DB.Users.Update(&user)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -244,7 +250,7 @@ func checkState(r *http.Request, s *sessions.Session) error {
 }
 
 // TODO: figure out if display name is deterministic or something
-func (a *AuthController) saveUserData(refreshToken string, u *spotifyUser) (*models.User, error) {
+func (a *AuthController) saveUserData(token *oauth2.Token, u *spotifyUser) (*models.User, error) {
 	var displayName string
 	displayName, ok := u.DisplayName.(string)
 	if !ok {
@@ -256,7 +262,8 @@ func (a *AuthController) saveUserData(refreshToken string, u *spotifyUser) (*mod
 		DisplayName:  displayName,
 		Email:        u.Email,
 		SpotifyID:    u.ID,
-		RefreshToken: refreshToken,
+		AccessToken:  token.AccessToken,
+		RefreshToken: token.RefreshToken,
 	}
 	user, err := a.DB.Users.FirstOrCreate(user)
 	if err != nil {

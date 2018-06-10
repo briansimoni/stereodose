@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -25,6 +26,7 @@ func UserContextMiddleware(next http.Handler) http.Handler {
 			return
 		}
 		user, err := stereoDoseDB.Users.ByID(ID)
+		fmt.Println(user.Playlists)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
