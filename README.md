@@ -2,6 +2,8 @@
 
 drug-inspired music app
 
+[![Build Status](https://travis-ci.org/briansimoni/stereodose.svg?branch=gorm)](https://travis-ci.org/briansimoni/stereodose)
+
 ## Setup
 
 For local development first create a .env file that looks like this:
