@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/briansimoni/stereodose/app/models"
 
@@ -64,6 +65,7 @@ type refreshTokenResponse struct {
 // 	r.HandleFunc("/callback", callback).Methods(http.MethodGet)
 // }
 
+// TODO: get this from the app config struct and not os env
 var conf = &oauth2.Config{
 	ClientID:     os.Getenv("STEREODOSE_CLIENT_ID"),
 	ClientSecret: os.Getenv("STEREODOSE_CLIENT_SECRET"),
@@ -158,6 +160,7 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) {
 }
 
 // Refresh will update the Spotify API Access Token for the user's session
+// TODO: check the refresh token and save it (it might be a new refresh token)
 func (a *AuthController) Refresh(w http.ResponseWriter, r *http.Request) {
 	user, ok := r.Context().Value("User").(models.User)
 	if !ok {
@@ -184,7 +187,7 @@ func (a *AuthController) Refresh(w http.ResponseWriter, r *http.Request) {
 	}
 	s.Values["Access_Token"] = tok.AccessToken
 	// TODO: fix this
-	s.Values["Expiry"] = tok.ExpiresIn
+	s.Values["Expiry"] = tokenExpirationDate(tok.ExpiresIn)
 	err = s.Save(r, w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -302,8 +305,30 @@ func (a *AuthController) Middleware(next http.HandlerFunc) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		// TODO: check token expiration
+		expireTime, ok := s.Values["Expiry"].(string)
+		if !ok {
+			s.Values["return_path"] = r.URL.Path
+			s.Save(r, w)
+			http.Redirect(w, r, "/auth/login", http.StatusTemporaryRedirect)
+			return
+		}
+		expired, err := isExpired(expireTime)
+		if err != nil {
+			log.Println("[ERROR]", err.Error())
+			s.Values["return_path"] = r.URL.Path
+			s.Save(r, w)
+			http.Redirect(w, r, "/auth/login", http.StatusTemporaryRedirect)
+			return
+		}
+		if expired {
+			s.Values["return_path"] = r.URL.Path
+			s.Save(r, w)
+			http.Redirect(w, r, "/auth/login", http.StatusTemporaryRedirect)
+			return
+		}
 
+		log.Println("[INFO] EXPIRES:", s.Values["Expiry"])
+		log.Printf("%T", s.Values["Expiry"])
 		if s.Values["Access_Token"] == nil {
 			s.Values["return_path"] = r.URL.Path
 			s.Save(r, w)
@@ -313,4 +338,23 @@ func (a *AuthController) Middleware(next http.HandlerFunc) http.HandlerFunc {
 		next.ServeHTTP(w, r)
 	}
 	return http.HandlerFunc(f)
+}
+
+// takes the expires time from Spotify API response and converts it to a date
+func tokenExpirationDate(expires int) string {
+	t := time.Now()
+	expiresTime := t.Add(time.Second * time.Duration(expires))
+	return expiresTime.String()
+}
+
+// TODO: use better time format
+func isExpired(date string) (bool, error) {
+	t, err := time.Parse("2006-01-02 15:04:05.999999999 -0700 MST", date)
+	if err != nil {
+		return true, err
+	}
+	if time.Now().After(t) {
+		return true, nil
+	}
+	return false, nil
 }
