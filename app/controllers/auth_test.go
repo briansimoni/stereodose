@@ -49,7 +49,7 @@ import (
 // 	}
 // }
 
-func TesttokenExpirationDate(t *testing.T) {
+func TestTokenExpirationDate(t *testing.T) {
 	thing := time.Now().Add(time.Second * 3600)
 	expected := thing.Format(time.RFC822)
 	actual := tokenExpirationDate(3600)

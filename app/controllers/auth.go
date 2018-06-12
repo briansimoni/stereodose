@@ -344,7 +344,6 @@ func (a *AuthController) Middleware(next http.HandlerFunc) http.HandlerFunc {
 func tokenExpirationDate(expires int) string {
 	t := time.Now()
 	expiresTime := t.Add(time.Second * time.Duration(expires))
-	// convert this to rfc822
 	return expiresTime.Format(time.RFC822)
 }
 
