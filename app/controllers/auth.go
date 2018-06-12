@@ -348,6 +348,7 @@ func tokenExpirationDate(expires int) string {
 }
 
 // TODO: use better time format
+// need to write unit tests for these. This function is working right now
 func isExpired(date string) (bool, error) {
 	t, err := time.Parse("2006-01-02 15:04:05.999999999 -0700 MST", date)
 	if err != nil {
