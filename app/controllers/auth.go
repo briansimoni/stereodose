@@ -131,7 +131,7 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.Values["Access_Token"] = tok.AccessToken
-	s.Values["Expiry"] = tok.Expiry.String()
+	s.Values["Expiry"] = tok.Expiry.Format(time.RFC822)
 	user, err := GetUserData(tok.AccessToken)
 	if err != nil {
 		log.Println(err.Error())
@@ -344,13 +344,14 @@ func (a *AuthController) Middleware(next http.HandlerFunc) http.HandlerFunc {
 func tokenExpirationDate(expires int) string {
 	t := time.Now()
 	expiresTime := t.Add(time.Second * time.Duration(expires))
-	return expiresTime.String()
+	// convert this to rfc822
+	return expiresTime.Format(time.RFC822)
 }
 
 // TODO: use better time format
 // need to write unit tests for these. This function is working right now
 func isExpired(date string) (bool, error) {
-	t, err := time.Parse("2006-01-02 15:04:05.999999999 -0700 MST", date)
+	t, err := time.Parse(time.RFC822, date)
 	if err != nil {
 		return true, err
 	}

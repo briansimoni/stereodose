@@ -1,5 +1,10 @@
 package controllers
 
+import (
+	"testing"
+	"time"
+)
+
 // import (
 // 	"net/http"
 // 	"net/http/httptest"
@@ -43,3 +48,12 @@ package controllers
 // 		t.Error("Expected 500, Got:", res.StatusCode)
 // 	}
 // }
+
+func TesttokenExpirationDate(t *testing.T) {
+	thing := time.Now().Add(time.Second * 3600)
+	expected := thing.Format(time.RFC822)
+	actual := tokenExpirationDate(3600)
+	if actual != expected {
+		t.Errorf("Actual (%s) was different than expected (%s)", actual, expected)
+	}
+}
