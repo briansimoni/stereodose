@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -27,6 +28,20 @@ var spotifyURL = "https://accounts.spotify.com"
 type AuthController struct {
 	DB    *models.StereoDoseDB
 	Store *sessions.CookieStore
+	F     Handler
+}
+
+func NewAuthController(db *models.StereoDoseDB, store *sessions.CookieStore) *AuthController {
+	a := &AuthController{}
+	a.DB = db
+	a.Store = store
+	a.F = Handler{H: a.f}
+	return a
+}
+
+func (a *AuthController) f(w http.ResponseWriter, r *http.Request) error {
+	fmt.Fprint(w, "asdf")
+	return nil
 }
 
 // spotifyUser struct is used when querying the /me API endpoint
