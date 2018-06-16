@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/briansimoni/stereodose/app/models"
+	"github.com/briansimoni/stereodose/app/util"
 
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/spotify"
@@ -282,20 +283,18 @@ func GetUserData(accessToken string) (*spotifyUser, error) {
 
 // Middleware checks to see if the user is logged in before
 // allowing the request to continue
-func (a *AuthController) Middleware(next http.HandlerFunc) http.HandlerFunc {
-	f := func(w http.ResponseWriter, r *http.Request) {
+func (a *AuthController) Middleware(next http.HandlerFunc) http.Handler {
+	f := func(w http.ResponseWriter, r *http.Request) error {
 		s, err := a.Store.Get(r, sessionName)
 		if err != nil {
-			log.Println(err.Error())
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+			return err
 		}
 		expireTime, ok := s.Values["Expiry"].(string)
 		if !ok {
 			s.Values["return_path"] = r.URL.Path
 			s.Save(r, w)
 			http.Redirect(w, r, "/auth/login", http.StatusTemporaryRedirect)
-			return
+			return nil
 		}
 		expired, err := isExpired(expireTime)
 		if err != nil {
@@ -303,26 +302,25 @@ func (a *AuthController) Middleware(next http.HandlerFunc) http.HandlerFunc {
 			s.Values["return_path"] = r.URL.Path
 			s.Save(r, w)
 			http.Redirect(w, r, "/auth/login", http.StatusTemporaryRedirect)
-			return
+			return nil
 		}
 		if expired {
 			s.Values["return_path"] = r.URL.Path
 			s.Save(r, w)
 			http.Redirect(w, r, "/auth/login", http.StatusTemporaryRedirect)
-			return
+			return nil
 		}
 
-		log.Println("[INFO] EXPIRES:", s.Values["Expiry"])
-		log.Printf("%T", s.Values["Expiry"])
 		if s.Values["Access_Token"] == nil {
 			s.Values["return_path"] = r.URL.Path
 			s.Save(r, w)
 			http.Redirect(w, r, "/auth/login", http.StatusTemporaryRedirect)
-			return
+			return nil
 		}
 		next.ServeHTTP(w, r)
+		return nil
 	}
-	return http.HandlerFunc(f)
+	return util.Handler{f}
 }
 
 // takes the expires time from Spotify API response and converts it to a date

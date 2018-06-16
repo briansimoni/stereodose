@@ -1,4 +1,4 @@
-package app
+package util
 
 import (
 	"log"
@@ -37,4 +37,10 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "error: "+e.Error(), http.StatusInternalServerError)
 		}
 	}
+}
+
+type HandlerFunc func(w http.ResponseWriter, r *http.Request) error
+
+func (h HandlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	Handler{h}.ServeHTTP(w, r)
 }

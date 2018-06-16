@@ -9,6 +9,7 @@ import (
 
 	"github.com/briansimoni/stereodose/app/controllers"
 	"github.com/briansimoni/stereodose/app/models"
+	"github.com/briansimoni/stereodose/app/util"
 	"github.com/briansimoni/stereodose/config"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -30,16 +31,8 @@ var store *sessions.CookieStore
 var db *gorm.DB
 var stereoDoseDB *models.StereoDoseDB
 
-type AppRouter struct {
-	*mux.Router
-}
-
-func (a *AppRouter) AppHandler(path string, f func(w http.ResponseWriter, r *http.Request) error) *mux.Route {
-	return a.Handle(path, Handler{f})
-}
-
 // InitApp puts together the Router to use as the app's main HTTP handler
-func InitApp(c *config.Config, db *gorm.DB) *AppRouter {
+func InitApp(c *config.Config, db *gorm.DB) *util.AppRouter {
 	var err error
 
 	authKey, err := base64.StdEncoding.DecodeString(c.AuthKey)
@@ -54,7 +47,7 @@ func InitApp(c *config.Config, db *gorm.DB) *AppRouter {
 
 	stereoDoseDB = models.NewStereodoseDB(db, store)
 
-	app := &AppRouter{mux.NewRouter()}
+	app := &util.AppRouter{mux.NewRouter()}
 	app.Use(func(next http.Handler) http.Handler {
 		return handlers.LoggingHandler(os.Stdout, next)
 	})
@@ -73,21 +66,25 @@ func InitApp(c *config.Config, db *gorm.DB) *AppRouter {
 	// auth.RegisterHandlers(c, store, authRouter)
 
 	app.HandleFunc("/", index)
-	app.HandleFunc("/test", auth.Middleware(webPlayerTest))
+	app.Handle("/test", auth.Middleware(webPlayerTest))
 
 	notFound := func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "Need to add a 404 page")
 	}
 	app.NotFoundHandler = http.HandlerFunc(notFound)
 
-	app.HandleFunc("/other", auth.Middleware(loggedIn))
+	app.Handle("/other", auth.Middleware(loggedIn))
 
-	authRouter := AppRouter{app.PathPrefix("/auth").Subrouter()}
+	authRouter := util.AppRouter{app.PathPrefix("/auth").Subrouter()}
 	authRouter.AppHandler("/login", auth.Login).Methods(http.MethodGet)
 	authRouter.AppHandler("/callback", auth.Callback).Methods(http.MethodGet)
 	authRouter.AppHandler("/refresh", auth.Refresh).Methods(http.MethodGet)
-	app.AppHandler("/me", auth.Middleware(users.Me)).Methods(http.MethodGet)
+	app.Handle("/me", auth.Middleware(users.Me)).Methods(http.MethodGet)
 	app.AppHandler("/derp", auth.F)
+
+	// app.Use(func(next http.Handler) http.Handler {
+	// 	return auth.Middleware(next)
+	// })
 	return app
 }
 
