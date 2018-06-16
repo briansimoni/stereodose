@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -28,20 +27,10 @@ var spotifyURL = "https://accounts.spotify.com"
 type AuthController struct {
 	DB    *models.StereoDoseDB
 	Store *sessions.CookieStore
-	F     Handler
 }
 
-func NewAuthController(db *models.StereoDoseDB, store *sessions.CookieStore) *AuthController {
-	a := &AuthController{}
-	a.DB = db
-	a.Store = store
-	a.F = Handler{H: a.f}
-	return a
-}
-
-func (a *AuthController) f(w http.ResponseWriter, r *http.Request) error {
-	fmt.Fprint(w, "asdf")
-	return nil
+func (a *AuthController) F(w http.ResponseWriter, r *http.Request) error {
+	return errors.New("butts")
 }
 
 // spotifyUser struct is used when querying the /me API endpoint
@@ -95,13 +84,11 @@ var conf = &oauth2.Config{
 	Endpoint: spotify.Endpoint,
 }
 
-func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) {
+func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 	s, err := a.Store.Get(r, sessionName)
 
 	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return err
 	}
 
 	if s.Values["Access_Token"] == nil {
@@ -112,7 +99,7 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) {
 		b := make([]byte, 32)
 		_, err = rand.Read(b)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return err
 		}
 		state := base64.StdEncoding.EncodeToString(b)
 		s.Values["State"] = state
@@ -120,105 +107,88 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) {
 
 		url := conf.AuthCodeURL(state, oauth2.AccessTypeOnline)
 		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
-		return
+		return nil
 	}
 	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	return nil
 
 }
 
-func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) {
+func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error {
 	s, err := a.Store.Get(r, sessionName)
 	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return err
 	}
 	err = checkState(r, s)
 	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return err
 	}
 
 	tok, err := conf.Exchange(r.Context(), r.URL.Query().Get("code"))
 	if err != nil {
-		http.Error(w, "Error obtaining getting token from Spotify"+err.Error(), http.StatusInternalServerError)
-		return
+		return errors.New("Error obtaining token from Spotify: " + err.Error())
 	}
 	s.Values["Access_Token"] = tok.AccessToken
 	s.Values["Expiry"] = tok.Expiry.Format(time.RFC822)
 	user, err := GetUserData(tok.AccessToken)
 	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return err
 	}
 	sdUser, err := a.saveUserData(tok, user)
 	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return err
 	}
 
 	s.Values["User_ID"] = sdUser.ID
 	err = s.Save(r, w)
 	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return err
 	}
 	returnPath, ok := s.Values["return_path"].(string)
 	if !ok {
 		returnPath = "/"
 	}
 	http.Redirect(w, r, returnPath, http.StatusTemporaryRedirect)
+	return nil
 }
 
 // Refresh will update the Spotify API Access Token for the user's session
 // TODO: check the refresh token and save it (it might be a new refresh token)
-func (a *AuthController) Refresh(w http.ResponseWriter, r *http.Request) {
+func (a *AuthController) Refresh(w http.ResponseWriter, r *http.Request) error {
 	user, ok := r.Context().Value("User").(models.User)
 	if !ok {
-		http.Error(w, "Unable to obtain user from context", http.StatusInternalServerError)
-		return
+		return errors.New("unable to obtain user from context")
 	}
 	s, err := a.Store.Get(r, sessionName)
 	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return err
 	}
 	tok, err := refreshToken(user.RefreshToken)
 	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return err
 	}
 	user.AccessToken = tok.AccessToken
 	err = a.DB.Users.Update(&user)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return err
 	}
 	s.Values["Access_Token"] = tok.AccessToken
 	// TODO: fix this
 	s.Values["Expiry"] = tokenExpirationDate(tok.ExpiresIn)
 	err = s.Save(r, w)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return err
 	}
 	j, err := json.MarshalIndent(&tok, " ", " ")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return err
 	}
 	w.Header().Add("Content-Type", "application/json")
 	_, err = w.Write(j)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return err
 	}
+	return nil
 }
 
 func refreshToken(refreshToken string) (*refreshTokenResponse, error) {

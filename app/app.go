@@ -30,8 +30,16 @@ var store *sessions.CookieStore
 var db *gorm.DB
 var stereoDoseDB *models.StereoDoseDB
 
+type AppRouter struct {
+	*mux.Router
+}
+
+func (a *AppRouter) AppHandler(path string, f func(w http.ResponseWriter, r *http.Request) error) *mux.Route {
+	return a.Handle(path, Handler{f})
+}
+
 // InitApp puts together the Router to use as the app's main HTTP handler
-func InitApp(c *config.Config, db *gorm.DB) *mux.Router {
+func InitApp(c *config.Config, db *gorm.DB) *AppRouter {
 	var err error
 
 	authKey, err := base64.StdEncoding.DecodeString(c.AuthKey)
@@ -46,7 +54,7 @@ func InitApp(c *config.Config, db *gorm.DB) *mux.Router {
 
 	stereoDoseDB = models.NewStereodoseDB(db, store)
 
-	app := mux.NewRouter()
+	app := &AppRouter{mux.NewRouter()}
 	app.Use(func(next http.Handler) http.Handler {
 		return handlers.LoggingHandler(os.Stdout, next)
 	})
@@ -74,11 +82,12 @@ func InitApp(c *config.Config, db *gorm.DB) *mux.Router {
 
 	app.HandleFunc("/other", auth.Middleware(loggedIn))
 
-	authRouter := app.PathPrefix("/auth").Subrouter()
-	authRouter.HandleFunc("/login", auth.Login).Methods(http.MethodGet)
-	authRouter.HandleFunc("/callback", auth.Callback).Methods(http.MethodGet)
-	authRouter.HandleFunc("/refresh", auth.Refresh).Methods(http.MethodGet)
-	app.HandleFunc("/me", auth.Middleware(users.Me)).Methods(http.MethodGet)
+	authRouter := AppRouter{app.PathPrefix("/auth").Subrouter()}
+	authRouter.AppHandler("/login", auth.Login).Methods(http.MethodGet)
+	authRouter.AppHandler("/callback", auth.Callback).Methods(http.MethodGet)
+	authRouter.AppHandler("/refresh", auth.Refresh).Methods(http.MethodGet)
+	app.AppHandler("/me", auth.Middleware(users.Me)).Methods(http.MethodGet)
+	app.AppHandler("/derp", auth.F)
 	return app
 }
 
