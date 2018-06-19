@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"golang.org/x/oauth2"
 )
 
 // UserContextMiddleware inspects the cookie and adds the user to the context
@@ -16,6 +18,9 @@ func UserContextMiddleware(next http.Handler) http.Handler {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+
+		tok, _ := s.Values["TOKEN"].(oauth2.Token)
+		log.Println("TOKEN", tok)
 
 		ID, ok := s.Values["User_ID"].(uint)
 		if !ok {

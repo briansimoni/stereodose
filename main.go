@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/gob"
 	"log"
 	"net/http"
 	"os"
@@ -8,6 +9,7 @@ import (
 	"github.com/briansimoni/stereodose/app"
 	"github.com/briansimoni/stereodose/config"
 	"github.com/jinzhu/gorm"
+	"golang.org/x/oauth2"
 )
 
 func main() {
@@ -39,4 +41,9 @@ func main() {
 	stereodose := app.InitApp(c, db)
 	log.Println("Starting stereodose app on port", port)
 	log.Fatal(http.ListenAndServe(":"+port, stereodose))
+}
+
+// Register the oauth2.Token type so we can store it in sessions later
+func init() {
+	gob.Register(oauth2.Token{})
 }

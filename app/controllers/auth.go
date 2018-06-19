@@ -129,6 +129,9 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error 
 	if err != nil {
 		return errors.New("Error obtaining token from Spotify: " + err.Error())
 	}
+
+	s.Values["TOKEN"] = *tok
+
 	s.Values["Access_Token"] = tok.AccessToken
 	s.Values["Expiry"] = tok.Expiry.Format(time.RFC822)
 	user, err := GetUserData(tok.AccessToken)
