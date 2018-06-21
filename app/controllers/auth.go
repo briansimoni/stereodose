@@ -15,8 +15,9 @@ import (
 	"github.com/briansimoni/stereodose/app/models"
 	"github.com/briansimoni/stereodose/app/util"
 
+	"github.com/zmb3/spotify"
 	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/spotify"
+	endpoint "golang.org/x/oauth2/spotify"
 
 	"github.com/gorilla/sessions"
 )
@@ -30,41 +31,12 @@ type AuthController struct {
 	Store *sessions.CookieStore
 }
 
-// spotifyUser struct is used when querying the /me API endpoint
-type spotifyUser struct {
-	Birthdate    string      `json:"birthdate"`
-	Country      string      `json:"country"`
-	DisplayName  interface{} `json:"display_name"`
-	Email        string      `json:"email"`
-	ExternalUrls struct {
-		Spotify string `json:"spotify"`
-	} `json:"external_urls"`
-	Followers struct {
-		Href  interface{} `json:"href"`
-		Total int         `json:"total"`
-	} `json:"followers"`
-	Href    string        `json:"href"`
-	ID      string        `json:"id"`
-	Images  []interface{} `json:"images"`
-	Product string        `json:"product"`
-	Type    string        `json:"type"`
-	URI     string        `json:"uri"`
-}
-
 type refreshTokenResponse struct {
 	AccessToken string `json:"access_token"`
 	TokenType   string `json:"token_type"`
 	ExpiresIn   int    `json:"expires_in"`
 	Scope       string `json:"scope"`
 }
-
-// RegisterHandlers adds the routes and handlers to a router
-// that are needed for authentication purposes
-// func RegisterHandlers(c *config.Config, cookieStore *sessions.CookieStore, r *mux.Router) {
-// 	store = cookieStore
-// 	r.HandleFunc("/login", login).Methods(http.MethodGet)
-// 	r.HandleFunc("/callback", callback).Methods(http.MethodGet)
-// }
 
 // TODO: get this from the app config struct and not os env
 var conf = &oauth2.Config{
@@ -78,7 +50,7 @@ var conf = &oauth2.Config{
 		"user-read-email",
 		"user-read-private",
 	},
-	Endpoint: spotify.Endpoint,
+	Endpoint: endpoint.Endpoint,
 }
 
 func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
@@ -132,14 +104,14 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error 
 	if err != nil {
 		return errors.New("Error obtaining token from Spotify: " + err.Error())
 	}
-	fmt.Println(tok)
 
 	s.Values["Token"] = *tok
-	user, err := GetUserData(tok.AccessToken)
+	client := spotify.Authenticator{}.NewClient(tok)
+	currentUser, err := client.CurrentUser()
 	if err != nil {
 		return err
 	}
-	sdUser, err := a.saveUserData(tok, user)
+	sdUser, err := a.saveUserData(tok, currentUser)
 	if err != nil {
 		return err
 	}
@@ -238,17 +210,10 @@ func checkState(r *http.Request, s *sessions.Session) error {
 	return nil
 }
 
-// TODO: figure out if display name is deterministic or something
-func (a *AuthController) saveUserData(token *oauth2.Token, u *spotifyUser) (*models.User, error) {
-	var displayName string
-	displayName, ok := u.DisplayName.(string)
-	if !ok {
-		displayName = u.ID
-	}
-
+func (a *AuthController) saveUserData(token *oauth2.Token, u *spotify.PrivateUser) (*models.User, error) {
 	user := &models.User{
 		Birthdate:    u.Birthdate,
-		DisplayName:  displayName,
+		DisplayName:  u.DisplayName,
 		Email:        u.Email,
 		SpotifyID:    u.ID,
 		AccessToken:  token.AccessToken,
@@ -259,26 +224,6 @@ func (a *AuthController) saveUserData(token *oauth2.Token, u *spotifyUser) (*mod
 		return nil, err
 	}
 	return user, nil
-}
-
-func GetUserData(accessToken string) (*spotifyUser, error) {
-	req, err := http.NewRequest(http.MethodGet, "https://api.spotify.com/v1/me", nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("Authorization", "Bearer "+accessToken)
-	// TODO: do not use default client
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-	var u spotifyUser
-	err = json.NewDecoder(res.Body).Decode(&u)
-	if err != nil {
-		return nil, err
-	}
-	return &u, nil
 }
 
 // Middleware checks to see if the user is logged in before

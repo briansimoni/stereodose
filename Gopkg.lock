@@ -64,6 +64,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/zmb3/spotify"
+  packages = ["."]
+  revision = "79deba8533f6a0e6545b3937667522d323aa6754"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -98,6 +104,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "09e28a45d113adf9c68f18761046ec3f495303229fb5d556d1da59fef29c5f2b"
+  inputs-digest = "143cfcad1b25390193f218b43f6a6a5cf62d77775240a6c4fdf4e664ccba235d"
   solver-name = "gps-cdcl"
   solver-version = 1
