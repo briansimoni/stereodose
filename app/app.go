@@ -80,7 +80,6 @@ func InitApp(c *config.Config, db *gorm.DB) *util.AppRouter {
 	authRouter.AppHandler("/callback", auth.Callback).Methods(http.MethodGet)
 	authRouter.AppHandler("/refresh", auth.Refresh).Methods(http.MethodGet)
 	app.Handle("/me", auth.Middleware(users.Me)).Methods(http.MethodGet)
-	app.AppHandler("/derp", auth.F)
 
 	// app.Use(func(next http.Handler) http.Handler {
 	// 	return auth.Middleware(next)

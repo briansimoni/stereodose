@@ -5,12 +5,12 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"log"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/briansimoni/stereodose/app/models"
 	"github.com/briansimoni/stereodose/app/util"
@@ -28,10 +28,6 @@ var spotifyURL = "https://accounts.spotify.com"
 type AuthController struct {
 	DB    *models.StereoDoseDB
 	Store *sessions.CookieStore
-}
-
-func (a *AuthController) F(w http.ResponseWriter, r *http.Request) error {
-	return errors.New("butts")
 }
 
 // spotifyUser struct is used when querying the /me API endpoint
@@ -87,7 +83,6 @@ var conf = &oauth2.Config{
 
 func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 	s, err := a.Store.Get(r, sessionName)
-
 	if err != nil {
 		return err
 	}
@@ -110,6 +105,14 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 		return nil
 	}
+	tok, ok := s.Values["Token"].(oauth2.Token)
+	if !ok {
+		return errors.New("Unable to obtain token from session")
+	}
+	if !tok.Valid() {
+		http.Redirect(w, r, "/auth/refresh", http.StatusTemporaryRedirect)
+		return nil
+	}
 	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 	return nil
 
@@ -129,11 +132,9 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error 
 	if err != nil {
 		return errors.New("Error obtaining token from Spotify: " + err.Error())
 	}
+	fmt.Println(tok)
 
-	s.Values["TOKEN"] = *tok
-
-	s.Values["Access_Token"] = tok.AccessToken
-	s.Values["Expiry"] = tok.Expiry.Format(time.RFC822)
+	s.Values["Token"] = *tok
 	user, err := GetUserData(tok.AccessToken)
 	if err != nil {
 		return err
@@ -176,13 +177,7 @@ func (a *AuthController) Refresh(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	s.Values["Access_Token"] = tok.AccessToken
-	// TODO: fix this
-	s.Values["Expiry"] = tokenExpirationDate(tok.ExpiresIn)
-	err = s.Save(r, w)
-	if err != nil {
-		return err
-	}
+	s.Values["Token"] = *tok
 	j, err := json.MarshalIndent(&tok, " ", " ")
 	if err != nil {
 		return err
@@ -195,7 +190,7 @@ func (a *AuthController) Refresh(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func refreshToken(refreshToken string) (*refreshTokenResponse, error) {
+func refreshToken(refreshToken string) (*oauth2.Token, error) {
 	data := url.Values{}
 	data.Set("grant_type", "refresh_token")
 	data.Set("refresh_token", refreshToken)
@@ -216,7 +211,9 @@ func refreshToken(refreshToken string) (*refreshTokenResponse, error) {
 		return nil, errors.New("Response from spotify.com/api/token " + res.Status)
 	}
 	defer res.Body.Close()
-	var tok refreshTokenResponse
+	var tok oauth2.Token
+	asdf, _ := ioutil.ReadAll(res.Body)
+	fmt.Println(string(asdf))
 	err = json.NewDecoder(res.Body).Decode(&tok)
 	if err != nil {
 		return nil, err
@@ -292,29 +289,8 @@ func (a *AuthController) Middleware(next http.HandlerFunc) http.Handler {
 		if err != nil {
 			return err
 		}
-		expireTime, ok := s.Values["Expiry"].(string)
-		if !ok {
-			s.Values["return_path"] = r.URL.Path
-			s.Save(r, w)
-			http.Redirect(w, r, "/auth/login", http.StatusTemporaryRedirect)
-			return nil
-		}
-		expired, err := isExpired(expireTime)
-		if err != nil {
-			log.Println("[ERROR]", err.Error())
-			s.Values["return_path"] = r.URL.Path
-			s.Save(r, w)
-			http.Redirect(w, r, "/auth/login", http.StatusTemporaryRedirect)
-			return nil
-		}
-		if expired {
-			s.Values["return_path"] = r.URL.Path
-			s.Save(r, w)
-			http.Redirect(w, r, "/auth/login", http.StatusTemporaryRedirect)
-			return nil
-		}
-
-		if s.Values["Access_Token"] == nil {
+		tok, ok := s.Values["Token"].(oauth2.Token)
+		if !ok || !tok.Valid() {
 			s.Values["return_path"] = r.URL.Path
 			s.Save(r, w)
 			http.Redirect(w, r, "/auth/login", http.StatusTemporaryRedirect)
@@ -324,24 +300,4 @@ func (a *AuthController) Middleware(next http.HandlerFunc) http.Handler {
 		return nil
 	}
 	return util.Handler{f}
-}
-
-// takes the expires time from Spotify API response and converts it to a date
-func tokenExpirationDate(expires int) string {
-	t := time.Now()
-	expiresTime := t.Add(time.Second * time.Duration(expires))
-	return expiresTime.Format(time.RFC822)
-}
-
-// TODO: use better time format
-// need to write unit tests for these. This function is working right now
-func isExpired(date string) (bool, error) {
-	t, err := time.Parse(time.RFC822, date)
-	if err != nil {
-		return true, err
-	}
-	if time.Now().After(t) {
-		return true, nil
-	}
-	return false, nil
 }
