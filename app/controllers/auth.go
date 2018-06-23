@@ -5,12 +5,12 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"fmt"
-	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/briansimoni/stereodose/app/models"
 	"github.com/briansimoni/stereodose/app/util"
@@ -149,7 +149,18 @@ func (a *AuthController) Refresh(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	s.Values["Token"] = *tok
+	sessionToken, ok := s.Values["Token"].(oauth2.Token)
+	if !ok {
+		return errors.New("Error reading OAuth Token from Session")
+	}
+	sessionToken.AccessToken = tok.AccessToken
+	sessionToken.Expiry = sessionToken.Expiry.Add(time.Duration(tok.ExpiresIn) * time.Second)
+	s.Values["Token"] = sessionToken
+	log.Println(sessionToken)
+	err = s.Save(r, w)
+	if err != nil {
+		return err
+	}
 	j, err := json.MarshalIndent(&tok, " ", " ")
 	if err != nil {
 		return err
@@ -162,7 +173,7 @@ func (a *AuthController) Refresh(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func refreshToken(refreshToken string) (*oauth2.Token, error) {
+func refreshToken(refreshToken string) (*refreshTokenResponse, error) {
 	data := url.Values{}
 	data.Set("grant_type", "refresh_token")
 	data.Set("refresh_token", refreshToken)
@@ -183,9 +194,7 @@ func refreshToken(refreshToken string) (*oauth2.Token, error) {
 		return nil, errors.New("Response from spotify.com/api/token " + res.Status)
 	}
 	defer res.Body.Close()
-	var tok oauth2.Token
-	asdf, _ := ioutil.ReadAll(res.Body)
-	fmt.Println(string(asdf))
+	var tok refreshTokenResponse
 	err = json.NewDecoder(res.Body).Decode(&tok)
 	if err != nil {
 		return nil, err
@@ -216,10 +225,11 @@ func (a *AuthController) saveUserData(token *oauth2.Token, u *spotify.PrivateUse
 		DisplayName:  u.DisplayName,
 		Email:        u.Email,
 		SpotifyID:    u.ID,
+		Images:       u.Images,
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
 	}
-	user, err := a.DB.Users.FirstOrCreate(user)
+	user, err := a.DB.Users.FirstOrCreate(user, token)
 	if err != nil {
 		return nil, err
 	}

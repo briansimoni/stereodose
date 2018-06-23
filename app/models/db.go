@@ -16,7 +16,8 @@ type StereoDoseDB struct {
 // NewStereodoseDB takes a reference to gorm and returns
 // an abstraction for use throughout the app
 func NewStereodoseDB(db *gorm.DB, s *sessions.CookieStore) *StereoDoseDB {
-	err := db.AutoMigrate(User{}, Playlist{}).Error
+	db.Debug().DropTable(User{}, Playlist{}, UserImage{}, PlaylistImage{}, Track{})
+	err := db.AutoMigrate(User{}, Playlist{}, UserImage{}, PlaylistImage{}, Track{}).Error
 	if err != nil {
 		log.Fatal(err.Error())
 	}

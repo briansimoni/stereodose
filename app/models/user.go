@@ -1,18 +1,18 @@
 package models
 
 import (
-	"encoding/json"
-	"errors"
-	"net/http"
+	"log"
 
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/zmb3/spotify"
+	"golang.org/x/oauth2"
 )
 
 type UserService interface {
 	ByID(ID uint) (*User, error)
-	FirstOrCreate(user *User) (*User, error)
+	FirstOrCreate(user *User, tok *oauth2.Token) (*User, error)
 	Update(user *User) error
 }
 
@@ -30,28 +30,33 @@ type User struct {
 	SpotifyID    string `gorm:"unique;not null"`
 	RefreshToken string `json:"-"` // Hide the RefreshToken in json responses
 	AccessToken  string `json:"-"`
-	//Images      []string
-	Playlists []Playlist
+	Images       []spotify.Image
+	Playlists    []Playlist
 }
 
-// Me first checks to see if the user already exists
+type UserImage struct {
+	gorm.Model
+	spotify.Image
+	UserID uint
+}
+
+// ByID first checks to see if the user already exists
 // if it doesn't it creates one, otherwise it returns a pointer to user
 func (u *StereodoseUserService) ByID(ID uint) (*User, error) {
 	user := &User{}
-
-	err := u.db.Find(user, "id = ?", ID).Error
+	err := u.db.Debug().Preload("Playlists").Find(user, "id = ?", ID).Error
 	if err != nil {
 		return nil, err
 	}
 	return user, nil
 }
 
-func (u *StereodoseUserService) FirstOrCreate(user *User) (*User, error) {
-	err := user.getMyPlaylists()
+func (u *StereodoseUserService) FirstOrCreate(user *User, tok *oauth2.Token) (*User, error) {
+	err := user.getMyPlaylists(tok)
 	if err != nil {
 		return nil, err
 	}
-	err = u.db.FirstOrCreate(user).Error
+	err = u.db.Debug().FirstOrCreate(user).Error
 	if err != nil {
 		return nil, err
 	}
@@ -74,31 +79,45 @@ func (u *StereodoseUserService) DeleteUser(user *User) error {
 	return nil
 }
 
-func (u *User) getMyPlaylists() error {
-	req, err := http.NewRequest(http.MethodGet, "https://api.spotify.com/v1/me/playlists", nil)
+func (u *User) getMyPlaylists(tok *oauth2.Token) error {
+	c := spotify.Authenticator{}.NewClient(tok)
+	result, err := c.CurrentUsersPlaylists()
 	if err != nil {
 		return err
 	}
-	req.Header.Add("Authorization", "Bearer "+u.AccessToken)
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return err
-	}
-	if res.StatusCode != 200 {
-		return errors.New("Response was " + res.Status)
-	}
-	defer res.Body.Close()
-	var playlists myPlaylistsResponse
-	err = json.NewDecoder(res.Body).Decode(&playlists)
-	if err != nil {
-		return err
-	}
-	// probably am going to need to compare and only add if its not there
-	for _, playlist := range playlists.Items {
-		myPlaylist := Playlist{
-			Href: playlist.Href,
+	log.Println(result.Playlists[0].Tracks.Endpoint)
+	for _, playlist := range result.Playlists {
+		for _, oldPlaylists := range u.Playlists {
+			if string(playlist.ID) == oldPlaylists.SpotifyID {
+				break
+			}
 		}
-		u.Playlists = append(u.Playlists, myPlaylist)
+		tracks, err := c.GetPlaylistTracks(u.SpotifyID, playlist.ID)
+		if err != nil {
+			return err
+		}
+		playlistToAdd := Playlist{
+			UserID:        u.ID,
+			SpotifyID:     playlist.ID.String(),
+			Collaborative: playlist.Collaborative,
+			Endpoint:      playlist.Endpoint,
+			Name:          playlist.Name,
+			IsPublic:      playlist.IsPublic,
+			SnapshotID:    playlist.SnapshotID,
+			URI:           string(playlist.URI),
+		}
+		for _, track := range tracks.Tracks {
+			trackToAdd := Track{
+				PlaylistID:  playlistToAdd.ID,
+				SpotifyID:   string(track.Track.ID),
+				Name:        track.Track.Name,
+				Duration:    track.Track.Duration,
+				PreviewURL:  track.Track.PreviewURL,
+				TrackNumber: track.Track.TrackNumber,
+			}
+			playlistToAdd.Tracks = append(playlistToAdd.Tracks, trackToAdd)
+		}
+		u.Playlists = append(u.Playlists, playlistToAdd)
 	}
 	return nil
 }
