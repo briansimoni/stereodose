@@ -1,13 +1,14 @@
-package auth
+package config
 
 import "testing"
 
 func TestVerify(t *testing.T) {
 	c := &Config{
-		ClientID:     "aspoidfjpoijadsf",
-		ClientSecret: "apiosjdfposijdf",
-		AuthKey:      "apiodsjfpojasf",
-		RedirectURL:  "asjkdfpoija",
+		ClientID:      "aspoidfjpoijadsf",
+		ClientSecret:  "apiosjdfposijdf",
+		AuthKey:       "apiodsjfpojasf",
+		RedirectURL:   "asjkdfpoija",
+		EncryptionKey: "apsoifjdfjds",
 	}
 
 	err := c.Verify()
