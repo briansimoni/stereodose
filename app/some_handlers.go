@@ -6,10 +6,12 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"golang.org/x/oauth2"
 )
 
 func webPlayerTest(w http.ResponseWriter, r *http.Request) {
-	file, err := os.Open("./app/templates/index.html")
+	file, err := os.Open("./app/views/index.gohtml")
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -36,7 +38,7 @@ func webPlayerTest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tok, ok := s.Values["Access_Token"].(string)
+	tok, ok := s.Values["Token"].(oauth2.Token)
 	if !ok {
 		log.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -46,7 +48,7 @@ func webPlayerTest(w http.ResponseWriter, r *http.Request) {
 	d := struct {
 		AccessToken string
 	}{
-		AccessToken: tok,
+		AccessToken: tok.AccessToken,
 	}
 	t.Execute(w, d)
 

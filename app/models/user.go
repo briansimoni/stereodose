@@ -85,8 +85,9 @@ func (u *User) getMyPlaylists(tok *oauth2.Token) error {
 	if err != nil {
 		return err
 	}
-	log.Println(result.Playlists[0].Tracks.Endpoint)
-	for _, playlist := range result.Playlists {
+	log.Println("Total Playlists", result.Total)
+	for i, playlist := range result.Playlists {
+		log.Println(i)
 		for _, oldPlaylists := range u.Playlists {
 			if string(playlist.ID) == oldPlaylists.SpotifyID {
 				break

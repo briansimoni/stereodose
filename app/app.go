@@ -17,24 +17,15 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-func index(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "hello world")
-}
-
-func loggedIn(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "login success")
-}
-
 const sessionName = "_stereodose-session"
 
 var store *sessions.CookieStore
 var db *gorm.DB
 var stereoDoseDB *models.StereoDoseDB
+var err error
 
 // InitApp puts together the Router to use as the app's main HTTP handler
 func InitApp(c *config.Config, db *gorm.DB) *util.AppRouter {
-	var err error
-
 	authKey, err := base64.StdEncoding.DecodeString(c.AuthKey)
 	if err != nil {
 		log.Fatal("Unable to obtain auth key", err.Error())
@@ -46,7 +37,10 @@ func InitApp(c *config.Config, db *gorm.DB) *util.AppRouter {
 	store = sessions.NewCookieStore(authKey, encryptionKey)
 
 	stereoDoseDB = models.NewStereodoseDB(db, store)
+	return createRouter()
+}
 
+func createRouter() *util.AppRouter {
 	app := &util.AppRouter{mux.NewRouter()}
 	app.Use(func(next http.Handler) http.Handler {
 		return handlers.LoggingHandler(os.Stdout, next)
@@ -55,17 +49,18 @@ func InitApp(c *config.Config, db *gorm.DB) *util.AppRouter {
 	users := controllers.UsersController{
 		DB: stereoDoseDB,
 	}
+	playlists := controllers.PlaylistsController{
+		DB: stereoDoseDB,
+	}
 	auth := controllers.AuthController{
 		DB:    stereoDoseDB,
 		Store: store,
 	}
 
-	app.Use(UserContextMiddleware)
+	// Serve all of the static files
+	fs := http.StripPrefix("/public/", http.FileServer(http.Dir("app/views/public")))
+	app.PathPrefix("/public/").Handler(fs)
 
-	// authRouter := app.PathPrefix("/auth").Subrouter()
-	// auth.RegisterHandlers(c, store, authRouter)
-
-	app.HandleFunc("/", index)
 	app.Handle("/test", auth.Middleware(webPlayerTest))
 
 	notFound := func(w http.ResponseWriter, r *http.Request) {
@@ -73,21 +68,28 @@ func InitApp(c *config.Config, db *gorm.DB) *util.AppRouter {
 	}
 	app.NotFoundHandler = http.HandlerFunc(notFound)
 
-	app.Handle("/other", auth.Middleware(loggedIn))
-
 	authRouter := util.AppRouter{app.PathPrefix("/auth").Subrouter()}
 	authRouter.AppHandler("/login", auth.Login).Methods(http.MethodGet)
 	authRouter.AppHandler("/callback", auth.Callback).Methods(http.MethodGet)
 	authRouter.AppHandler("/refresh", auth.Refresh).Methods(http.MethodGet)
-	app.Handle("/me", auth.Middleware(users.Me)).Methods(http.MethodGet)
 
-	// app.Use(func(next http.Handler) http.Handler {
-	// 	return auth.Middleware(next)
-	// })
+	usersRouter := util.AppRouter{app.PathPrefix("/api/users/").Subrouter()}
+	usersRouter.Use(UserContextMiddleware)
+	usersRouter.Handle("/me", auth.Middleware(users.Me)).Methods(http.MethodGet)
+
+	playlistsRouter := util.AppRouter{app.PathPrefix("/api/playlists/").Subrouter()}
+	playlistsRouter.AppHandler("/", playlists.GetPlaylists).Methods(http.MethodGet)
+
+	app.Handle("/", auth.Middleware(webPlayerTest))
+
 	return app
 }
 
 // could do this on a subrouter to handle auth for all routes
 // app.Use(func(next http.Handler) http.Handler {
 // 	return auth.Middleware(next.ServeHTTP)
+// })
+
+// app.Use(func(next http.Handler) http.Handler {
+// 	return auth.Middleware(next)
 // })

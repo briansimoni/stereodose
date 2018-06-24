@@ -1,12 +1,13 @@
 package models
 
 import (
+	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
 	"github.com/zmb3/spotify"
 )
 
 type PlaylistService interface {
-	CreatePlaylist(*Playlist)
+	GetPlaylists() ([]Playlist, error)
 }
 
 type Playlist struct {
@@ -28,4 +29,19 @@ type PlaylistImage struct {
 	gorm.Model
 	spotify.Image
 	PlaylistID uint
+}
+
+type StereodosePlaylistService struct {
+	store *sessions.CookieStore
+	db    *gorm.DB
+}
+
+func (s *StereodosePlaylistService) GetPlaylists() ([]Playlist, error) {
+	playlists := []Playlist{}
+	err := s.db.Find(&playlists).Error
+	if err != nil {
+		return nil, err
+	}
+	return playlists, nil
+
 }

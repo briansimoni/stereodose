@@ -49,6 +49,7 @@ var conf = &oauth2.Config{
 		"user-read-birthdate",
 		"user-read-email",
 		"user-read-private",
+		"playlist-read-collaborative",
 	},
 	Endpoint: endpoint.Endpoint,
 }
