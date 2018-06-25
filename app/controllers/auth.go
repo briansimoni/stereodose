@@ -50,6 +50,7 @@ var conf = &oauth2.Config{
 		"user-read-email",
 		"user-read-private",
 		"playlist-read-collaborative",
+		"user-modify-playback-state",
 	},
 	Endpoint: endpoint.Endpoint,
 }

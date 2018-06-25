@@ -1,11 +1,5 @@
-// let myReq = new XMLHttpRequest();
-// myReq.open("GET", "/api/playlists/");
-// myReq.addEventListener("readystatechange", function () {
-// 	if (this.readyState === 4) {
-// 		let playlists = JSON.parse(this.responseText);
-// 	}
-// });
-// myReq.send();
+
+let MyDeviceID = null;
 
 const getMyPlaylists = function () {
 	return new Promise((resolve, reject) => {
@@ -42,26 +36,57 @@ const getSongs = function(playlistID) {
 	});
 };
 
+const playSong = function() {
+	let playlistID = this.getAttribute("data-spotify-playlist-id");
+	let trackID = this.getAttribute("data-stereodose-id");
+	console.log(MyDeviceID + " " + playlistID + " " + trackID);
+	req = new XMLHttpRequest();
+	req.open("PUT", "https://api.spotify.com/v1/me/player/play?" + MyDeviceID);
+	req.setRequestHeader("Authorization", "Bearer " + Token);
+	req.setRequestHeader("Content-Type", "application/json");
+	let data = {
+		"context_uri": playlistID,
+		"offset": { 
+			"uri": "spotify:track:" + trackID
+		}
+	}
+	req.addEventListener("readystatechange", function() {
+		if (this.readyState === 4) {
+			console.log(this.responseText);
+			console.log("The song should be playing...");
+		}
+	});
+	data = JSON.stringify(data);
+	console.log(data);
+	req.send(data);
+}
+
 const updateTracksView = async function() {
 	console.log("updating track view?");
 	console.log(this);
-	playlistID = this.getAttribute("data-stereodose-id");
+	let playlistID = this.getAttribute("data-stereodose-id");
+	let spotifyPlaylistID = this.getAttribute("data-spotify-id");
 	try {
 		let tracks = await getSongs(playlistID);
 		let tracksOl = document.getElementById("tracks-ol");
 		tracks.forEach( (track) => {
 			let entry = document.createElement('li');
+			entry.setAttribute("data-spotify-playlist-id", spotifyPlaylistID);
+			entry.setAttribute("data-stereodose-id", track.SpotifyID);
 			entry.appendChild(document.createTextNode(track.Name));
+			entry.addEventListener("click", playSong)
 			tracksOl.appendChild(entry);
 		});
-
 	} catch(e) {
+		console.log(e);
 		console.error(e);
 	}
 };
 
 
-let Main = async function () {
+let Main = async function (ID) {
+	console.log("what is this!?!?!?" + ID);
+	MyDeviceID = ID;
 	try {
 		let playlists = await getMyPlaylists();
 		let ol = document.getElementById("playlist-ol");
@@ -69,6 +94,7 @@ let Main = async function () {
 			let entry = document.createElement('li');
 			entry.appendChild(document.createTextNode(playlist.name));
 			entry.setAttribute("data-stereodose-id", playlist.ID);
+			entry.setAttribute("data-spotify-id", playlist.uri);
 			entry.addEventListener("click", updateTracksView);
 			ol.appendChild(entry);
 		});

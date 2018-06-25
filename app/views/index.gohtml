@@ -125,7 +125,7 @@
 		// Ready
 		player.addListener('ready', ({ device_id }) => {
 			// Main is from temp.js
-			Main();
+			Main(device_id);
 			console.log('Ready with Device ID', device_id);
 		});
 
