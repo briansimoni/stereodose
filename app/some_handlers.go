@@ -50,6 +50,9 @@ func webPlayerTest(w http.ResponseWriter, r *http.Request) {
 	}{
 		AccessToken: tok.AccessToken,
 	}
-	t.Execute(w, d)
+	err = t.Execute(w, d)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
 }

@@ -1,8 +1,6 @@
 package models
 
 import (
-	"log"
-
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -85,9 +83,7 @@ func (u *User) getMyPlaylists(tok *oauth2.Token) error {
 	if err != nil {
 		return err
 	}
-	log.Println("Total Playlists", result.Total)
-	for i, playlist := range result.Playlists {
-		log.Println(i)
+	for _, playlist := range result.Playlists {
 		for _, oldPlaylists := range u.Playlists {
 			if string(playlist.ID) == oldPlaylists.SpotifyID {
 				break
@@ -106,6 +102,9 @@ func (u *User) getMyPlaylists(tok *oauth2.Token) error {
 			IsPublic:      playlist.IsPublic,
 			SnapshotID:    playlist.SnapshotID,
 			URI:           string(playlist.URI),
+		}
+		for _, image := range playlist.Images {
+			playlistToAdd.Images = append(playlistToAdd.Images, PlaylistImage{Image: image})
 		}
 		for _, track := range tracks.Tracks {
 			trackToAdd := Track{

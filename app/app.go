@@ -79,6 +79,7 @@ func createRouter() *util.AppRouter {
 
 	playlistsRouter := util.AppRouter{app.PathPrefix("/api/playlists/").Subrouter()}
 	playlistsRouter.AppHandler("/", playlists.GetPlaylists).Methods(http.MethodGet)
+	playlistsRouter.AppHandler("/{id:[0-9]+}", playlists.GetPlaylistByID).Methods(http.MethodGet)
 
 	app.Handle("/", auth.Middleware(webPlayerTest))
 

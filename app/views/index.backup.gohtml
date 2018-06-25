@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>Hello, world!</title>
+  </head>
+  <body>
+    <h1>Spotify Web Playback SDK Quick Start Tutorial</h1>
+	<h2>Open your console log:
+		<code>View > Developer > JavaScript Console</code>
+	</h2>
+
+	<script src="https://sdk.scdn.co/spotify-player.js"></script>
+	<!-- We will insert our code here. -->
+	<script>
+		window.onSpotifyWebPlaybackSDKReady = () => {
+			const token = {{.AccessToken}};
+			const player = new Spotify.Player({
+				name: 'Web Playback SDK Quick Start Player',
+				getOAuthToken: cb => { cb(token); }
+			});
+
+			// Error handling
+			player.addListener('initialization_error', ({ message }) => { console.error(message); });
+			player.addListener('authentication_error', ({ message }) => { console.error(message); });
+			player.addListener('account_error', ({ message }) => { console.error(message); });
+			player.addListener('playback_error', ({ message }) => { console.error(message); });
+
+			// Playback status updates
+			player.addListener('player_state_changed', state => { console.log(state); });
+
+			// Ready
+			player.addListener('ready', ({ device_id }) => {
+				console.log('Ready with Device ID', device_id);
+			});
+
+			// Not Ready
+			player.addListener('not_ready', ({ device_id }) => {
+				console.log('Device ID has gone offline', device_id);
+			});
+
+			// Connect to the player!
+			player.connect();
+		};
+	</script>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>
