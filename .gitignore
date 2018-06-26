@@ -14,8 +14,6 @@
 stereodose
 debug
 
-vendor
-
 .vscode
 gin-bin
 .env
