@@ -1,10 +1,6 @@
 pipeline {
 	agent { docker { image 'golang:1.10' } }
 
-	environment {
-		GOPATH = $WORKSPACE
-	}
-
     stages {
         stage('build') {
             steps {
@@ -13,6 +9,7 @@ pipeline {
         }
 		stage('test') {
 			steps {
+				sh 'export GOPATH=${WORKSPACE}'
 				// sh 'mkdir -p ${GOPATH}/src/github.com/briansimoni/stereodose'
 				// sh 'ln -sf ${WORKSPACE} ${GOPATH}/src/github.com/briansimoni/stereodose'
 				sh 'go test ./...'
