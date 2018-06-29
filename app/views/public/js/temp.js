@@ -1,6 +1,32 @@
 
 let MyDeviceID = null;
 
+const transferPlayback = function(token, deviceID) {
+    console.log("maybe transverring playback");
+    return new Promise( (resolve, reject) => {
+        let req = new XMLHttpRequest();
+        req.open("PUT", "https://api.spotify.com/v1/me/player");
+        req.setRequestHeader("Authorization", "Bearer " + token);
+	    req.setRequestHeader("Content-Type", "application/json");
+        req.addEventListener("readystatechange", function() {
+            console.log("READY STATE CHANGE!");
+            if (this.readyState === 4) {
+                console.log(this.responseText);
+				resolve(this.responseText);
+			}
+			if (this.status !== 204) {
+                console.log(this.statusText);
+				reject(new Error(String(this.status) + "Unable to transfer player to this player: " + this.statusText));
+            }
+        })
+        let data = {
+            device_ids: [deviceID],
+            play: false
+        }
+        req.send(JSON.stringify(data));
+    });
+}
+
 const getMyPlaylists = function () {
 	return new Promise((resolve, reject) => {
 		let myReq = new XMLHttpRequest();
@@ -67,7 +93,8 @@ const updateTracksView = async function() {
 	let playlistID = this.getAttribute("data-stereodose-id");
 	let spotifyPlaylistID = this.getAttribute("data-spotify-id");
 	try {
-		let tracks = await getSongs(playlistID);
+        let tracks = await getSongs(playlistID);
+        console.log(tracks);
 		let tracksOl = document.getElementById("tracks-ol");
 		tracks.forEach( (track) => {
 			let entry = document.createElement('li');
@@ -84,11 +111,13 @@ const updateTracksView = async function() {
 };
 
 
-let Main = async function (ID) {
-	console.log("what is this!?!?!?" + ID);
-	MyDeviceID = ID;
+let Main = async function (Token, DeviceID) {
+    MyDeviceID = DeviceID
+    transferPlayback(Token, DeviceID)
+	console.log("what is this!?!?!?" + DeviceID);
 	try {
-		let playlists = await getMyPlaylists();
+        let playlists = await getMyPlaylists();
+        console.log(playlists);
 		let ol = document.getElementById("playlist-ol");
 		playlists.forEach((playlist) => {
 			let entry = document.createElement('li');
@@ -96,7 +125,7 @@ let Main = async function (ID) {
 			entry.setAttribute("data-stereodose-id", playlist.ID);
 			entry.setAttribute("data-spotify-id", playlist.uri);
 			entry.addEventListener("click", updateTracksView);
-			ol.appendChild(entry);
+            ol.appendChild(entry);
 		});
 	} catch (e) {
 		console.log("error!");
