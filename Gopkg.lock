@@ -63,6 +63,12 @@
   revision = "90697d60dd844d5ef6ff15135d0203f65d2f53b8"
 
 [[projects]]
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/zmb3/spotify"
   packages = ["."]
@@ -104,6 +110,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "143cfcad1b25390193f218b43f6a6a5cf62d77775240a6c4fdf4e664ccba235d"
+  inputs-digest = "d9a3bbec347fdf0427e494c7cc2eac791a32a90398ac0f705e825a87cd911162"
   solver-name = "gps-cdcl"
   solver-version = 1

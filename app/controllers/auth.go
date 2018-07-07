@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"log"
 	"net/http"
 	"net/url"
@@ -20,6 +19,7 @@ import (
 	endpoint "golang.org/x/oauth2/spotify"
 
 	"github.com/gorilla/sessions"
+	"github.com/pkg/errors"
 )
 
 const sessionName = "_stereodose-session"
@@ -58,7 +58,7 @@ var conf = &oauth2.Config{
 func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 	s, err := a.Store.Get(r, sessionName)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	if s.Values["Access_Token"] == nil {
@@ -69,7 +69,7 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 		b := make([]byte, 32)
 		_, err = rand.Read(b)
 		if err != nil {
-			return err
+			return errors.WithStack(err)
 		}
 		state := base64.StdEncoding.EncodeToString(b)
 		s.Values["State"] = state
@@ -95,7 +95,7 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error {
 	s, err := a.Store.Get(r, sessionName)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	err = checkState(r, s)
 	if err != nil {
@@ -111,17 +111,17 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error 
 	client := spotify.Authenticator{}.NewClient(tok)
 	currentUser, err := client.CurrentUser()
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	sdUser, err := a.saveUserData(tok, currentUser)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	s.Values["User_ID"] = sdUser.ID
 	err = s.Save(r, w)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	returnPath, ok := s.Values["return_path"].(string)
 	if !ok {
@@ -140,16 +140,16 @@ func (a *AuthController) Refresh(w http.ResponseWriter, r *http.Request) error {
 	}
 	s, err := a.Store.Get(r, sessionName)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	tok, err := refreshToken(user.RefreshToken)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	user.AccessToken = tok.AccessToken
 	err = a.DB.Users.Update(&user)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	sessionToken, ok := s.Values["Token"].(oauth2.Token)
 	if !ok {
@@ -161,16 +161,16 @@ func (a *AuthController) Refresh(w http.ResponseWriter, r *http.Request) error {
 	log.Println(sessionToken)
 	err = s.Save(r, w)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	j, err := json.MarshalIndent(&tok, " ", " ")
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	w.Header().Add("Content-Type", "application/json")
 	_, err = w.Write(j)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	return nil
 }
@@ -244,7 +244,7 @@ func (a *AuthController) Middleware(next http.HandlerFunc) http.Handler {
 	f := func(w http.ResponseWriter, r *http.Request) error {
 		s, err := a.Store.Get(r, sessionName)
 		if err != nil {
-			return err
+			return errors.WithStack(err)
 		}
 		tok, ok := s.Values["Token"].(oauth2.Token)
 		if !ok || !tok.Valid() {

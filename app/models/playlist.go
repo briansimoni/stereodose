@@ -14,7 +14,7 @@ const (
 	// Shrooms ...
 	Shrooms = "Shrooms"
 	// Ecstasy ...
-	Ecstasy = "Ectasy"
+	Ecstasy = "Ecstasy"
 )
 
 type PlaylistService interface {
