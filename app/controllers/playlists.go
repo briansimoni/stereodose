@@ -15,7 +15,13 @@ type PlaylistsController struct {
 }
 
 func (p *PlaylistsController) GetPlaylists(w http.ResponseWriter, r *http.Request) error {
-	playlists, err := p.DB.Playlists.GetPlaylists()
+	// The router will run some regex to make sure that they are [0-9]+
+	// no need to check again here
+	queryValues := r.URL.Query()
+	offset := queryValues.Get("offset")
+	limit := queryValues.Get("limit")
+
+	playlists, err := p.DB.Playlists.GetPlaylists(offset, limit)
 	if err != nil {
 		return errors.WithStack(err)
 	}

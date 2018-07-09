@@ -18,7 +18,7 @@ const (
 )
 
 type PlaylistService interface {
-	GetPlaylists() ([]Playlist, error)
+	GetPlaylists(offset, limit string) ([]Playlist, error)
 	GetByID(ID uint) (*Playlist, error)
 }
 
@@ -51,9 +51,9 @@ type StereodosePlaylistService struct {
 
 // TODO: narrow this down to the specific category
 // TODO: add paging
-func (s *StereodosePlaylistService) GetPlaylists() ([]Playlist, error) {
+func (s *StereodosePlaylistService) GetPlaylists(offset, limit string) ([]Playlist, error) {
 	playlists := []Playlist{}
-	err := s.db.Find(&playlists).Error
+	err := s.db.Debug().Offset(offset).Limit(limit).Find(&playlists).Error
 	if err != nil {
 		return nil, err
 	}
