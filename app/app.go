@@ -64,6 +64,7 @@ func createRouter() *util.AppRouter {
 	app.Handle("/test", auth.Middleware(webPlayerTest))
 
 	notFound := func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprint(w, "Need to add a 404 page")
 	}
 	app.NotFoundHandler = http.HandlerFunc(notFound)

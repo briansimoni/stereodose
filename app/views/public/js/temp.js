@@ -11,13 +11,14 @@ const transferPlayback = function(token, deviceID) {
         req.addEventListener("readystatechange", function() {
             console.log("READY STATE CHANGE!");
             if (this.readyState === 4) {
-                console.log(this.responseText);
-				resolve(this.responseText);
+				if (this.status === 204) {
+					console.log(this.responseText);
+					resolve(this.responseText);
+				} else {
+					console.log(this.statusText);
+					reject(new Error(String(this.status) + "Unable to transfer player to this player: " + this.statusText));
+				}
 			}
-			if (this.status !== 204) {
-                console.log(this.statusText);
-				reject(new Error(String(this.status) + "Unable to transfer player to this player: " + this.statusText));
-            }
         })
         let data = {
             device_ids: [deviceID],
@@ -30,14 +31,15 @@ const transferPlayback = function(token, deviceID) {
 const getMyPlaylists = function () {
 	return new Promise((resolve, reject) => {
 		let myReq = new XMLHttpRequest();
-		myReq.open("GET", "/api/playlists/");
+		myReq.open("GET", "/api/playlists/?limit=1000&offset=0");
 		myReq.addEventListener("readystatechange", function () {
 			if (this.readyState === 4) {
-				let playlists = JSON.parse(this.responseText);
-				resolve(playlists);
-			}
-			if (this.status !== 200) {
-				reject(new Error(String(this.status) + "Unable to get playlists: " + this.statusText));
+				if (this.status === 200) {
+					let playlists = JSON.parse(this.responseText);
+					resolve(playlists);
+				} else {
+					reject(new Error(String(this.status) + "Unable to get playlists: " + this.statusText));
+				}
 			}
 		});
 		myReq.send();
@@ -51,12 +53,14 @@ const getSongs = function(playlistID) {
 		req.open("GET", "/api/playlists/" + playlistID);
 		req.addEventListener("readystatechange", function() {
 			if (this.readyState === 4) {
-				let tracks = JSON.parse(this.responseText).tracks;
-				resolve(tracks);
+				if (this.status === 200) {
+					let tracks = JSON.parse(this.responseText).tracks;
+					resolve(tracks);
+				} else {
+					reject(new Error(String(this.status) + "Unable to get songs: " + this.statusText));
+				}
 			}
-			if (this.status !== 200) {
-				reject(new Error(String(this.status) + "Unable to get songs: " + this.statusText));
-			}
+			
 		})
 		req.send();
 	});
