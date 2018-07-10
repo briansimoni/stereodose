@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -43,6 +45,31 @@ func (p *PlaylistsController) GetPlaylistByID(w http.ResponseWriter, r *http.Req
 		return errors.WithStack(err)
 	}
 	err = util.JSON(w, playlist)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	return nil
+}
+
+// CreatePlaylist reads the SpotifyID from the POST body
+// It then calls the spotify API to get the full info and store in the local DB
+func (p *PlaylistsController) CreatePlaylist(w http.ResponseWriter, r *http.Request) error {
+	type jsonBody struct {
+		SpotifyID string `json:"SpotifyID"`
+	}
+	var data jsonBody
+	defer r.Body.Close()
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	user, ok := r.Context().Value("User").(models.User)
+	if !ok {
+		return errors.New("Unable to obtain user from session")
+	}
+	log.Println("ID", data.SpotifyID)
+
+	_, err = p.DB.Playlists.CreatePlaylistBySpotifyID(user, data.SpotifyID)
 	if err != nil {
 		return errors.WithStack(err)
 	}
