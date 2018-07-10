@@ -33,7 +33,7 @@ type Playlist struct {
 	Name       string          `json:"name"`
 	IsPublic   bool            `json:"public"`
 	SnapshotID string          `json:"snapshot_id"`
-	Tracks     []Track         `json:"tracks"`
+	Tracks     []Track         `json:"tracks" gorm:"many2many:playlist_tracks;"`
 	URI        string          `json:"uri"`
 	UserID     uint
 }

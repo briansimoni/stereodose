@@ -10,5 +10,5 @@ type Track struct {
 	PreviewURL  string
 	TrackNumber int
 	URI         string
-	PlaylistID  uint
+	// PlaylistID  uint
 }

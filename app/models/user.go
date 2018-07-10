@@ -108,7 +108,7 @@ func (u *User) getMyPlaylists(tok *oauth2.Token) error {
 		}
 		for _, track := range tracks.Tracks {
 			trackToAdd := Track{
-				PlaylistID:  playlistToAdd.ID,
+				// PlaylistID:  playlistToAdd.ID,
 				SpotifyID:   string(track.Track.ID),
 				Name:        track.Track.Name,
 				Duration:    track.Track.Duration,
