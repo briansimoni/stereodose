@@ -35,6 +35,10 @@ func (f *fakePlaylistService) GetByID(ID uint) (*models.Playlist, error) {
 	return playlist, nil
 }
 
+func (f *fakePlaylistService) CreatePlaylistBySpotifyID(user models.User, spotifyID string) (*models.Playlist, error) {
+	return nil, nil
+}
+
 var controller = &PlaylistsController{
 	DB: &models.StereoDoseDB{
 		Playlists: &fakePlaylistService{},

@@ -1,14 +1,15 @@
 package models
 
-import "github.com/jinzhu/gorm"
+import "time"
 
 type Track struct {
-	gorm.Model
-	SpotifyID   string `gorm:"not null;unique"`
+	// ID          uint   `gorm:"primary_key:true"`
+	SpotifyID   string `gorm:"primary_key:true"`
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 	Name        string
 	Duration    int
 	PreviewURL  string
 	TrackNumber int
 	URI         string
-	// PlaylistID  uint
 }

@@ -54,7 +54,7 @@ const getSongs = function(playlistID) {
 		req.addEventListener("readystatechange", function() {
 			if (this.readyState === 4) {
 				if (this.status === 200) {
-					let tracks = JSON.parse(this.responseText).tracks;
+					let tracks = JSON.parse(this.responseText).Tracks;
 					resolve(tracks);
 				} else {
 					reject(new Error(String(this.status) + "Unable to get songs: " + this.statusText));

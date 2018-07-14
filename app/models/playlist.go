@@ -2,6 +2,7 @@ package models
 
 import (
 	"log"
+	"time"
 
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
@@ -27,9 +28,12 @@ type PlaylistService interface {
 }
 
 type Playlist struct {
-	gorm.Model
+	//gorm.Model
+	ID            uint   `gorm:"primary_key:true"`
+	SpotifyID     string `gorm:"primary_key:true"`
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
 	Category      string `json:"Category"`
-	SpotifyID     string `gorm:"not null;unique"`
 	Collaborative bool   `json:"collaborative"`
 	//ExternalURLs  map[string]string `json:"external_urls"`
 	Endpoint   string          `json:"href"`
@@ -37,7 +41,7 @@ type Playlist struct {
 	Name       string          `json:"name"`
 	IsPublic   bool            `json:"public"`
 	SnapshotID string          `json:"snapshot_id"`
-	Tracks     []Track         `json:"tracks" gorm:"many2many:playlist_track"`
+	Tracks     []Track         `gorm:"many2many:playlist_tracks"`
 	URI        string          `json:"uri"`
 	UserID     uint
 }
