@@ -79,11 +79,15 @@ func createRouter() *util.AppRouter {
 	usersRouter.Handle("/me", auth.Middleware(users.Me)).Methods(http.MethodGet)
 
 	playlistsRouter := util.AppRouter{app.PathPrefix("/api/playlists").Subrouter()}
+	playlistsRouter.Use(UserContextMiddleware)
 	playlistsRouter.AppHandler("/", playlists.GetPlaylists).
 		Queries("offset", "{offset:[0-9]+}", "limit", "{limit:[0-9]+}").
 		Methods(http.MethodGet)
-
-	playlistsRouter.AppHandler("/{id:[0-9]+}", playlists.GetPlaylistByID).Methods(http.MethodGet)
+		// TODO: fix the ID thing here
+	playlistsRouter.AppHandler("/{id}", playlists.GetPlaylistByID).Methods(http.MethodGet)
+	playlistsRouter.AppHandler("/me", playlists.GetMyPlaylists).Methods(http.MethodGet)
+	playlistsRouter.AppHandler("/", playlists.CreatePlaylist).Methods(http.MethodPost)
+	playlistsRouter.AppHandler("/{id}", playlists.DeletePlaylist).Methods(http.MethodDelete)
 
 	app.Handle("/", auth.Middleware(webPlayerTest))
 
