@@ -66,7 +66,6 @@ func (p *PlaylistsController) GetMyPlaylists(w http.ResponseWriter, r *http.Requ
 // CreatePlaylist reads the SpotifyID from the POST body
 // It then calls the spotify API to get the full info and store in the local DB
 // TODO: return 409 conflict instead of 500 error if playlist already exists
-// TODO: return 201 instead of 200
 func (p *PlaylistsController) CreatePlaylist(w http.ResponseWriter, r *http.Request) error {
 	type jsonBody struct {
 		SpotifyID string `json:"SpotifyID"`
@@ -87,6 +86,7 @@ func (p *PlaylistsController) CreatePlaylist(w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	w.WriteHeader(http.StatusCreated)
 	return nil
 }
 
@@ -95,6 +95,9 @@ func (p *PlaylistsController) DeletePlaylist(w http.ResponseWriter, r *http.Requ
 	ID := vars["id"]
 	err := p.DB.Playlists.DeletePlaylist(ID)
 	if err != nil {
+		if err.Error() == "Delete failed. Playlist Did not exist" {
+			return &statusError{errors.WithStack(err), err.Error(), http.StatusBadRequest}
+		}
 		return errors.WithStack(err)
 	}
 	return nil

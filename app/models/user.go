@@ -50,10 +50,6 @@ func (u *StereodoseUserService) ByID(ID uint) (*User, error) {
 }
 
 func (u *StereodoseUserService) FirstOrCreate(user *User, tok *oauth2.Token) (*User, error) {
-	// err := user.getMyPlaylists(tok)
-	// if err != nil {
-	// 	return nil, err
-	// }
 	err := u.db.Debug().FirstOrCreate(user).Error
 	if err != nil {
 		return nil, err
@@ -76,48 +72,3 @@ func (u *StereodoseUserService) DeleteUser(user *User) error {
 	}
 	return nil
 }
-
-// func (u *User) getMyPlaylists(tok *oauth2.Token) error {
-// 	c := spotify.Authenticator{}.NewClient(tok)
-// 	result, err := c.CurrentUsersPlaylists()
-// 	if err != nil {
-// 		return err
-// 	}
-// 	for _, playlist := range result.Playlists {
-// 		for _, oldPlaylists := range u.Playlists {
-// 			if string(playlist.ID) == oldPlaylists.SpotifyID {
-// 				break
-// 			}
-// 		}
-// 		tracks, err := c.GetPlaylistTracks(u.SpotifyID, playlist.ID)
-// 		if err != nil {
-// 			return err
-// 		}
-// 		playlistToAdd := Playlist{
-// 			UserID:        u.ID,
-// 			SpotifyID:     playlist.ID.String(),
-// 			Collaborative: playlist.Collaborative,
-// 			Endpoint:      playlist.Endpoint,
-// 			Name:          playlist.Name,
-// 			IsPublic:      playlist.IsPublic,
-// 			SnapshotID:    playlist.SnapshotID,
-// 			URI:           string(playlist.URI),
-// 		}
-// 		for _, image := range playlist.Images {
-// 			playlistToAdd.Images = append(playlistToAdd.Images, PlaylistImage{Image: image})
-// 		}
-// 		for _, track := range tracks.Tracks {
-// 			trackToAdd := Track{
-// 				// PlaylistID:  playlistToAdd.ID,
-// 				SpotifyID:   string(track.Track.ID),
-// 				Name:        track.Track.Name,
-// 				Duration:    track.Track.Duration,
-// 				PreviewURL:  track.Track.PreviewURL,
-// 				TrackNumber: track.Track.TrackNumber,
-// 			}
-// 			playlistToAdd.Tracks = append(playlistToAdd.Tracks, trackToAdd)
-// 		}
-// 		u.Playlists = append(u.Playlists, playlistToAdd)
-// 	}
-// 	return nil
-// }
