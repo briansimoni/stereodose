@@ -12,7 +12,16 @@
 </head>
 
 <body>
+<h1>Stereodose</h1>
+
+	<div id="my-playlists">
+	<h3>Playlists that you have on Spotify</h3>
+		
+	</div>
+	<hr>
+	<button id="refresh">refresh</button>
     <div style="margin: 20px;" class="playlists">
+		<h3>Playlists shared to Stereodose</h3>
         <ol id="playlist-ol">
         </ol>
     </div>
@@ -26,6 +35,10 @@
     <script src="https://sdk.scdn.co/spotify-player.js"></script>
     <!-- We will insert our code here. -->
     <script>
+		let refreshButton = document.getElementById("refresh");
+		refreshButton.addEventListener("click", function() {
+			window.location.reload();
+		});
         let Token = {{.AccessToken}};
         window.onSpotifyWebPlaybackSDKReady = () => {
           const token = {{.AccessToken}};

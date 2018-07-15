@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/briansimoni/stereodose/app/models"
 	"github.com/briansimoni/stereodose/app/util"
@@ -36,11 +35,8 @@ func (p *PlaylistsController) GetPlaylists(w http.ResponseWriter, r *http.Reques
 
 func (p *PlaylistsController) GetPlaylistByID(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
-	ID, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	playlist, err := p.DB.Playlists.GetByID(uint(ID))
+	ID := vars["id"]
+	playlist, err := p.DB.Playlists.GetByID(ID)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -51,8 +47,26 @@ func (p *PlaylistsController) GetPlaylistByID(w http.ResponseWriter, r *http.Req
 	return nil
 }
 
+func (p *PlaylistsController) GetMyPlaylists(w http.ResponseWriter, r *http.Request) error {
+	user, ok := r.Context().Value("User").(models.User)
+	if !ok {
+		return errors.New("Unable to obtain user from session")
+	}
+	playlists, err := p.DB.Playlists.GetMyPlaylists(user)
+	if err != nil {
+		return err
+	}
+	err = util.JSON(w, playlists)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // CreatePlaylist reads the SpotifyID from the POST body
 // It then calls the spotify API to get the full info and store in the local DB
+// TODO: return 409 conflict instead of 500 error if playlist already exists
+// TODO: return 201 instead of 200
 func (p *PlaylistsController) CreatePlaylist(w http.ResponseWriter, r *http.Request) error {
 	type jsonBody struct {
 		SpotifyID string `json:"SpotifyID"`
@@ -70,6 +84,16 @@ func (p *PlaylistsController) CreatePlaylist(w http.ResponseWriter, r *http.Requ
 	log.Println("ID", data.SpotifyID)
 
 	_, err = p.DB.Playlists.CreatePlaylistBySpotifyID(user, data.SpotifyID)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	return nil
+}
+
+func (p *PlaylistsController) DeletePlaylist(w http.ResponseWriter, r *http.Request) error {
+	vars := mux.Vars(r)
+	ID := vars["id"]
+	err := p.DB.Playlists.DeletePlaylist(ID)
 	if err != nil {
 		return errors.WithStack(err)
 	}

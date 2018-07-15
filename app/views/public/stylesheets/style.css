@@ -1,0 +1,11 @@
+#playlist-ol>li{
+	cursor: pointer;
+}
+
+#tracks-ol {
+	display: inline;
+}
+
+#tracks-ol>li {
+	cursor: pointer;
+}

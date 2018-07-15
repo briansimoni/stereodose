@@ -50,6 +50,7 @@ var conf = &oauth2.Config{
 		"user-read-email",
 		"user-read-private",
 		"playlist-read-collaborative",
+		//"playlist-read-private",
 		"user-modify-playback-state",
 	},
 	Endpoint: endpoint.Endpoint,
@@ -114,6 +115,13 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error 
 		return errors.WithStack(err)
 	}
 	sdUser, err := a.saveUserData(tok, currentUser)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	// saveUserData doesn't do updates. This call makes sure that
+	// the database has an up-to-date AccessToken
+	sdUser.AccessToken = tok.AccessToken
+	err = a.DB.Users.Update(sdUser)
 	if err != nil {
 		return errors.WithStack(err)
 	}

@@ -25,9 +25,9 @@ func (f *fakePlaylistService) GetPlaylists(offset, limit string) ([]models.Playl
 	}
 	return nil, nil
 }
-func (f *fakePlaylistService) GetByID(ID uint) (*models.Playlist, error) {
-	if ID == 0 {
-		return nil, errors.New("Playlist with ID 0 does not exist")
+func (f *fakePlaylistService) GetByID(ID string) (*models.Playlist, error) {
+	if ID == "" {
+		return nil, errors.New("Playlist with empty string does not exist")
 	}
 	playlist := &models.Playlist{
 		Name: "Test Playlist",
@@ -37,6 +37,12 @@ func (f *fakePlaylistService) GetByID(ID uint) (*models.Playlist, error) {
 
 func (f *fakePlaylistService) CreatePlaylistBySpotifyID(user models.User, spotifyID string) (*models.Playlist, error) {
 	return nil, nil
+}
+func (f *fakePlaylistService) GetMyPlaylists(user models.User) ([]models.Playlist, error) {
+	return nil, nil
+}
+func (f *fakePlaylistService) DeletePlaylist(id string) error {
+	return nil
 }
 
 var controller = &PlaylistsController{
@@ -54,14 +60,11 @@ func TestPlaylistsController_GetPlaylistByID(t *testing.T) {
 		status     int
 	}{
 		{name: "Valid Playlist ID", value: "1", status: http.StatusOK},
-		{name: "Playlist ID too long to be a uint", value: "999999999999999999999", status: http.StatusInternalServerError},
-		{name: "Invalid Playlist ID", value: "0", status: http.StatusInternalServerError},
-		{name: "Negative Number", value: "-1", status: http.StatusNotFound},
 	}
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			// arrange
-			testRouter.AppHandler("/api/playlists/{id:[0-9]+}", controller.GetPlaylistByID)
+			testRouter.AppHandler("/api/playlists/{id}", controller.GetPlaylistByID)
 			req, err := http.NewRequest(http.MethodGet, "/api/playlists/"+tc.value, nil)
 			if err != nil {
 				t.Fatal("Failed to create a request")
