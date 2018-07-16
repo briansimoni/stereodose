@@ -11,10 +11,14 @@ import (
 	"github.com/pkg/errors"
 )
 
+// PlaylistsController is a collection of RESTful Handlers for Playlists
 type PlaylistsController struct {
 	DB *models.StereoDoseDB
 }
 
+// GetPlaylists will return a subset of all the playlists in the DB
+// either offset or limit are required parameters
+// TODO: filter by category
 func (p *PlaylistsController) GetPlaylists(w http.ResponseWriter, r *http.Request) error {
 	// The router will run some regex to make sure that they are [0-9]+
 	// no need to check again here
@@ -33,6 +37,7 @@ func (p *PlaylistsController) GetPlaylists(w http.ResponseWriter, r *http.Reques
 	return nil
 }
 
+// GetPlaylistByID reads the id variable from the url path and sends a JSON response
 func (p *PlaylistsController) GetPlaylistByID(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	ID := vars["id"]
@@ -90,6 +95,8 @@ func (p *PlaylistsController) CreatePlaylist(w http.ResponseWriter, r *http.Requ
 	return nil
 }
 
+// DeletePlaylist takes the id variable from the url path
+// It performs a hard delete of the playlist from the DB
 func (p *PlaylistsController) DeletePlaylist(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	ID := vars["id"]
