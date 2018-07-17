@@ -61,36 +61,18 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-
-	if s.Values["Access_Token"] == nil {
-		// user is not logged in. send to authorization code flow
-		// Redirect user to consent page to ask for permission
-		// for the specified scopes.
-
-		b := make([]byte, 32)
-		_, err = rand.Read(b)
-		if err != nil {
-			return errors.WithStack(err)
-		}
-		state := base64.StdEncoding.EncodeToString(b)
-		s.Values["State"] = state
-		s.Save(r, w)
-
-		url := conf.AuthCodeURL(state, oauth2.AccessTypeOnline)
-		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
-		return nil
+	b := make([]byte, 32)
+	_, err = rand.Read(b)
+	if err != nil {
+		return errors.WithStack(err)
 	}
-	tok, ok := s.Values["Token"].(oauth2.Token)
-	if !ok {
-		return errors.New("Unable to obtain token from session")
-	}
-	if !tok.Valid() {
-		http.Redirect(w, r, "/auth/refresh", http.StatusTemporaryRedirect)
-		return nil
-	}
-	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	state := base64.StdEncoding.EncodeToString(b)
+	s.Values["State"] = state
+	s.Save(r, w)
+
+	url := conf.AuthCodeURL(state, oauth2.AccessTypeOnline)
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 	return nil
-
 }
 
 func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error {
@@ -142,20 +124,26 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error 
 // Refresh will update the Spotify API Access Token for the user's session
 // TODO: check the refresh token and save it (it might be a new refresh token)
 func (a *AuthController) Refresh(w http.ResponseWriter, r *http.Request) error {
-	user, ok := r.Context().Value("User").(models.User)
-	if !ok {
-		return errors.New("unable to obtain user from context")
-	}
+
 	s, err := a.Store.Get(r, sessionName)
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	ID, ok := s.Values["User_ID"].(uint)
+	if !ok {
+		return errors.New("unable to obtain user from session data")
+	}
+	user, err := a.DB.Users.ByID(ID)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
 	tok, err := refreshToken(user.RefreshToken)
 	if err != nil {
 		return errors.WithStack(err)
 	}
 	user.AccessToken = tok.AccessToken
-	err = a.DB.Users.Update(&user)
+	err = a.DB.Users.Update(user)
 	if err != nil {
 		return errors.WithStack(err)
 	}
