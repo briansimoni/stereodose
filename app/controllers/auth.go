@@ -124,7 +124,6 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error 
 // Refresh will update the Spotify API Access Token for the user's session
 // TODO: check the refresh token and save it (it might be a new refresh token)
 func (a *AuthController) Refresh(w http.ResponseWriter, r *http.Request) error {
-
 	s, err := a.Store.Get(r, sessionName)
 	if err != nil {
 		return errors.WithStack(err)
@@ -137,7 +136,6 @@ func (a *AuthController) Refresh(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-
 	tok, err := refreshToken(user.RefreshToken)
 	if err != nil {
 		return errors.WithStack(err)
