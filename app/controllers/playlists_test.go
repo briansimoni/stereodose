@@ -38,7 +38,7 @@ func (f *fakePlaylistService) GetByID(ID string) (*models.Playlist, error) {
 	return playlist, nil
 }
 
-func (f *fakePlaylistService) CreatePlaylistBySpotifyID(user models.User, spotifyID string) (*models.Playlist, error) {
+func (f *fakePlaylistService) CreatePlaylistBySpotifyID(user models.User, spotifyID, category, subcategory string) (*models.Playlist, error) {
 	if spotifyID == "alreadyExists" {
 		return nil, errors.New("Playlist with this id already exists")
 	}
@@ -127,10 +127,16 @@ func TestPlaylistsController_GetPlaylists(t *testing.T) {
 
 func TestPlaylistsController_CreatePlaylist(t *testing.T) {
 
-	var validData = struct {
-		SpotifyID string
-	}{
-		SpotifyID: "test",
+	type postBody struct {
+		SpotifyID   string
+		Category    string
+		SubCategory string
+	}
+
+	validData := postBody{
+		SpotifyID:   "test",
+		Category:    "Weed",
+		SubCategory: "Chill",
 	}
 	var testRouter = &util.AppRouter{mux.NewRouter()}
 	tt := []struct {
@@ -140,12 +146,13 @@ func TestPlaylistsController_CreatePlaylist(t *testing.T) {
 		data   interface{}
 	}{
 		{name: "Valid ID", status: 201, user: models.User{}, data: validData},
+		{name: "Invalid Categories", status: 400, user: nil, data: postBody{"test", "Fake", "Category"}},
 		{name: "Invalid User Context", status: 500, user: nil, data: validData},
-		{name: "Invalid POST body", status: 500, user: models.User{}, data: 69},
-		{name: "Database Error", status: 500, user: models.User{}, data: struct {
-			SpotifyID string
-		}{
-			SpotifyID: "alreadyExists",
+		{name: "Invalid POST body", status: 400, user: models.User{}, data: 69},
+		{name: "Database Error", status: 500, user: models.User{}, data: postBody{
+			SpotifyID:   "alreadyExists",
+			Category:    "Weed",
+			SubCategory: "Chill",
 		},
 		},
 	}

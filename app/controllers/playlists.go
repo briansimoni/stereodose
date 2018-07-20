@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/briansimoni/stereodose/app/models"
@@ -73,18 +74,24 @@ func (p *PlaylistsController) GetMyPlaylists(w http.ResponseWriter, r *http.Requ
 func (p *PlaylistsController) CreatePlaylist(w http.ResponseWriter, r *http.Request) error {
 	type jsonBody struct {
 		SpotifyID   string `json:"SpotifyID"`
-		Category    string `json:"Cateogry"`
+		Category    string `json:"Category"`
 		SubCategory string `json:"SubCategory"`
 	}
 	var data jsonBody
 	defer r.Body.Close()
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
-		return errors.WithStack(err)
+		return &statusError{
+			Message: fmt.Sprintf("Error parsing JSON: %s", err.Error()),
+			Code:    http.StatusBadRequest,
+		}
 	}
 	valid := models.Categories.Valid(data.Category, data.SubCategory)
 	if !valid {
-		return &statusError{Message: "Invalid Category/Subcategory", Code: http.StatusBadRequest}
+		return &statusError{
+			Message: fmt.Sprintf("Invalid Category/Subcategory: %s / %s", data.Category, data.SubCategory),
+			Code:    http.StatusBadRequest,
+		}
 	}
 	user, ok := r.Context().Value("User").(models.User)
 	if !ok {
