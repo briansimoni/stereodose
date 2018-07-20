@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/briansimoni/stereodose/app/models"
@@ -73,7 +72,9 @@ func (p *PlaylistsController) GetMyPlaylists(w http.ResponseWriter, r *http.Requ
 // TODO: return 409 conflict instead of 500 error if playlist already exists
 func (p *PlaylistsController) CreatePlaylist(w http.ResponseWriter, r *http.Request) error {
 	type jsonBody struct {
-		SpotifyID string `json:"SpotifyID"`
+		SpotifyID   string `json:"SpotifyID"`
+		Category    string `json:"Cateogry"`
+		SubCategory string `json:"SubCategory"`
 	}
 	var data jsonBody
 	defer r.Body.Close()
@@ -81,13 +82,16 @@ func (p *PlaylistsController) CreatePlaylist(w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	valid := models.Categories.Valid(data.Category, data.SubCategory)
+	if !valid {
+		return &statusError{Message: "Invalid Category/Subcategory", Code: http.StatusBadRequest}
+	}
 	user, ok := r.Context().Value("User").(models.User)
 	if !ok {
 		return errors.New("Unable to obtain user from session")
 	}
-	log.Println("ID", data.SpotifyID)
 
-	_, err = p.DB.Playlists.CreatePlaylistBySpotifyID(user, data.SpotifyID)
+	_, err = p.DB.Playlists.CreatePlaylistBySpotifyID(user, data.SpotifyID, data.Category, data.SubCategory)
 	if err != nil {
 		return errors.WithStack(err)
 	}
