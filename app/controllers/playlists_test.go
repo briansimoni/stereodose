@@ -1,6 +1,9 @@
 package controllers
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -35,7 +38,10 @@ func (f *fakePlaylistService) GetByID(ID string) (*models.Playlist, error) {
 	return playlist, nil
 }
 
-func (f *fakePlaylistService) CreatePlaylistBySpotifyID(user models.User, spotifyID string) (*models.Playlist, error) {
+func (f *fakePlaylistService) CreatePlaylistBySpotifyID(user models.User, spotifyID, category, subcategory string) (*models.Playlist, error) {
+	if spotifyID == "alreadyExists" {
+		return nil, errors.New("Playlist with this id already exists")
+	}
 	return nil, nil
 }
 func (f *fakePlaylistService) GetMyPlaylists(user models.User) ([]models.Playlist, error) {
@@ -112,6 +118,58 @@ func TestPlaylistsController_GetPlaylists(t *testing.T) {
 			result := recorder.Result()
 
 			// assert
+			if result.StatusCode != tc.status {
+				t.Errorf("Expected status: %v; Got: %v", tc.status, result.Status)
+			}
+		})
+	}
+}
+
+func TestPlaylistsController_CreatePlaylist(t *testing.T) {
+
+	type postBody struct {
+		SpotifyID   string
+		Category    string
+		SubCategory string
+	}
+
+	validData := postBody{
+		SpotifyID:   "test",
+		Category:    "Weed",
+		SubCategory: "Chill",
+	}
+	var testRouter = &util.AppRouter{mux.NewRouter()}
+	tt := []struct {
+		name   string
+		status int
+		user   interface{}
+		data   interface{}
+	}{
+		{name: "Valid ID", status: 201, user: models.User{}, data: validData},
+		{name: "Invalid Categories", status: 400, user: nil, data: postBody{"test", "Fake", "Category"}},
+		{name: "Invalid User Context", status: 500, user: nil, data: validData},
+		{name: "Invalid POST body", status: 400, user: models.User{}, data: 69},
+		{name: "Database Error", status: 500, user: models.User{}, data: postBody{
+			SpotifyID:   "alreadyExists",
+			Category:    "Weed",
+			SubCategory: "Chill",
+		},
+		},
+	}
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			testRouter.AppHandler("/api/playlists/", controller.CreatePlaylist).Methods(http.MethodPost)
+			body, _ := json.Marshal(tc.data)
+			req, err := http.NewRequest(http.MethodPost, "/api/playlists/", bytes.NewBuffer(body))
+			if err != nil {
+				t.Error(err.Error())
+			}
+			recorder := httptest.NewRecorder()
+
+			ctx := context.WithValue(req.Context(), "User", tc.user)
+			testRouter.ServeHTTP(recorder, req.WithContext(ctx))
+			result := recorder.Result()
+
 			if result.StatusCode != tc.status {
 				t.Errorf("Expected status: %v; Got: %v", tc.status, result.Status)
 			}

@@ -7,22 +7,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-type Error interface {
-	error
-	Status() int
-}
-
-type stackTracer interface {
+type stackTracerError interface {
 	StackTrace() errors.StackTrace
 }
 
-type StatusError struct {
-	Code int
-	Err  error
-}
-
-func (e StatusError) Error() string {
-	return e.Error()
+type statusError interface {
+	Status() int
 }
 
 // Handler struct allows for functions to return errors and still implement
@@ -35,15 +25,18 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err := h.H(w, r)
 	if err != nil {
 		switch e := err.(type) {
-		case Error:
-			log.Println("[Error]", e.Status(), e.Error())
-			http.Error(w, e.Error(), e.Status())
-		case stackTracer:
+		case statusError:
+			log.Printf("statusStackTracer %T\n", e)
+			log.Printf("[ERROR] %d %s\n", e.Status(), err.Error())
+			http.Error(w, "error: "+err.Error(), e.Status())
+		case stackTracerError:
+			log.Printf("%T\n", e)
 			st := e.StackTrace()
 			log.Printf("[ERROR] %s\n%+v", err.Error(), st[0])
 			http.Error(w, "error: "+err.Error(), http.StatusInternalServerError)
 		default:
-			log.Println("[Error]", e.Error())
+			log.Printf("%T\n", e)
+			log.Println("[ERROR]", e.Error())
 			http.Error(w, "error: "+e.Error(), http.StatusInternalServerError)
 		}
 	}

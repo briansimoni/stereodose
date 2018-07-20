@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
-	"log"
+	"fmt"
 	"net/http"
 
 	"github.com/briansimoni/stereodose/app/models"
@@ -11,10 +11,14 @@ import (
 	"github.com/pkg/errors"
 )
 
+// PlaylistsController is a collection of RESTful Handlers for Playlists
 type PlaylistsController struct {
 	DB *models.StereoDoseDB
 }
 
+// GetPlaylists will return a subset of all the playlists in the DB
+// either offset or limit are required parameters
+// TODO: filter by category
 func (p *PlaylistsController) GetPlaylists(w http.ResponseWriter, r *http.Request) error {
 	// The router will run some regex to make sure that they are [0-9]+
 	// no need to check again here
@@ -33,6 +37,7 @@ func (p *PlaylistsController) GetPlaylists(w http.ResponseWriter, r *http.Reques
 	return nil
 }
 
+// GetPlaylistByID reads the id variable from the url path and sends a JSON response
 func (p *PlaylistsController) GetPlaylistByID(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	ID := vars["id"]
@@ -66,35 +71,51 @@ func (p *PlaylistsController) GetMyPlaylists(w http.ResponseWriter, r *http.Requ
 // CreatePlaylist reads the SpotifyID from the POST body
 // It then calls the spotify API to get the full info and store in the local DB
 // TODO: return 409 conflict instead of 500 error if playlist already exists
-// TODO: return 201 instead of 200
 func (p *PlaylistsController) CreatePlaylist(w http.ResponseWriter, r *http.Request) error {
 	type jsonBody struct {
-		SpotifyID string `json:"SpotifyID"`
+		SpotifyID   string `json:"SpotifyID"`
+		Category    string `json:"Category"`
+		SubCategory string `json:"SubCategory"`
 	}
 	var data jsonBody
 	defer r.Body.Close()
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
-		return errors.WithStack(err)
+		return &statusError{
+			Message: fmt.Sprintf("Error parsing JSON: %s", err.Error()),
+			Code:    http.StatusBadRequest,
+		}
+	}
+	valid := models.Categories.Valid(data.Category, data.SubCategory)
+	if !valid {
+		return &statusError{
+			Message: fmt.Sprintf("Invalid Category/Subcategory: %s / %s", data.Category, data.SubCategory),
+			Code:    http.StatusBadRequest,
+		}
 	}
 	user, ok := r.Context().Value("User").(models.User)
 	if !ok {
 		return errors.New("Unable to obtain user from session")
 	}
-	log.Println("ID", data.SpotifyID)
 
-	_, err = p.DB.Playlists.CreatePlaylistBySpotifyID(user, data.SpotifyID)
+	_, err = p.DB.Playlists.CreatePlaylistBySpotifyID(user, data.SpotifyID, data.Category, data.SubCategory)
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	w.WriteHeader(http.StatusCreated)
 	return nil
 }
 
+// DeletePlaylist takes the id variable from the url path
+// It performs a hard delete of the playlist from the DB
 func (p *PlaylistsController) DeletePlaylist(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	ID := vars["id"]
 	err := p.DB.Playlists.DeletePlaylist(ID)
 	if err != nil {
+		if err.Error() == "Delete failed. Playlist Did not exist" {
+			return &statusError{errors.WithStack(err), err.Error(), http.StatusBadRequest}
+		}
 		return errors.WithStack(err)
 	}
 	return nil

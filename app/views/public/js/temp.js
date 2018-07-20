@@ -53,7 +53,7 @@ const addToStereodose = function(playlistID) {
 		req.setRequestHeader("Content-Type", "application/json");
         req.addEventListener("readystatechange", function() {
             if (this.readyState === 4) {
-				if (this.status === 200) {
+				if (this.status === 201) {
 					resolve(true);
 				} else {
 					alert(this.statusText + " " + this.responseText);
@@ -62,7 +62,9 @@ const addToStereodose = function(playlistID) {
 			}
 		});
 		let data = {
-			SpotifyID: playlistID
+			SpotifyID: playlistID,
+			Category: "Weed",
+			SubCategory: "Chill"
 		};
         req.send(JSON.stringify(data));
     });

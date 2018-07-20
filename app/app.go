@@ -52,6 +52,7 @@ func createRouter() *util.AppRouter {
 	playlists := controllers.PlaylistsController{
 		DB: stereoDoseDB,
 	}
+	categories := controllers.CategoriesController{}
 	auth := controllers.AuthController{
 		DB:    stereoDoseDB,
 		Store: store,
@@ -88,6 +89,9 @@ func createRouter() *util.AppRouter {
 	playlistsRouter.AppHandler("/me", playlists.GetMyPlaylists).Methods(http.MethodGet)
 	playlistsRouter.AppHandler("/", playlists.CreatePlaylist).Methods(http.MethodPost)
 	playlistsRouter.AppHandler("/{id}", playlists.DeletePlaylist).Methods(http.MethodDelete)
+
+	categoriesRouter := util.AppRouter{app.PathPrefix("/api/categories").Subrouter()}
+	categoriesRouter.AppHandler("/", categories.GetAvailableCategories).Methods(http.MethodGet)
 
 	app.Handle("/", auth.Middleware(webPlayerTest))
 

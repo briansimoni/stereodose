@@ -18,7 +18,7 @@ STEREODOSE_ENCRYPTION_KEY=somesecretkeythatyoucangenerate
 
 Obtain the client ID and secret by creating an app in the Spotify developer dashboard, and set the callback to http://localhost:3000/auth/callback
 
-You can generate a random AUTH_KEY by switching to the scripts directory
+You can generate a random AUTH_KEY and ENCRYPTION_KEY by switching to the scripts directory
 
 `go run secret_generator.go`
 

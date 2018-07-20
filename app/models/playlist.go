@@ -26,7 +26,7 @@ type PlaylistService interface {
 	GetPlaylists(offset, limit string) ([]Playlist, error)
 	GetByID(ID string) (*Playlist, error)
 	GetMyPlaylists(user User) ([]Playlist, error)
-	CreatePlaylistBySpotifyID(user User, spotifyID string) (*Playlist, error)
+	CreatePlaylistBySpotifyID(user User, playlistID, category, subCategory string) (*Playlist, error)
 	DeletePlaylist(spotifyID string) error
 }
 
@@ -36,6 +36,7 @@ type Playlist struct {
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
 	Category      string `json:"Category"`
+	SubCategory   string `json:"SubCategory"`
 	Collaborative bool   `json:"collaborative"`
 	//ExternalURLs  map[string]string `json:"external_urls"`
 	Endpoint   string          `json:"href"`
@@ -89,7 +90,7 @@ func (s *StereodosePlaylistService) GetMyPlaylists(user User) ([]Playlist, error
 
 // CreatePlaylist is given a user and playlistID
 // It uses the information to call the Spotify API and save the information to the local db
-func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlistID string) (*Playlist, error) {
+func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlistID, category, subCategory string) (*Playlist, error) {
 	// 1. get the tracks for the playlist
 	// 2. create playlist, add tracks
 	// 3. add to db
@@ -117,6 +118,8 @@ func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlis
 		SnapshotID:    list.SnapshotID,
 		URI:           string(list.URI),
 		UserID:        user.ID,
+		Category:      category,
+		SubCategory:   subCategory,
 	}
 	for _, image := range list.Images {
 		playlist.Images = append(playlist.Images, PlaylistImage{Image: image})
