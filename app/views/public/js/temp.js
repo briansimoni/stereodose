@@ -62,7 +62,9 @@ const addToStereodose = function(playlistID) {
 			}
 		});
 		let data = {
-			SpotifyID: playlistID
+			SpotifyID: playlistID,
+			Category: "Weed",
+			SubCategory: "Chill"
 		};
         req.send(JSON.stringify(data));
     });
