@@ -59,7 +59,7 @@ func createRouter() *util.AppRouter {
 	}
 
 	// Serve all of the static files
-	fs := http.StripPrefix("/public/", http.FileServer(http.Dir("app/views/public")))
+	fs := http.StripPrefix("/public/", http.FileServer(http.Dir("app/views/build/")))
 	app.PathPrefix("/public/").Handler(fs)
 
 	app.Handle("/test", auth.Middleware(webPlayerTest))
@@ -93,7 +93,7 @@ func createRouter() *util.AppRouter {
 	categoriesRouter := util.AppRouter{app.PathPrefix("/api/categories").Subrouter()}
 	categoriesRouter.AppHandler("/", categories.GetAvailableCategories).Methods(http.MethodGet)
 
-	app.Handle("/", auth.Middleware(webPlayerTest))
+	app.HandleFunc("/", webPlayerTest)
 
 	return app
 }

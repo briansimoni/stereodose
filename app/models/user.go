@@ -27,7 +27,7 @@ type User struct {
 	// TODO: may want to change this to not unique to handle soft delete cases
 	SpotifyID    string `gorm:"unique;not null"`
 	RefreshToken string `json:"-"` // Hide the RefreshToken in json responses
-	AccessToken  string `json:"-"`
+	AccessToken  string
 	Images       []spotify.Image
 	Playlists    []Playlist
 }
