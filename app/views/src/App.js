@@ -1,119 +1,125 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
+import React, { Component, Fragment } from 'react';
 import './App.css';
-import Main from './temp';
+import WebPlaybackReact from './Spotify/WebPlaybackReact';
+import Playlist from './screens/Playlist';
+import MySpotifyPlaylists from './screens/MySpotifyPlaylists';
 
-class App extends Component {
-  render() {
+import Login from './Spotify/Login.js';
 
+// import Header from './layout/Header.js';
+// import Footer from './layout/Footer.js';
 
-	// Start: garbage temporary JS for POC purposes
+import IntroScreen from './screens/Intro.js';
+import NowPlayingScreen from './screens/NowPlaying.js';
 
-	// this needs to log us in
-	// if we have a cookie, call the /refresh endpoint
-	// if not, window location to /auth/login
-	// returns an Access Token
-	let checkLoginStatus = function() {
-		function getCookie(name) {
-			var dc = document.cookie;
-			var prefix = name + "=";
-			var begin = dc.indexOf("; " + prefix);
-			if (begin == -1) {
-				begin = dc.indexOf(prefix);
-				if (begin != 0) return null;
-			}
-			else
-			{
-				begin += 2;
-				var end = document.cookie.indexOf(";", begin);
-				if (end == -1) {
-				end = dc.length;
-				}
-			}
-			// because unescape has been deprecated, replaced with decodeURI
-			//return unescape(dc.substring(begin + prefix.length, end));
-			return decodeURI(dc.substring(begin + prefix.length, end));
-		}
-		let cookie = getCookie("_stereodose-session");
-		if (!cookie) {
-			// throw new Error("No cookie boi");
-			window.location = "/auth/login";
-			return;
-		}
-
-		return new Promise( (resolve, reject) => {
-			let req = new XMLHttpRequest();
-			req.open("GET", "/auth/refresh");
-			req.addEventListener("readystatechange", function () {
-				if (this.readyState === 4) {
-					if (this.status === 200) {
-						let data = JSON.parse(this.responseText);
-						console.log(data);
-						resolve(data.access_token);
-					} else {
-						reject(new Error("failed to get the token boi"));
-					}
-				}
-
-			})
-			req.send();
-		});
+export default class App extends Component {
+	state = {
+	  // User's session credentials
+	  userDeviceId: null,
+	  userAccessToken: null,
+  
+	  // Player state
+	  playerLoaded: false,
+	  playerSelected: false,
+	  playerState: null
 	}
-	checkLoginStatus().then(function(token) {
-		console.log(token);
-
-		let refreshButton = document.getElementById("refresh");
-		refreshButton.addEventListener("click", function() {
-			window.location.reload();
-		});
-        // let Token = {{.AccessToken}};
-        window.onSpotifyWebPlaybackSDKReady = () => {
-        //   const token = {{.AccessToken}};
-          const player = new window.Spotify.Player({
-            name: 'Web Playback SDK Quick Start Player',
-			getOAuthToken: cb => { cb(token); }
-          });
-    
-          // Error handling
-          player.addListener('initialization_error', ({ message }) => { console.error(message); });
-          player.addListener('authentication_error', ({ message }) => { console.error(message); });
-          player.addListener('account_error', ({ message }) => { console.error(message); });
-          player.addListener('playback_error', ({ message }) => { console.error(message); });
-    
-          // Playback status updates
-          player.addListener('player_state_changed', state => { console.log(state); });
-    
-          // Ready
-          player.addListener('ready', ({ device_id }) => {
-            Main(token, device_id);
-            console.log('Ready with Device ID', device_id);
-          });
-    
-          // Not Ready
-          player.addListener('not_ready', ({ device_id }) => {
-            console.log('Device ID has gone offline', device_id);
-          });
-    
-          // Connect to the player!
-          player.connect();
-        };
-	})
-	// END: garbage code
-
-
+  
+	componentWillMount() {
+		Login().then( (token) => {
+			this.onSuccessfulAuthorization(token);
+		})
+	//   LoginCallback({
+	// 	onSuccessfulAuthorization: this.onSuccessfulAuthorization.bind(this),
+	// 	onAccessTokenExpiration: this.onAccessTokenExpiration.bind(this)
+	//   });
+	}
 	
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
-    );
-  }
-}
+	onSuccessfulAuthorization(accessToken) {
+		console.log('success!');
+	  this.setState({
+		userAccessToken: accessToken
+	  });
+	}
+	
+	onAccessTokenExpiration() {
+	  this.setState({
+		userDeviceId: null,
+		userAccessToken: null,
+		playerLoaded: false,
+		playerSelected: false,
+		playerState: null
+	  });
+  
+	  console.error("The user access token has expired.");
+	}
+	
+	render() {
+	  let {
+		userDeviceId,
+		userAccessToken,
+		playerLoaded,
+		playerSelected,
+		playerState
+	  } = this.state;
+	  
+	  let webPlaybackSdkProps = {
+		playerName: "Spotify React Player",
+		playerInitialVolume: 1.0,
+		playerRefreshRateMs: 100,
+		playerAutoConnect: true,
+		onPlayerRequestAccessToken: (() => userAccessToken),
+		onPlayerLoading: (() => this.setState({ playerLoaded: true })),
+		onPlayerWaitingForDevice: (data => this.setState({ playerSelected: false, userDeviceId: data.device_id })),
+		onPlayerDeviceSelected: (() => this.setState({ playerSelected: true })),
+		onPlayerStateChange: (playerState => this.setState({ playerState: playerState })),
+		onPlayerError: (playerError => console.error(playerError))
+	  };
+	  
+	  return (
+		<div className="App">
+		  {/* <Header /> */}
+		  <main>
+			{!userAccessToken && <IntroScreen />}
+			{userAccessToken &&
+			  <WebPlaybackReact {...webPlaybackSdkProps}>
+			  <h4>my playlists!</h4>
+		  		<MySpotifyPlaylists access_token={userAccessToken}></MySpotifyPlaylists>
 
-export default App;
+			<h4>Playlists on Stereodose</h4>
+			<Playlist access_token={userAccessToken} category="Weed" subcategory="Chill" device_id={userDeviceId}></Playlist>
+				{!playerLoaded &&
+				  <h2 className="action-orange">Loading Player</h2>
+				}
+  
+				{playerLoaded && !playerSelected && 
+				  <Fragment>
+					<h2 className="action-green">Loading Player</h2>
+					<h2 className="action-orange">Waiting for device to be selected</h2>
+				  </Fragment>
+				}
+  
+				{playerLoaded && playerSelected && !playerState &&
+				  <Fragment>
+					<h2 className="action-green">Loading Player</h2>
+					{/* <h2 className="action-green">Waiting for device to be selected</h2> */}
+					<h2 className="action-orange">Start playing music ...</h2>
+				  </Fragment>
+				}
+  
+				{playerLoaded && playerSelected && playerState &&
+				  <Fragment>
+					<h2 className="action-green">Loading Player</h2>
+					<h2 className="action-green">Waiting for device to be selected</h2>
+					<h2 className="action-green">Start playing music!</h2>
+					<NowPlayingScreen playerState={playerState} />
+				  </Fragment>
+				}
+			  </WebPlaybackReact>
+			}
+		  </main>
+  
+		  {/* <Footer /> */}
+		</div>
+	  );
+	}
+  };

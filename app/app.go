@@ -81,8 +81,9 @@ func createRouter() *util.AppRouter {
 
 	playlistsRouter := util.AppRouter{app.PathPrefix("/api/playlists").Subrouter()}
 	playlistsRouter.Use(UserContextMiddleware)
+	playlistsRouter.AppHandler("/", playlists.GetPlaylists).Methods(http.MethodGet)
 	playlistsRouter.AppHandler("/", playlists.GetPlaylists).
-		Queries("offset", "{offset:[0-9]+}", "limit", "{limit:[0-9]+}").
+		Queries("offset", "{offset:[0-9]+}", "limit", "{limit:[0-9]+}", "category", "{category:[a-zA-Z]+}", "subcategory", "{subcategory:[a-zA-Z]+}").
 		Methods(http.MethodGet)
 		// TODO: fix the ID thing here
 	playlistsRouter.AppHandler("/{id}", playlists.GetPlaylistByID).Methods(http.MethodGet)
