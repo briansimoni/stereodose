@@ -77,8 +77,9 @@ func (s *StereodosePlaylistService) GetPlaylists(offset, limit, category, subcat
 }
 
 func (s *StereodosePlaylistService) GetByID(ID string) (*Playlist, error) {
+	log.Println("HELLO")
 	playlist := &Playlist{}
-	err := s.db.Preload("Tracks").Find(playlist, "spotify_id = ?", ID).Error
+	err := s.db.Debug().Preload("Tracks").Find(playlist, "spotify_id = ?", ID).Error
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +88,7 @@ func (s *StereodosePlaylistService) GetByID(ID string) (*Playlist, error) {
 
 func (s *StereodosePlaylistService) GetMyPlaylists(user User) ([]Playlist, error) {
 	playlists := []Playlist{}
-	err := s.db.Debug().Find(playlists, "user_id = ?", user.ID).Error
+	err := s.db.Debug().Find(&playlists, "user_id = ?", user.ID).Error
 	if err != nil {
 		return nil, err
 	}

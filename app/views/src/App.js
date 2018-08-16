@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import './App.css';
 import WebPlaybackReact from './Spotify/WebPlaybackReact';
-import Playlist from './screens/Playlist';
+import Playlists from './screens/Playlists';
 import MySpotifyPlaylists from './screens/MySpotifyPlaylists';
 
 import Login from './Spotify/Login.js';
@@ -86,7 +86,7 @@ export default class App extends Component {
 		  		<MySpotifyPlaylists access_token={userAccessToken}></MySpotifyPlaylists>
 
 			<h4>Playlists on Stereodose</h4>
-			<Playlist access_token={userAccessToken} category="Weed" subcategory="Chill" device_id={userDeviceId}></Playlist>
+			<Playlists access_token={userAccessToken} category="Weed" subcategory="Chill" device_id={userDeviceId}></Playlists>
 				{!playerLoaded &&
 				  <h2 className="action-orange">Loading Player</h2>
 				}
