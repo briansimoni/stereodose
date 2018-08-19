@@ -13,7 +13,6 @@ class Playlist extends React.Component {
 	// getSongs is passed in by the parent, and triggers the Tracks to render
 	getSongs
 
-
 	render() {
 		return <li onClick={() => {this.props.getSongs(this.props.playlist_id)}}>{this.props.name}</li>
 	}

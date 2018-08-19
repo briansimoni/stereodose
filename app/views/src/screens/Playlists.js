@@ -25,29 +25,37 @@ class Playlists extends React.Component{
 		let playlistData = this.state.playlistData;
 		if(playlists !== null) {
 			if (playlistData !== null) {
-				console.log(this.state.playlistData);
-				console.log(this.state.playlistData !== null);
 				return (
 					<ul>
 						<li>:)</li>
-						{playlistData.Tracks.map(track => (
-							<Track name={track.Name}></Track>
-						))}
+
+						{playlistData.Tracks.map( (track) => {
+							 return (<Track
+							key={track.SpotifyID}
+							name={track.Name} 
+							URI={track.URI} 
+							context={playlistData.uri}
+							accessToken={this.props.access_token}
+							deviceID= {this.props.device_id}>
+							 </Track> )
+						})}
 					</ul>
 				);
 			}
 			return (
 				<ul>
-				{playlists.map(playlist => (
-					<Playlist
+				{playlists.map( (playlist, index) => {
+					return (
+						<Playlist
 						device_id={this.props.device_id}
 						access_token={this.props.access_token}
 						playlist_id={playlist.SpotifyID} 
-						key={playlist.SpotifyID}
+						key={index}
 						name={playlist.name}
 						getSongs={this.getSongs}>
-					</Playlist>
-				))}
+						</Playlist>
+					)
+				} )}
 				</ul>
 			);
 		}

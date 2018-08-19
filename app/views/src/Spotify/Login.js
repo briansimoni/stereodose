@@ -32,7 +32,6 @@ export default function () {
 			if (this.readyState === 4) {
 				if (this.status === 200) {
 					let data = JSON.parse(this.responseText);
-					console.log(data);
 					resolve(data.access_token);
 				} else {
 					reject(new Error("failed to get the token boi " + this.responseText));

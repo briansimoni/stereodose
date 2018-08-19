@@ -11,7 +11,6 @@ class UserPlaylist extends React.Component{
 	// }
 
 	addToStereodose() {
-		console.log(this.props.spotifyid);
 		this.props.add_playlist(this.props.spotifyid);
 	}
 

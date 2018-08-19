@@ -29,12 +29,6 @@ class MySpotifyPlaylists extends React.Component {
 	}
 
 	addPlaylistToStereodose(playlistID) {
-		let data = {
-			SpotifyID: playlistID,
-			Category: "Weed",
-			SubCategory: "Chill"
-		}
-		console.log(data);
 		let ID = playlistID;
 		fetch("/api/playlists/", {
 			method: "POST",
@@ -45,7 +39,6 @@ class MySpotifyPlaylists extends React.Component {
 			})
 		}).then((res) => {
 			console.log("Made fetch call to POST playlist without error");
-			console.log(res);
 		})
 	}
 

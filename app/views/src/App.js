@@ -35,7 +35,6 @@ export default class App extends Component {
 	}
 	
 	onSuccessfulAuthorization(accessToken) {
-		console.log('success!');
 	  this.setState({
 		userAccessToken: accessToken
 	  });
@@ -85,8 +84,8 @@ export default class App extends Component {
 			  <h4>my playlists!</h4>
 		  		<MySpotifyPlaylists access_token={userAccessToken}></MySpotifyPlaylists>
 
-			<h4>Playlists on Stereodose</h4>
-			<Playlists access_token={userAccessToken} category="Weed" subcategory="Chill" device_id={userDeviceId}></Playlists>
+					<h4>Playlists on Stereodose</h4>
+					<Playlists access_token={userAccessToken} category="Weed" subcategory="Chill" device_id={userDeviceId}></Playlists>
 				{!playerLoaded &&
 				  <h2 className="action-orange">Loading Player</h2>
 				}
