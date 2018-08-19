@@ -23,7 +23,7 @@ const (
 )
 
 type PlaylistService interface {
-	GetPlaylists(offset, limit string) ([]Playlist, error)
+	GetPlaylists(offset, limit, category, subcategory string) ([]Playlist, error)
 	GetByID(ID string) (*Playlist, error)
 	GetMyPlaylists(user User) ([]Playlist, error)
 	CreatePlaylistBySpotifyID(user User, playlistID, category, subCategory string) (*Playlist, error)
@@ -60,10 +60,16 @@ type StereodosePlaylistService struct {
 	db    *gorm.DB
 }
 
-// TODO: narrow this down to the specific category
-func (s *StereodosePlaylistService) GetPlaylists(offset, limit string) ([]Playlist, error) {
+// GetPlaylists takes search parameters and returns a subset of playlists
+func (s *StereodosePlaylistService) GetPlaylists(offset, limit, category, subcategory string) ([]Playlist, error) {
 	playlists := []Playlist{}
-	err := s.db.Debug().Offset(offset).Limit(limit).Find(&playlists).Error
+
+	err := s.db.Debug().
+		Offset(offset).
+		Limit(limit).
+		Where("category = ? AND sub_category = ?", category, subcategory).
+		Find(&playlists).Error
+
 	if err != nil {
 		return nil, err
 	}
@@ -71,8 +77,9 @@ func (s *StereodosePlaylistService) GetPlaylists(offset, limit string) ([]Playli
 }
 
 func (s *StereodosePlaylistService) GetByID(ID string) (*Playlist, error) {
+	log.Println("HELLO")
 	playlist := &Playlist{}
-	err := s.db.Preload("Tracks").Find(playlist, "spotify_id = ?", ID).Error
+	err := s.db.Debug().Preload("Tracks").Find(playlist, "spotify_id = ?", ID).Error
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +88,7 @@ func (s *StereodosePlaylistService) GetByID(ID string) (*Playlist, error) {
 
 func (s *StereodosePlaylistService) GetMyPlaylists(user User) ([]Playlist, error) {
 	playlists := []Playlist{}
-	err := s.db.Debug().Find(playlists, "user_id = ?", user.ID).Error
+	err := s.db.Debug().Find(&playlists, "user_id = ?", user.ID).Error
 	if err != nil {
 		return nil, err
 	}

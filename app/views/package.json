@@ -5,7 +5,8 @@
   "dependencies": {
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
-    "react-scripts": "1.1.4"
+    "react-scripts": "1.1.4",
+    "spotify-web-api-js": "^0.24.0"
   },
   "scripts": {
     "start": "PORT=4000 react-scripts start",
@@ -16,10 +17,10 @@
   "proxy": {
     "/api": {
       "target": "http://localhost:3000"
-	},
-	"/auth": {
-	  "target": "http://localhost:3000"
-	}
+    },
+    "/auth": {
+      "target": "http://localhost:3000"
+    }
   },
   "homepage": "/public"
 }

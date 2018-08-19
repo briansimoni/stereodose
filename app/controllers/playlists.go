@@ -20,13 +20,19 @@ type PlaylistsController struct {
 // either offset or limit are required parameters
 // TODO: filter by category
 func (p *PlaylistsController) GetPlaylists(w http.ResponseWriter, r *http.Request) error {
-	// The router will run some regex to make sure that they are [0-9]+
-	// no need to check again here
 	queryValues := r.URL.Query()
 	offset := queryValues.Get("offset")
 	limit := queryValues.Get("limit")
+	category := queryValues.Get("category")
+	subcategory := queryValues.Get("subcategory")
+	if offset == "" {
+		offset = "0"
+	}
+	if limit == "" {
+		limit = "10"
+	}
 
-	playlists, err := p.DB.Playlists.GetPlaylists(offset, limit)
+	playlists, err := p.DB.Playlists.GetPlaylists(offset, limit, category, subcategory)
 	if err != nil {
 		return errors.WithStack(err)
 	}

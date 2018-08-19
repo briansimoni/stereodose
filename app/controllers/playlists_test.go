@@ -20,7 +20,7 @@ import (
 type fakePlaylistService struct {
 }
 
-func (f *fakePlaylistService) GetPlaylists(offset, limit string) ([]models.Playlist, error) {
+func (f *fakePlaylistService) GetPlaylists(offset, limit, category, subcategory string) ([]models.Playlist, error) {
 	off, _ := strconv.Atoi(offset)
 	lim, _ := strconv.Atoi(limit)
 	if off < 0 || lim < 0 {
@@ -45,6 +45,9 @@ func (f *fakePlaylistService) CreatePlaylistBySpotifyID(user models.User, spotif
 	return nil, nil
 }
 func (f *fakePlaylistService) GetMyPlaylists(user models.User) ([]models.Playlist, error) {
+	if user.DisplayName == "BadTestCase" {
+		return nil, errors.New("Unable to obtain playlists because reasons")
+	}
 	return nil, nil
 }
 func (f *fakePlaylistService) DeletePlaylist(id string) error {
@@ -167,6 +170,44 @@ func TestPlaylistsController_CreatePlaylist(t *testing.T) {
 			recorder := httptest.NewRecorder()
 
 			ctx := context.WithValue(req.Context(), "User", tc.user)
+			testRouter.ServeHTTP(recorder, req.WithContext(ctx))
+			result := recorder.Result()
+
+			if result.StatusCode != tc.status {
+				t.Errorf("Expected status: %v; Got: %v", tc.status, result.Status)
+			}
+		})
+	}
+}
+
+func TestPlaylistsController_GetMyPlaylists(t *testing.T) {
+	var testRouter = &util.AppRouter{mux.NewRouter()}
+	tt := []struct {
+		name   string
+		status int
+		user   *models.User
+	}{
+		{name: "Valid Test", status: 200, user: &models.User{}},
+		{name: "User Missing", status: 500, user: nil},
+		{name: "Database Error", status: 500, user: &models.User{DisplayName: "BadTestCase"}},
+	}
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			testRouter.AppHandler("/api/playlists/me", controller.GetMyPlaylists).Methods(http.MethodGet)
+			req, err := http.NewRequest(http.MethodGet, "/api/playlists/me", nil)
+			if err != nil {
+				t.Error(err.Error())
+			}
+
+			user := tc.user
+			var ctx context.Context
+			if tc.user != nil {
+				ctx = context.WithValue(req.Context(), "User", *user)
+			} else {
+				ctx = req.Context()
+			}
+			recorder := httptest.NewRecorder()
+
 			testRouter.ServeHTTP(recorder, req.WithContext(ctx))
 			result := recorder.Result()
 
