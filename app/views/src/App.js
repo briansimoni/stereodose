@@ -99,9 +99,9 @@ export default class App extends Component {
   
 				{playerLoaded && playerSelected && !playerState &&
 				  <Fragment>
-					<h2 className="action-green">Loading Player</h2>
+					{/* <h2 className="action-green">Loading Player</h2> */}
 					{/* <h2 className="action-green">Waiting for device to be selected</h2> */}
-					<h2 className="action-orange">Start playing music ...</h2>
+					{/* <h2 className="action-orange">Start playing music ...</h2> */}
 				  </Fragment>
 				}
   
