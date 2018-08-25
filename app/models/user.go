@@ -50,7 +50,7 @@ func (u *StereodoseUserService) ByID(ID uint) (*User, error) {
 }
 
 func (u *StereodoseUserService) FirstOrCreate(user *User, tok *oauth2.Token) (*User, error) {
-	err := u.db.Debug().FirstOrCreate(user).Error
+	err := u.db.Debug().FirstOrCreate(user, "spotify_id = ?", user.SpotifyID).Error
 	if err != nil {
 		return nil, err
 	}
