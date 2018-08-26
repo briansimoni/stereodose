@@ -11,12 +11,16 @@ For local development first create a .env file that looks like this:
 ```bash
 STEREODOSE_CLIENT_ID=someclientid
 STEREODOSE_CLIENT_SECRET=someclientsecret
-STEREODOSE_REDIRECT_URL=http://localhost:3000/auth/callback
+STEREODOSE_REDIRECT_URL=http://localhost:4000/auth/callback
 STEREODOSE_AUTH_KEY=somesecretkeythatyoucangenerate
 STEREODOSE_ENCRYPTION_KEY=somesecretkeythatyoucangenerate
 ```
 
 Obtain the client ID and secret by creating an app in the Spotify developer dashboard, and set the callback to http://localhost:3000/auth/callback
+and
+http://localhost:4000/auth/callback
+
+It is helpful to have both
 
 You can generate a random AUTH_KEY and ENCRYPTION_KEY by switching to the scripts directory
 
@@ -27,6 +31,7 @@ If you don't want to use a .env file, you can use regular system environment var
 Once you have the variables set:
 ```
 docker-compose up
+# new terminal
 cd app/views/
 npm install
 npm start
