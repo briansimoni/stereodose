@@ -1,7 +1,6 @@
 package models
 
 import (
-	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/zmb3/spotify"
@@ -15,8 +14,7 @@ type UserService interface {
 }
 
 type StereodoseUserService struct {
-	store *sessions.CookieStore
-	db    *gorm.DB
+	db *gorm.DB
 }
 
 type User struct {

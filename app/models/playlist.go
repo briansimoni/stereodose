@@ -5,7 +5,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
 	"github.com/zmb3/spotify"
 	"golang.org/x/oauth2"
@@ -56,8 +55,7 @@ type PlaylistImage struct {
 }
 
 type StereodosePlaylistService struct {
-	store *sessions.CookieStore
-	db    *gorm.DB
+	db *gorm.DB
 }
 
 // GetPlaylists takes search parameters and returns a subset of playlists

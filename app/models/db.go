@@ -25,7 +25,7 @@ func NewStereodoseDB(db *gorm.DB, s *sessions.CookieStore) *StereoDoseDB {
 	database := &StereoDoseDB{}
 	database.db = db
 	database.store = s
-	database.Users = &StereodoseUserService{db: db, store: s}
-	database.Playlists = &StereodosePlaylistService{db: db, store: s}
+	database.Users = &StereodoseUserService{db: db}
+	database.Playlists = &StereodosePlaylistService{db: db}
 	return database
 }
