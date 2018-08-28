@@ -23,10 +23,10 @@ class Playlist extends React.Component {
 		if (playlist) {
 			return (
 				<div>
-					<h4 onClick={ () => this.props.getAccessToken()}>Playlist Get access token</h4>
 					{playlist.Tracks.map( (track) => {
 						return (
-							<li key={track.SpotifyID}>
+							<li 
+							key={track.SpotifyID} onClick={() => this.playSong(playlist.uri, track.URI)}>
 								{track.Name}
 							</li>
 						)
@@ -36,7 +36,41 @@ class Playlist extends React.Component {
 		}
 	}
 
+	playSong(context, uri) {
+		let data = {
+			"context_uri": context,
+			"offset": {
+				"uri": uri
+			}
+		}
+
+		this.props.getDeviceID().then( (deviceID) => {
+			this.props.getAccessToken().then( (accessToken) => {
+				fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceID}`,{
+			
+					method: "PUT",
+					headers : {
+						"Authorization": `Bearer ${accessToken.token.access_token}`,
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify(data)
+				})
+				.then( (result) => {
+					console.log("play track result");
+					console.log(result);
+				})
+				.catch( (error) => {
+					console.warn(error);
+				})
+			})
+		})
+	}
+
 	componentDidMount() {
+		this.props.getDeviceID().then( (data) => {
+			console.log("this is the data!");
+			console.log("data!:" + data);
+		})
 		let playlistID = this.props.match.params.playlist
 		fetch(`/api/playlists/${playlistID}`)
 		.then( (response) => {

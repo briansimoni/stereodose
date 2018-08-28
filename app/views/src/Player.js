@@ -2,8 +2,6 @@ import React, { Component, Fragment } from 'react';
 import './Player.css';
 import WebPlaybackReact from './Spotify/WebPlaybackReact';
 
-import Login from './Spotify/Login';
-
 // import Header from './layout/Header.js';
 // import Footer from './layout/Footer.js';
 
@@ -11,21 +9,28 @@ import IntroScreen from './screens/Intro';
 import NowPlayingScreen from './screens/NowPlaying';
 
 export default class Player extends Component {
-	state = {
-		// User's session credentials
-		userDeviceId: null,
-		userAccessToken: null,
 
-		// Player state
-		playerLoaded: false,
-		playerSelected: false,
-		playerState: null
+	constructor(props) {
+		super(props);
+		this.state = {
+			// User's session credentials
+			userDeviceId: null,
+			userAccessToken: null,
+	
+			// Player state
+			playerLoaded: false,
+			playerSelected: false,
+			playerState: null
+		};
 	}
 
 	componentWillMount() {
-		Login().then((token) => {
-			this.onSuccessfulAuthorization(token);
+		this.props.getAccessToken().then( (AccessToken) => {
+			this.onSuccessfulAuthorization(AccessToken.token.access_token);
 		})
+		// Login().then((token) => {
+		// 	this.onSuccessfulAuthorization(token);
+		// })
 		//   LoginCallback({
 		// 	onSuccessfulAuthorization: this.onSuccessfulAuthorization.bind(this),
 		// 	onAccessTokenExpiration: this.onAccessTokenExpiration.bind(this)
@@ -33,6 +38,8 @@ export default class Player extends Component {
 	}
 
 	onSuccessfulAuthorization(accessToken) {
+		console.log("setting userAccessToken");
+		console.log(accessToken);
 		this.setState({
 			userAccessToken: accessToken
 		});
@@ -58,6 +65,10 @@ export default class Player extends Component {
 			playerSelected,
 			playerState
 		} = this.state;
+
+		if (userDeviceId) {
+			this.props.setDeviceID(userDeviceId);
+		}
 
 		let webPlaybackSdkProps = {
 			playerName: "Spotify React Player",

@@ -3,6 +3,7 @@ import Drugs from './dev/Drugs';
 import Drug from './dev/Drug';
 import Playlists from './dev/Playlists';
 import Playlist from './dev/Playlist';
+import Player from './Player';
 import {BrowserRouter as Router, Route} from 'react-router-dom';
 import oauth2 from 'simple-oauth2';
 
@@ -10,19 +11,23 @@ import oauth2 from 'simple-oauth2';
 class App extends React.Component {
 
 	accessToken
+	deviceIDPromise
+	deviceIDResolver
 
 	constructor(props) {
 		super(props);
 
 		this.state = {accessToken: null}
 
+		this.deviceIDPromise =  new Promise( (resolve, reject) => {
+			resolve = resolve.bind(this);
+			this.deviceIDResolver = resolve;
+		})
+		
+
 		// TODO: figure out how an arrow function could eliminate this line
 		this.getAccessToken = this.getAccessToken.bind(this);
-		this.doSomething = this.doSomething.bind(this);
-	}
-
-	doSomething() {
-		console.log("SOMETHING");
+		this.setDeviceID = this.setDeviceID.bind(this);
 	}
 
 	render() {
@@ -31,13 +36,29 @@ class App extends React.Component {
 				<h1 onClick={ () => {this.getAccessToken()} }>Header</h1>
 				<Router>
 					<div>
+						<Route 
+							path="/" 
+							render={ (props) => 
+								<Player 
+								{...props} 
+								getAccessToken={ () => this.getAccessToken()}
+								setDeviceID={(deviceID) => this.setDeviceID(deviceID)}>
+								</Player>
+							}
+						/>
 						<Route exact path="/" component={Drugs} />
 						<Route exact path="/:drug" component={Drug} />
 						<Route exact path="/:drug/:subcategory" component={Playlists} />
 						{/* <Route path="/:drug/:subcategory/:playlist" component={Playlist} /> */}
 						<Route 
 							path="/:drug/:subcategory/:playlist"
-							render={(props) => <Playlist {...props} getAccessToken={ () => {this.getAccessToken()}} />}
+							render={(props) => 
+							<Playlist
+							{...props} 
+							getAccessToken={ () => this.getAccessToken()} 
+							getDeviceID={ () => this.deviceIDPromise }
+							/>
+						}
 						/>
 						
 					</div>
@@ -46,12 +67,18 @@ class App extends React.Component {
 		)
 	}
 
+	// pass setDeviceID to the player component so we can lift "state" up
+	// and then move it over to peers
+	setDeviceID(deviceID) {
+		this.deviceIDResolver(deviceID);
+	}
+
 	// getAccessToken will return a Promise to either get the access token or will redirect
 	// the user to Login
 	// Should be able to pass this function around as a prop to components that need a token
 	// i.e. <Player> and <Playlist>
 	async getAccessToken() {
-		let token = this.state.accessToken;
+		let token = this.accessToken;
 		if (token && !token.expired()) {
 			return token;
 		}
@@ -102,7 +129,6 @@ class App extends React.Component {
 
 		// Using the npm library only for the convenient helper AccessToken class
 		// Should probably write the logic to track expiration myself and remove this dependency
-		console.log(data);
 		const fake = {
 			client: {
 			  id: '<client-id>',
