@@ -138,8 +138,8 @@ func TestPlaylistsController_CreatePlaylist(t *testing.T) {
 
 	validData := postBody{
 		SpotifyID:   "test",
-		Category:    "Weed",
-		SubCategory: "Chill",
+		Category:    "weed",
+		SubCategory: "chill",
 	}
 	var testRouter = &util.AppRouter{mux.NewRouter()}
 	tt := []struct {
@@ -154,8 +154,8 @@ func TestPlaylistsController_CreatePlaylist(t *testing.T) {
 		{name: "Invalid POST body", status: 400, user: models.User{}, data: 69},
 		{name: "Database Error", status: 500, user: models.User{}, data: postBody{
 			SpotifyID:   "alreadyExists",
-			Category:    "Weed",
-			SubCategory: "Chill",
+			Category:    "weed",
+			SubCategory: "chill",
 		},
 		},
 	}
