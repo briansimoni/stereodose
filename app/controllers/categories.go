@@ -12,6 +12,11 @@ import (
 // playlist categories. Like Weed/Chill
 type CategoriesController struct{}
 
+// NewCategoriesController returns a pointer to a CategoriesController
+func NewCategoriesController() *CategoriesController {
+	return &CategoriesController{}
+}
+
 // GetAvailableCategories sends a JSON object with available categories to use
 // The server will deny requests to tag playlists with invalid categories
 func (c *CategoriesController) GetAvailableCategories(w http.ResponseWriter, r *http.Request) error {

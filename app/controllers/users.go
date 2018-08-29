@@ -12,6 +12,11 @@ type UsersController struct {
 	DB *models.StereoDoseDB
 }
 
+// NewUsersController returns a pointer to UsersController
+func NewUsersController(db *models.StereoDoseDB) *UsersController {
+	return &UsersController{DB: db}
+}
+
 func (u *UsersController) Me(w http.ResponseWriter, r *http.Request) {
 	user, ok := r.Context().Value("User").(models.User)
 	if !ok {

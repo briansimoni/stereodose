@@ -13,6 +13,7 @@ import (
 
 	"github.com/briansimoni/stereodose/app/models"
 	"github.com/briansimoni/stereodose/app/util"
+	"github.com/briansimoni/stereodose/config"
 
 	"github.com/zmb3/spotify"
 	"golang.org/x/oauth2"
@@ -27,8 +28,36 @@ const sessionName = "_stereodose-session"
 var spotifyURL = "https://accounts.spotify.com"
 
 type AuthController struct {
-	DB    *models.StereoDoseDB
-	Store *sessions.CookieStore
+	DB     *models.StereoDoseDB
+	Store  *sessions.CookieStore
+	Config *oauth2.Config
+}
+
+// NewAuthController takes a StereodoseDB, CookieStore, and App Config
+// returns an AuthController
+func NewAuthController(db *models.StereoDoseDB, store *sessions.CookieStore, config *config.Config) *AuthController {
+	oauthConfig := &oauth2.Config{
+		ClientID:     os.Getenv(config.ClientID),
+		ClientSecret: os.Getenv(config.ClientSecret),
+		RedirectURL:  os.Getenv(config.RedirectURL),
+		Scopes: []string{
+			"playlist-modify-public",
+			"streaming",
+			"user-read-birthdate",
+			"user-read-email",
+			"user-read-private",
+			"playlist-read-collaborative",
+			//"playlist-read-private",
+			"user-modify-playback-state",
+		},
+		Endpoint: endpoint.Endpoint,
+	}
+	a := &AuthController{
+		DB:     db,
+		Store:  store,
+		Config: oauthConfig,
+	}
+	return a
 }
 
 type refreshTokenResponse struct {

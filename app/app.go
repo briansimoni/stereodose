@@ -37,26 +37,19 @@ func InitApp(c *config.Config, db *gorm.DB) *util.AppRouter {
 	store = sessions.NewCookieStore(authKey, encryptionKey)
 
 	stereoDoseDB = models.NewStereodoseDB(db, store)
-	return createRouter()
+	return createRouter(c)
 }
 
-func createRouter() *util.AppRouter {
+func createRouter(c *config.Config) *util.AppRouter {
 	app := &util.AppRouter{mux.NewRouter()}
 	app.Use(func(next http.Handler) http.Handler {
 		return handlers.LoggingHandler(os.Stdout, next)
 	})
 
-	users := controllers.UsersController{
-		DB: stereoDoseDB,
-	}
-	playlists := controllers.PlaylistsController{
-		DB: stereoDoseDB,
-	}
-	categories := controllers.CategoriesController{}
-	auth := controllers.AuthController{
-		DB:    stereoDoseDB,
-		Store: store,
-	}
+	categories := controllers.NewCategoriesController()
+	users := controllers.NewUsersController(stereoDoseDB)
+	playlists := controllers.NewPlaylistsController(stereoDoseDB)
+	auth := controllers.NewAuthController(stereoDoseDB, store, c)
 
 	// Serve all of the static files
 	fs := http.StripPrefix("/public/", http.FileServer(http.Dir("app/views/build/")))

@@ -23,11 +23,11 @@ class Playlist extends React.Component {
 		if (playlist) {
 			return (
 				<div>
-					{playlist.Tracks.map( (track) => {
+					{playlist.tracks.map( (track) => {
 						return (
 							<li 
-							key={track.SpotifyID} onClick={() => this.playSong(playlist.uri, track.URI)}>
-								{track.Name}
+							key={track.spotifyID} onClick={() => this.playSong(playlist.URI, track.URI)}>
+								{track.name}
 							</li>
 						)
 					})}
@@ -67,10 +67,7 @@ class Playlist extends React.Component {
 	}
 
 	componentDidMount() {
-		this.props.getDeviceID().then( (data) => {
-			console.log("this is the data!");
-			console.log("data!:" + data);
-		})
+
 		let playlistID = this.props.match.params.playlist
 		fetch(`/api/playlists/${playlistID}`)
 		.then( (response) => {

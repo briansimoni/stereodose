@@ -38,8 +38,6 @@ export default class Player extends Component {
 	}
 
 	onSuccessfulAuthorization(accessToken) {
-		console.log("setting userAccessToken");
-		console.log(accessToken);
 		this.setState({
 			userAccessToken: accessToken
 		});

@@ -15,7 +15,6 @@ class Playlists extends React.Component {
 	render() {
 		console.log('whole thign rendered');
 		let {loading, err, playlists} = this.state;
-		console.log(playlists);
 		if (loading) {
 			return <h3>Loading</h3>
 		}
@@ -31,8 +30,8 @@ class Playlists extends React.Component {
 					<ul>
 						{playlists.map( (playlist) => {
 							return (
-								<Link to={`${match.url}/${playlist.SpotifyID}`}>
-									<li key={playlist.SpotifyID}>{playlist.name}</li>
+								<Link to={`${match.url}/${playlist.spotifyID}`}>
+									<li key={playlist.spotifyID}>{playlist.name}</li>
 								</Link>
 							)
 						})}
