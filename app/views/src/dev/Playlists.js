@@ -37,6 +37,7 @@ class Playlists extends React.Component {
 						})}
 					</ul>
 				</div>
+				
 			);
 		}
 	}
