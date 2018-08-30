@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -150,6 +149,25 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error 
 	return nil
 }
 
+// GetMyAccessToken will return the Spotify Access token associated with the user's current session
+// It probably would've have been better if I embedded this into a JWT and ditched cookies...
+// TODO: perhaps it is better design to encapsulate the refresh logic here as well
+func (a *AuthController) GetMyAccessToken(w http.ResponseWriter, r *http.Request) error {
+	s, err := a.Store.Get(r, sessionName)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	tok, ok := s.Values["Token"].(oauth2.Token)
+	if !ok {
+		return errors.WithStack(errors.New("Failed to read access_token from session cookie"))
+	}
+	err = util.JSON(w, tok)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // Refresh will update the Spotify API Access Token for the user's session
 // TODO: check the refresh token and save it (it might be a new refresh token)
 func (a *AuthController) Refresh(w http.ResponseWriter, r *http.Request) error {
@@ -179,19 +197,14 @@ func (a *AuthController) Refresh(w http.ResponseWriter, r *http.Request) error {
 		return errors.New("Error reading OAuth Token from Session")
 	}
 	sessionToken.AccessToken = tok.AccessToken
-	sessionToken.Expiry = sessionToken.Expiry.Add(time.Duration(tok.ExpiresIn) * time.Second)
+	now := time.Now()
+	sessionToken.Expiry = now.Add(time.Duration(tok.ExpiresIn) * time.Second)
 	s.Values["Token"] = sessionToken
-	log.Println(sessionToken)
 	err = s.Save(r, w)
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	j, err := json.MarshalIndent(&tok, " ", " ")
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	w.Header().Add("Content-Type", "application/json")
-	_, err = w.Write(j)
+	err = util.JSON(w, &tok)
 	if err != nil {
 		return errors.WithStack(err)
 	}

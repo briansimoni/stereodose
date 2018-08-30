@@ -50,7 +50,7 @@ class Playlist extends React.Component {
 			
 					method: "PUT",
 					headers : {
-						"Authorization": `Bearer ${accessToken.token.access_token}`,
+						"Authorization": `Bearer ${accessToken}`,
 						"Content-Type": "application/json"
 					},
 					body: JSON.stringify(data)
