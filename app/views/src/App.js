@@ -4,7 +4,8 @@ import Drug from './dev/Drug';
 import Playlists from './dev/Playlists';
 import Playlist from './dev/Playlist';
 import Player from './Player';
-import {BrowserRouter as Router, Route} from 'react-router-dom';
+import {HashRouter, Route} from 'react-router-dom';
+//import { HashRouter } from 'react-router-dom';
 
 
 class App extends React.Component {
@@ -33,7 +34,7 @@ class App extends React.Component {
 		return (
 			<div>
 				<h1 onClick={ () => {this.getAccessToken()} }>Header</h1>
-				<Router>
+				<HashRouter>
 					<div>
 						<Route 
 							path="/" 
@@ -61,7 +62,7 @@ class App extends React.Component {
 						/>
 						
 					</div>
-				</Router>
+				</HashRouter>
 			</div>
 		)
 	}

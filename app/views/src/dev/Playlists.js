@@ -13,7 +13,6 @@ class Playlists extends React.Component {
 	}
 
 	render() {
-		console.log('whole thign rendered');
 		let {loading, err, playlists} = this.state;
 		if (loading) {
 			return <h3>Loading</h3>
