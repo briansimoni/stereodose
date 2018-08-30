@@ -105,7 +105,7 @@ class App extends React.Component {
 		}
 
 		try {
-			let response =  await fetch("/auth/token");
+			let response =  await fetch("/auth/token", {credentials: "same-origin"});
 			let token = await response.json();
 			let expiresOn = token.expiry;
 			let now = new Date();
