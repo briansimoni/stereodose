@@ -25,8 +25,8 @@ export default class Player extends Component {
 	}
 
 	componentWillMount() {
-		this.props.getAccessToken().then( (AccessToken) => {
-			this.onSuccessfulAuthorization(AccessToken.token.access_token);
+		this.props.getAccessToken().then( (accessToken) => {
+			this.onSuccessfulAuthorization(accessToken);
 		})
 		// Login().then((token) => {
 		// 	this.onSuccessfulAuthorization(token);
@@ -38,8 +38,6 @@ export default class Player extends Component {
 	}
 
 	onSuccessfulAuthorization(accessToken) {
-		console.log("setting userAccessToken");
-		console.log(accessToken);
 		this.setState({
 			userAccessToken: accessToken
 		});

@@ -16,9 +16,13 @@ type PlaylistsController struct {
 	DB *models.StereoDoseDB
 }
 
+// NewPlaylistsController returns a pointer to PlaylistsController
+func NewPlaylistsController(db *models.StereoDoseDB) *PlaylistsController {
+	return &PlaylistsController{DB: db}
+}
+
 // GetPlaylists will return a subset of all the playlists in the DB
 // either offset or limit are required parameters
-// TODO: filter by category
 func (p *PlaylistsController) GetPlaylists(w http.ResponseWriter, r *http.Request) error {
 	queryValues := r.URL.Query()
 	offset := queryValues.Get("offset")

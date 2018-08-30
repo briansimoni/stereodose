@@ -10,17 +10,9 @@ import (
 	"golang.org/x/oauth2"
 )
 
-const (
-	// Weed ...
-	Weed = "Weed"
-	// LSD ...
-	LSD = "LSD"
-	// Shrooms ...
-	Shrooms = "Shrooms"
-	// Ecstasy ...
-	Ecstasy = "Ecstasy"
-)
-
+// PlaylistService is an interface used to describe all of the behavior
+// of some kind of service that a "Playlist Service" should offer
+// Useful for mocks/fakes when unit testing
 type PlaylistService interface {
 	GetPlaylists(offset, limit, category, subcategory string) ([]Playlist, error)
 	GetByID(ID string) (*Playlist, error)
@@ -29,31 +21,37 @@ type PlaylistService interface {
 	DeletePlaylist(spotifyID string) error
 }
 
+// Playlist is the data structure that contains playlist metadata from Spotify
+// It additionally has relations to users and tracks on Stereodose
 type Playlist struct {
 	//gorm.Model
-	SpotifyID     string `gorm:"primary_key:true"`
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
-	Category      string `json:"Category"`
-	SubCategory   string `json:"SubCategory"`
-	Collaborative bool   `json:"collaborative"`
+	SpotifyID     string    `json:"spotifyID" gorm:"primary_key:true"`
+	CreatedAt     time.Time `json:"createdAt"`
+	UpdatedAt     time.Time `json:"updatedAt"`
+	Category      string    `json:"category"`
+	SubCategory   string    `json:"subCategory"`
+	Collaborative bool      `json:"collaborative"`
 	//ExternalURLs  map[string]string `json:"external_urls"`
 	Endpoint   string          `json:"href"`
 	Images     []PlaylistImage `json:"images"`
 	Name       string          `json:"name"`
 	IsPublic   bool            `json:"public"`
 	SnapshotID string          `json:"snapshot_id"`
-	Tracks     []Track         `gorm:"many2many:playlist_tracks"`
-	URI        string          `json:"uri"`
-	UserID     uint
+	Tracks     []Track         `json:"tracks" gorm:"many2many:playlist_tracks"`
+	URI        string          `json:"URI"`
+	UserID     uint            `json:"userID"`
 }
 
+// PlaylistImage should contain a URL or reference to an image
+// It originally comes from Spotify
 type PlaylistImage struct {
 	gorm.Model
 	spotify.Image
 	PlaylistID uint
 }
 
+// StereodosePlaylistService contains a db and several methods
+// for acting on playlists in the local database
 type StereodosePlaylistService struct {
 	db *gorm.DB
 }
@@ -74,8 +72,8 @@ func (s *StereodosePlaylistService) GetPlaylists(offset, limit, category, subcat
 	return playlists, nil
 }
 
+// GetByID returns a playlist populated with all of its tracks
 func (s *StereodosePlaylistService) GetByID(ID string) (*Playlist, error) {
-	log.Println("HELLO")
 	playlist := &Playlist{}
 	err := s.db.Debug().Preload("Tracks").Find(playlist, "spotify_id = ?", ID).Error
 	if err != nil {
@@ -84,6 +82,7 @@ func (s *StereodosePlaylistService) GetByID(ID string) (*Playlist, error) {
 	return playlist, nil
 }
 
+// GetMyPlaylists returns all of the playlists that belong to a particular User
 func (s *StereodosePlaylistService) GetMyPlaylists(user User) ([]Playlist, error) {
 	playlists := []Playlist{}
 	err := s.db.Debug().Find(&playlists, "user_id = ?", user.ID).Error
@@ -93,7 +92,7 @@ func (s *StereodosePlaylistService) GetMyPlaylists(user User) ([]Playlist, error
 	return playlists, nil
 }
 
-// CreatePlaylist is given a user and playlistID
+// CreatePlaylistBySpotifyID is given a user and playlistID
 // It uses the information to call the Spotify API and save the information to the local db
 func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlistID, category, subCategory string) (*Playlist, error) {
 	// 1. get the tracks for the playlist
@@ -154,6 +153,7 @@ func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlis
 	return playlist, nil
 }
 
+// DeletePlaylist hard deletes the playlist (only from the StereodoseDB)
 func (s *StereodosePlaylistService) DeletePlaylist(spotifyID string) error {
 	if spotifyID == "" {
 		return errors.New("spotifyID was empty string")

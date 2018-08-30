@@ -37,26 +37,19 @@ func InitApp(c *config.Config, db *gorm.DB) *util.AppRouter {
 	store = sessions.NewCookieStore(authKey, encryptionKey)
 
 	stereoDoseDB = models.NewStereodoseDB(db, store)
-	return createRouter()
+	return createRouter(c)
 }
 
-func createRouter() *util.AppRouter {
+func createRouter(c *config.Config) *util.AppRouter {
 	app := &util.AppRouter{mux.NewRouter()}
 	app.Use(func(next http.Handler) http.Handler {
 		return handlers.LoggingHandler(os.Stdout, next)
 	})
 
-	users := controllers.UsersController{
-		DB: stereoDoseDB,
-	}
-	playlists := controllers.PlaylistsController{
-		DB: stereoDoseDB,
-	}
-	categories := controllers.CategoriesController{}
-	auth := controllers.AuthController{
-		DB:    stereoDoseDB,
-		Store: store,
-	}
+	categories := controllers.NewCategoriesController()
+	users := controllers.NewUsersController(stereoDoseDB)
+	playlists := controllers.NewPlaylistsController(stereoDoseDB)
+	auth := controllers.NewAuthController(stereoDoseDB, store, c)
 
 	// Serve all of the static files
 	fs := http.StripPrefix("/public/", http.FileServer(http.Dir("app/views/build/")))
@@ -74,6 +67,7 @@ func createRouter() *util.AppRouter {
 	authRouter.AppHandler("/login", auth.Login).Methods(http.MethodGet)
 	authRouter.AppHandler("/callback", auth.Callback).Methods(http.MethodGet)
 	authRouter.AppHandler("/refresh", auth.Refresh).Methods(http.MethodGet)
+	authRouter.AppHandler("/token", auth.GetMyAccessToken).Methods(http.MethodGet)
 
 	usersRouter := util.AppRouter{app.PathPrefix("/api/users/").Subrouter()}
 	usersRouter.Use(UserContextMiddleware)

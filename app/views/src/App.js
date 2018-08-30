@@ -4,8 +4,8 @@ import Drug from './dev/Drug';
 import Playlists from './dev/Playlists';
 import Playlist from './dev/Playlist';
 import Player from './Player';
-import {BrowserRouter as Router, Route} from 'react-router-dom';
-import oauth2 from 'simple-oauth2';
+import {HashRouter, Route} from 'react-router-dom';
+//import { HashRouter } from 'react-router-dom';
 
 
 class App extends React.Component {
@@ -34,7 +34,7 @@ class App extends React.Component {
 		return (
 			<div>
 				<h1 onClick={ () => {this.getAccessToken()} }>Header</h1>
-				<Router>
+				<HashRouter>
 					<div>
 						<Route 
 							path="/" 
@@ -62,7 +62,7 @@ class App extends React.Component {
 						/>
 						
 					</div>
-				</Router>
+				</HashRouter>
 			</div>
 		)
 	}
@@ -78,10 +78,6 @@ class App extends React.Component {
 	// Should be able to pass this function around as a prop to components that need a token
 	// i.e. <Player> and <Playlist>
 	async getAccessToken() {
-		let token = this.accessToken;
-		if (token && !token.expired()) {
-			return token;
-		}
 		// stolen from Stack Overflow
 		function getCookie(name) {
 			var dc = document.cookie;
@@ -108,42 +104,23 @@ class App extends React.Component {
 			return;
 		}
 
-		let call = new Promise((resolve, reject) => {
-			let req = new XMLHttpRequest();
-			req.open("GET", "/auth/refresh");
-			req.addEventListener("readystatechange", function () {
-				if (this.readyState === 4) {
-					if (this.status === 200) {
-						let data = JSON.parse(this.responseText);
-						resolve(data);
-					} else {
-						reject(new Error("failed to get the token boi " + this.responseText));
-					}
-				}
-
-			})
-			req.send();
-		});
-
-		let data = await call;
-
-		// Using the npm library only for the convenient helper AccessToken class
-		// Should probably write the logic to track expiration myself and remove this dependency
-		const fake = {
-			client: {
-			  id: '<client-id>',
-			  secret: '<client-secret>'
-			},
-			auth: {
-			  tokenHost: 'https://api.oauth.com'
+		try {
+			let response =  await fetch("/auth/token");
+			let token = await response.json();
+			let expiresOn = token.expiry;
+			let now = new Date();
+			let expiresDate = new Date(expiresOn);
+			if(now < expiresDate) {
+				this.accessToken = token.access_token;
+				return token.access_token;
 			}
-		  };
-		let oauth = oauth2.create(fake);
-
-		token = oauth.accessToken.create(data);
-		
-		this.accessToken = token;
-		return token;
+			response = await fetch("/auth/refresh");
+			token = await response.json();
+			this.accessToken = token.access_token;
+			return token.access_token;
+		} catch(err) {
+			return err;
+		}
 	}
 }
 
