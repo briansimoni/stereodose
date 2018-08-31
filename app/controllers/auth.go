@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 	"time"
 
@@ -22,10 +21,18 @@ import (
 	"github.com/pkg/errors"
 )
 
-const sessionName = "_stereodose-session"
+const (
+	spotifyURL = "https://accounts.spotify.com"
 
-var spotifyURL = "https://accounts.spotify.com"
+	// session keys
+	sessionName = "_stereodose-session"
+	token       = "Token"
+	state       = "State"
+	userID      = "User_ID"
+	returnPath  = "return_path"
+)
 
+// AuthController is a collection of RESTful Handlers for authentication
 type AuthController struct {
 	DB     *models.StereoDoseDB
 	Store  *sessions.CookieStore
@@ -36,9 +43,9 @@ type AuthController struct {
 // returns an AuthController
 func NewAuthController(db *models.StereoDoseDB, store *sessions.CookieStore, config *config.Config) *AuthController {
 	oauthConfig := &oauth2.Config{
-		ClientID:     os.Getenv(config.ClientID),
-		ClientSecret: os.Getenv(config.ClientSecret),
-		RedirectURL:  os.Getenv(config.RedirectURL),
+		ClientID:     config.ClientID,
+		ClientSecret: config.ClientSecret,
+		RedirectURL:  config.RedirectURL,
 		Scopes: []string{
 			"playlist-modify-public",
 			"streaming",
@@ -66,24 +73,7 @@ type refreshTokenResponse struct {
 	Scope       string `json:"scope"`
 }
 
-// TODO: get this from the app config struct and not os env
-var conf = &oauth2.Config{
-	ClientID:     os.Getenv("STEREODOSE_CLIENT_ID"),
-	ClientSecret: os.Getenv("STEREODOSE_CLIENT_SECRET"),
-	RedirectURL:  os.Getenv("STEREODOSE_REDIRECT_URL"),
-	Scopes: []string{
-		"playlist-modify-public",
-		"streaming",
-		"user-read-birthdate",
-		"user-read-email",
-		"user-read-private",
-		"playlist-read-collaborative",
-		//"playlist-read-private",
-		"user-modify-playback-state",
-	},
-	Endpoint: endpoint.Endpoint,
-}
-
+// Login is the handler that you can send the user to initiate an authorization code flow
 func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 	s, err := a.Store.Get(r, sessionName)
 	if err != nil {
@@ -98,7 +88,7 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 	s.Values["State"] = state
 	s.Save(r, w)
 
-	url := conf.AuthCodeURL(state, oauth2.AccessTypeOnline)
+	url := a.Config.AuthCodeURL(state, oauth2.AccessTypeOnline)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 	return nil
 }
@@ -113,12 +103,12 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error 
 		return err
 	}
 
-	tok, err := conf.Exchange(r.Context(), r.URL.Query().Get("code"))
+	tok, err := a.Config.Exchange(r.Context(), r.URL.Query().Get("code"))
 	if err != nil {
 		return errors.New("Error obtaining token from Spotify: " + err.Error())
 	}
 
-	s.Values["Token"] = *tok
+	s.Values[token] = *tok
 	client := spotify.Authenticator{}.NewClient(tok)
 	currentUser, err := client.CurrentUser()
 	if err != nil {
@@ -136,12 +126,12 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error 
 		return errors.WithStack(err)
 	}
 
-	s.Values["User_ID"] = sdUser.ID
+	s.Values[userID] = sdUser.ID
 	err = s.Save(r, w)
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	returnPath, ok := s.Values["return_path"].(string)
+	returnPath, ok := s.Values[returnPath].(string)
 	if !ok {
 		returnPath = "/"
 	}
@@ -183,7 +173,7 @@ func (a *AuthController) Refresh(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	tok, err := refreshToken(user.RefreshToken)
+	tok, err := refreshToken(a.Config, user.RefreshToken)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -211,12 +201,12 @@ func (a *AuthController) Refresh(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func refreshToken(refreshToken string) (*refreshTokenResponse, error) {
+func refreshToken(c *oauth2.Config, refreshToken string) (*refreshTokenResponse, error) {
 	data := url.Values{}
 	data.Set("grant_type", "refresh_token")
 	data.Set("refresh_token", refreshToken)
 	body := strings.NewReader(data.Encode())
-	creds := conf.ClientID + ":" + conf.ClientSecret
+	creds := c.ClientID + ":" + c.ClientSecret
 	basicAuth := base64.StdEncoding.EncodeToString([]byte(creds))
 	req, err := http.NewRequest(http.MethodPost, spotifyURL+"/api/token", body)
 	if err != nil {

@@ -3,6 +3,7 @@ package app
 import (
 	"encoding/base64"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -17,12 +18,14 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-const sessionName = "_stereodose-session"
-
-var store *sessions.CookieStore
-var db *gorm.DB
-var stereoDoseDB *models.StereoDoseDB
-var err error
+var (
+	store        *sessions.CookieStore
+	db           *gorm.DB
+	stereoDoseDB *models.StereoDoseDB
+	file         *os.File
+	indexHTML    []byte
+	err          error
+)
 
 // InitApp puts together the Router to use as the app's main HTTP handler
 func InitApp(c *config.Config, db *gorm.DB) *util.AppRouter {
@@ -55,14 +58,6 @@ func createRouter(c *config.Config) *util.AppRouter {
 	fs := http.StripPrefix("/public/", http.FileServer(http.Dir("app/views/build/")))
 	app.PathPrefix("/public/").Handler(fs)
 
-	app.Handle("/test", auth.Middleware(webPlayerTest))
-
-	notFound := func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprint(w, "Need to add a 404 page")
-	}
-	app.NotFoundHandler = http.HandlerFunc(notFound)
-
 	authRouter := util.AppRouter{app.PathPrefix("/auth").Subrouter()}
 	authRouter.AppHandler("/login", auth.Login).Methods(http.MethodGet)
 	authRouter.AppHandler("/callback", auth.Callback).Methods(http.MethodGet)
@@ -92,9 +87,27 @@ func createRouter(c *config.Config) *util.AppRouter {
 	categoriesRouter := util.AppRouter{app.PathPrefix("/api/categories").Subrouter()}
 	categoriesRouter.AppHandler("/", categories.GetAvailableCategories).Methods(http.MethodGet)
 
-	app.HandleFunc("/", webPlayerTest)
+	app.HandleFunc("/", serveReactApp)
 
 	return app
+}
+
+func serveReactApp(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, string(indexHTML))
+}
+
+// load the contents of index.html into memory only when the app starts up
+// instead of on each request
+func init() {
+	file, err = os.Open("./app/views/build/index.html")
+	if err != nil {
+		log.Fatalf("Unable to open index.html: %s", err.Error())
+	}
+
+	indexHTML, err = ioutil.ReadAll(file)
+	if err != nil {
+		log.Fatalf("Unable to read the contets of index.html, %s", err.Error())
+	}
 }
 
 // could do this on a subrouter to handle auth for all routes

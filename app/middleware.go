@@ -7,6 +7,8 @@ import (
 	"github.com/briansimoni/stereodose/app/util"
 )
 
+const sessionName = "_stereodose-session"
+
 // UserContextMiddleware inspects the cookie and adds the user to the context
 // For this middleware to work, the user must be authenticated
 func UserContextMiddleware(next http.Handler) http.Handler {
