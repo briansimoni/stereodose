@@ -2,9 +2,6 @@ import React, { Component, Fragment } from 'react';
 import './Player.css';
 import WebPlaybackReact from './Spotify/WebPlaybackReact';
 
-// import Header from './layout/Header.js';
-// import Footer from './layout/Footer.js';
-
 import IntroScreen from './screens/Intro';
 import NowPlayingScreen from './screens/NowPlaying';
 
@@ -25,8 +22,13 @@ export default class Player extends Component {
 	}
 
 	componentWillMount() {
-		this.props.getAccessToken().then( (accessToken) => {
+		this.props.getAccessToken()
+		.then( (accessToken) => {
+			console.log(accessToken);
 			this.onSuccessfulAuthorization(accessToken);
+		})
+		.catch( (error) => {
+			console.log(error.message);
 		})
 		// Login().then((token) => {
 		// 	this.onSuccessfulAuthorization(token);

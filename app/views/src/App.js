@@ -5,6 +5,7 @@ import Playlists from './dev/Playlists';
 import Playlist from './dev/Playlist';
 import Player from './Player';
 import {HashRouter, Route} from 'react-router-dom';
+import UserStatusIndicator from './User/StatusIndicator';
 //import { HashRouter } from 'react-router-dom';
 
 
@@ -14,20 +15,39 @@ class App extends React.Component {
 	deviceIDPromise
 	deviceIDResolver
 
+	// loggedInPromise resolves at a later time with the user's logged in status (true/false)
+	loggedInPromise
+	// callback function that can be called to resolve when we know that the user is logged in or not
+	loggedInPromiseResolver
+
 	constructor(props) {
 		super(props);
 
-		this.state = {accessToken: null}
+		this.state = {
+			accessToken: null,
+			loggedIn: false
+		}
 
-		this.deviceIDPromise =  new Promise( (resolve, reject) => {
+		this.deviceIDPromise = new Promise( (resolve, reject) => {
 			resolve = resolve.bind(this);
 			this.deviceIDResolver = resolve;
+		});
+
+		this.loggedInPromise = new Promise( (resolve) => {
+				this.loggedInPromiseResolver = resolve;
 		})
 		
 
 		// TODO: figure out how an arrow function could eliminate this line
 		this.getAccessToken = this.getAccessToken.bind(this);
 		this.setDeviceID = this.setDeviceID.bind(this);
+		this.isUserLoggedIn = this.isUserLoggedIn.bind(this);
+	}
+
+	isUserLoggedIn(loggedIn) {
+		let state = this.state;
+		state.loggedIn = loggedIn;
+		this.setState(state);
 	}
 
 	render() {
@@ -36,6 +56,16 @@ class App extends React.Component {
 				<h1 onClick={ () => {this.getAccessToken()} }>Header</h1>
 				<HashRouter>
 					<div>
+
+						<Route 
+							path="/" 
+							render={ (props) => 
+								<UserStatusIndicator
+									{...props}
+									isUserLoggedIn={ (loggedIn) => this.loggedInPromiseResolver(loggedIn)}
+								/>
+						}/>
+						
 						<Route 
 							path="/" 
 							render={ (props) => 
@@ -73,54 +103,30 @@ class App extends React.Component {
 		this.deviceIDResolver(deviceID);
 	}
 
-	// getAccessToken will return a Promise to either get the access token or will redirect
-	// the user to Login
+	// getAccessToken will return a Promise to either get the access token
 	// Should be able to pass this function around as a prop to components that need a token
 	// i.e. <Player> and <Playlist>
 	async getAccessToken() {
-		// stolen from Stack Overflow
-		function getCookie(name) {
-			var dc = document.cookie;
-			var prefix = name + "=";
-			var begin = dc.indexOf("; " + prefix);
-			if (begin === -1) {
-				begin = dc.indexOf(prefix);
-				if (begin !== 0) return null;
-			}
-			else {
-				begin += 2;
-				var end = document.cookie.indexOf(";", begin);
-				if (end === -1) {
-					end = dc.length;
-				}
-			}
-			// because unescape has been deprecated, replaced with decodeURI
-			//return unescape(dc.substring(begin + prefix.length, end));
-			return decodeURI(dc.substring(begin + prefix.length, end));
-		}
-		let cookie = getCookie("_stereodose-session");
-		if (!cookie) {
-			window.location = "/auth/login";
-			return;
+		let loggedIn = await this.loggedInPromise;
+		console.log("getAccessToken thing result" + loggedIn);
+		if (loggedIn === false) {
+			throw new Error("The user is not logged in");
 		}
 
-		try {
-			let response =  await fetch("/auth/token", {credentials: "same-origin"});
-			let token = await response.json();
-			let expiresOn = token.expiry;
-			let now = new Date();
-			let expiresDate = new Date(expiresOn);
-			if(now < expiresDate) {
-				this.accessToken = token.access_token;
-				return token.access_token;
-			}
-			response = await fetch("/auth/refresh");
-			token = await response.json();
+		let response =  await fetch("/auth/token", {credentials: "same-origin"});
+		let token = await response.json();
+		let expiresOn = token.expiry;
+		let now = new Date();
+		let expiresDate = new Date(expiresOn);
+		if(now < expiresDate) {
 			this.accessToken = token.access_token;
 			return token.access_token;
-		} catch(err) {
-			return err;
 		}
+		response = await fetch("/auth/refresh");
+		token = await response.json();
+		this.accessToken = token.access_token;
+		return token.access_token;
+
 	}
 }
 
