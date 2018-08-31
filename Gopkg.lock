@@ -4,8 +4,8 @@
 [[projects]]
   name = "github.com/golang/protobuf"
   packages = ["proto"]
-  revision = "b4deda0973fb4c70b50d226b1af49f3da59f5265"
-  version = "v1.1.0"
+  revision = "aa810b61a9c79d51363740d207bb46cf8e620ed5"
+  version = "v1.2.0"
 
 [[projects]]
   name = "github.com/gorilla/context"
@@ -16,8 +16,8 @@
 [[projects]]
   name = "github.com/gorilla/handlers"
   packages = ["."]
-  revision = "90663712d74cb411cbef281bc1e08c19d1a76145"
-  version = "v1.3.0"
+  revision = "7e0847f9db758cdebd26c149d0ae9d5d0b9c98ce"
+  version = "v1.4.0"
 
 [[projects]]
   name = "github.com/gorilla/mux"
@@ -53,14 +53,14 @@
   revision = "04140366298a54a039076d798123ffa108fff46c"
 
 [[projects]]
-  branch = "master"
   name = "github.com/lib/pq"
   packages = [
     ".",
     "hstore",
     "oid"
   ]
-  revision = "90697d60dd844d5ef6ff15135d0203f65d2f53b8"
+  revision = "4ded0e9383f75c197b3a2aaa6d590ac52df6fd79"
+  version = "v1.0.0"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -72,7 +72,7 @@
   branch = "master"
   name = "github.com/zmb3/spotify"
   packages = ["."]
-  revision = "79deba8533f6a0e6545b3937667522d323aa6754"
+  revision = "109a647ba6a25861b663614f7d7f301630bc8c14"
 
 [[projects]]
   branch = "master"
@@ -81,7 +81,7 @@
     "context",
     "context/ctxhttp"
   ]
-  revision = "afe8f62b1d6bbd81f31868121a50b06d8188e1f9"
+  revision = "8a410e7b638dca158bf9e766925842f6651ff828"
 
 [[projects]]
   branch = "master"
@@ -91,7 +91,7 @@
     "internal",
     "spotify"
   ]
-  revision = "ef147856a6ddbb60760db74283d2424e98c87bff"
+  revision = "d2e6202438beef2727060aa7cabdd924d92ebfd9"
 
 [[projects]]
   name = "google.golang.org/appengine"
