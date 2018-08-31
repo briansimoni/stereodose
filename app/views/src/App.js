@@ -6,6 +6,7 @@ import Playlist from './dev/Playlist';
 import Player from './Player';
 import {HashRouter, Route} from 'react-router-dom';
 import UserStatusIndicator from './User/StatusIndicator';
+import UserProfile from './User/Profile';
 //import { HashRouter } from 'react-router-dom';
 
 
@@ -76,10 +77,12 @@ class App extends React.Component {
 								</Player>
 							}
 						/>
+
+						<Route exact path="/profile" component={UserProfile}/>
+
 						<Route exact path="/" component={Drugs} />
 						<Route exact path="/:drug" component={Drug} />
 						<Route exact path="/:drug/:subcategory" component={Playlists} />
-						{/* <Route path="/:drug/:subcategory/:playlist" component={Playlist} /> */}
 						<Route 
 							path="/:drug/:subcategory/:playlist"
 							render={(props) => 

@@ -6,8 +6,8 @@ class UserStatusIndicator extends React.Component{
 
 		this.state = {
 			loggedIn: null,
-			username: null,
-			image: null
+			username: "",
+			user: {}
 		};
 
 		let loggedIn = this.checkSessionCookie();
@@ -29,12 +29,34 @@ class UserStatusIndicator extends React.Component{
 		}
 
 		if (this.state.loggedIn === true) {
-			return <div><p>I'm logged in!</p></div>
+			return <div><p>{this.state.username}</p></div>
 		}
 	}
 
 	logIn() {
 		window.location = "/auth/login";
+	}
+
+	componentDidMount() {
+		if (this.state.loggedIn === true) {
+			fetch("/api/users/me")
+			.then( (response) => {
+				return response.json();
+			})
+			.then( (user) => {
+				let state = this.state;
+				if (user.displayName !== "") {
+					state.username = user.displayName;
+				} else {
+					state.username = user.spotifyID;
+				}
+				state.user = user;
+				this.setState(state);
+			})
+			.catch( (err) => {
+				alert(err.message);
+			});
+		}
 	}
 
 	checkSessionCookie() {
