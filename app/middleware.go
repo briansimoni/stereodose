@@ -11,6 +11,7 @@ const sessionName = "_stereodose-session"
 
 // UserContextMiddleware inspects the cookie and adds the user to the context
 // For this middleware to work, the user must be authenticated
+// TODO: well if the user must be authenticated, might as well return a 403 if they're not
 func UserContextMiddleware(next http.Handler) http.Handler {
 	f := func(w http.ResponseWriter, r *http.Request) error {
 		s, err := store.Get(r, sessionName)

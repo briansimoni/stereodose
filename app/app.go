@@ -66,7 +66,7 @@ func createRouter(c *config.Config) *util.AppRouter {
 
 	usersRouter := util.AppRouter{app.PathPrefix("/api/users/").Subrouter()}
 	usersRouter.Use(UserContextMiddleware)
-	usersRouter.Handle("/me", auth.Middleware(users.Me)).Methods(http.MethodGet)
+	usersRouter.AppHandler("/me", users.Me).Methods(http.MethodGet)
 
 	// The order that the routes are registered does matter
 	playlistsRouter := util.AppRouter{app.PathPrefix("/api/playlists").Subrouter()}
