@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/briansimoni/stereodose/app/models"
+	"github.com/briansimoni/stereodose/app/util"
+	"github.com/pkg/errors"
 )
 
 type UsersController struct {
@@ -17,21 +17,18 @@ func NewUsersController(db *models.StereoDoseDB) *UsersController {
 	return &UsersController{DB: db}
 }
 
-func (u *UsersController) Me(w http.ResponseWriter, r *http.Request) {
+func (u *UsersController) Me(w http.ResponseWriter, r *http.Request) error {
 	user, ok := r.Context().Value("User").(models.User)
 	if !ok {
-		http.Error(w, "Unable to obtain user from session", http.StatusInternalServerError)
-		return
+		return errors.WithStack(errors.New("Unable to obtain user from request context"))
 	}
-	temp, err := u.DB.Users.ByID(user.ID)
+	data, err := u.DB.Users.ByID(user.ID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return errors.WithStack(err)
 	}
-	data, err := json.MarshalIndent(temp, " ", " ")
+	err = util.JSON(w, data)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return errors.WithStack(err)
 	}
-	fmt.Fprint(w, string(data))
+	return nil
 }

@@ -29,8 +29,8 @@ class Playlists extends React.Component {
 					<ul>
 						{playlists.map( (playlist) => {
 							return (
-								<Link to={`${match.url}/${playlist.spotifyID}`}>
-									<li key={playlist.spotifyID}>{playlist.name}</li>
+								<Link key={playlist.spotifyID} to={`${match.url}/${playlist.spotifyID}`}>
+									<li>{playlist.name}</li>
 								</Link>
 							)
 						})}
