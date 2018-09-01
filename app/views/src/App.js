@@ -4,7 +4,7 @@ import Drug from './dev/Drug';
 import Playlists from './dev/Playlists';
 import Playlist from './dev/Playlist';
 import Player from './Player';
-import {HashRouter, Route} from 'react-router-dom';
+import {HashRouter, Route, Switch} from 'react-router-dom';
 import UserStatusIndicator from './User/StatusIndicator';
 import UserProfile from './User/Profile';
 //import { HashRouter } from 'react-router-dom';
@@ -54,7 +54,7 @@ class App extends React.Component {
 	render() {
 		return (
 			<div>
-				<h1 onClick={ () => {this.getAccessToken()} }>Header</h1>
+				<h1 onClick={ () => {this.getAccessToken()} }>Stereodose</h1>
 				<HashRouter>
 					<div>
 
@@ -78,22 +78,31 @@ class App extends React.Component {
 							}
 						/>
 
-						<Route exact path="/profile" component={UserProfile}/>
-
-						<Route exact path="/" component={Drugs} />
-						<Route exact path="/:drug" component={Drug} />
-						<Route exact path="/:drug/:subcategory" component={Playlists} />
-						<Route 
-							path="/:drug/:subcategory/:playlist"
-							render={(props) => 
-							<Playlist
-							{...props} 
-							getAccessToken={ () => this.getAccessToken()} 
-							getDeviceID={ () => this.deviceIDPromise }
+						{/* Routes wrapped in a Switch match only the first route for ambigulous matches*/}
+						<Switch>
+							<Route exact path="/profile"
+								render={ (props)=>
+									<UserProfile
+										{...props}
+										getAccessToken={ ()=> this.getAccessToken()}
+									/>
+								}
 							/>
-						}
-						/>
-						
+
+							<Route exact path="/" component={Drugs} />
+							<Route exact path="/:drug" component={Drug} />
+							<Route exact path="/:drug/:subcategory" component={Playlists} />
+							<Route 
+								path="/:drug/:subcategory/:playlist"
+								render={(props) => 
+								<Playlist
+								{...props} 
+								getAccessToken={ () => this.getAccessToken()} 
+								getDeviceID={ () => this.deviceIDPromise }
+								/>
+							}
+							/>
+						</Switch>
 					</div>
 				</HashRouter>
 			</div>
@@ -111,7 +120,6 @@ class App extends React.Component {
 	// i.e. <Player> and <Playlist>
 	async getAccessToken() {
 		let loggedIn = await this.loggedInPromise;
-		console.log("getAccessToken thing result" + loggedIn);
 		if (loggedIn === false) {
 			throw new Error("The user is not logged in");
 		}

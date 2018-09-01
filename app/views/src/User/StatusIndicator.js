@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 class UserStatusIndicator extends React.Component{
 	constructor(props) {
@@ -29,7 +30,11 @@ class UserStatusIndicator extends React.Component{
 		}
 
 		if (this.state.loggedIn === true) {
-			return <div><p>{this.state.username}</p></div>
+			return (
+				<div>
+					<Link to="/profile">{this.state.username}</Link>
+				</div>
+			)
 		}
 	}
 
