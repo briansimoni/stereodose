@@ -1,5 +1,6 @@
 import React from "react";
 import Spotify from "spotify-web-api-js";
+import SpotifyPlaylist from "./SpotifyPlaylist";
 
 class UserProfile extends React.Component {
 
@@ -8,21 +9,38 @@ class UserProfile extends React.Component {
 
 		this.state = {
 			spotifyPlaylists: null,
-			stereodosePlaylists: null
+			stereodosePlaylists: null,
+			categories: null,
+			loading: true
 		}
 
 		this.checkPlaylists = this.checkPlaylists.bind(this);
 	}
 
 	render() {
-		let {spotifyPlaylists, stereodosePlaylists} = this.state;
-		if (spotifyPlaylists !== null && stereodosePlaylists !== null) {
+		console.log("rendering");
+		let {spotifyPlaylists, stereodosePlaylists, categories, loading} = this.state;
+		if (spotifyPlaylists !== null && stereodosePlaylists !== null && !loading) {
 			return (
 				<div>
 				<h2>Playlists Available From Spotify</h2>
+				<table>
+				<tbody>
+				<tr>
+					<th>Playlist Name</th>
+					<th>Drug</th>
+					<th>Mood</th>
+				</tr>
 				{spotifyPlaylists.map( (playlist) => {
-					return <li key={playlist.id}>{playlist.name}</li>
+					return <SpotifyPlaylist
+							 	key={playlist.id} 
+							 	categories={categories}
+								playlist={playlist}
+								onUpdate={ () => {this.checkPlaylists()}}
+							   />
 				})}
+				</tbody>
+				</table>
 
 				<h2>Playlists Shared to Stereodose</h2>
 				{stereodosePlaylists.map( (playlist) => {
@@ -41,6 +59,11 @@ class UserProfile extends React.Component {
 	}
 
 	async componentDidMount() {
+		let resp = await fetch("/api/categories/");
+		let categories = await resp.json();
+		let state = this.state;
+		state.categories = categories;
+		this.setState(state);
 		this.checkPlaylists();
 	}
 
@@ -58,7 +81,6 @@ class UserProfile extends React.Component {
 
 		// so old school
 		let spotifyPlaylists = userPlaylists.items;
-		console.log(spotifyPlaylists);
 		for (let i = 0; i < spotifyPlaylists.length; i++) {
 			let match = false;
 			for (let j = 0; j < stereodosePlaylists.length; j++) {
@@ -76,6 +98,8 @@ class UserProfile extends React.Component {
 		let state = this.state;
 		state.spotifyPlaylists = diffedSpotifyPlaylists;
 		state.stereodosePlaylists = diffedStereodosePlaylists;
+		console.log(stereodosePlaylists);
+		state.loading = false;
 		this.setState(state);
 	}
 }

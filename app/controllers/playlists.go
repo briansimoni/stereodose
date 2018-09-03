@@ -62,6 +62,7 @@ func (p *PlaylistsController) GetPlaylistByID(w http.ResponseWriter, r *http.Req
 	return nil
 }
 
+// GetMyPlaylists returns all of the playlists added to Stereodose that belong to the requesting user
 func (p *PlaylistsController) GetMyPlaylists(w http.ResponseWriter, r *http.Request) error {
 	user, ok := r.Context().Value("User").(models.User)
 	if !ok {
