@@ -32,6 +32,12 @@ func (f *fakePlaylistService) GetByID(ID string) (*models.Playlist, error) {
 	if ID == "" {
 		return nil, errors.New("Playlist with empty string does not exist")
 	}
+	if ID == "error-condition" {
+		return nil, errors.New("Error reading playlist from DB")
+	}
+	if ID == "9000" {
+		return nil, nil
+	}
 	playlist := &models.Playlist{
 		Name: "Test Playlist",
 	}
@@ -47,6 +53,18 @@ func (f *fakePlaylistService) CreatePlaylistBySpotifyID(user models.User, spotif
 func (f *fakePlaylistService) GetMyPlaylists(user models.User) ([]models.Playlist, error) {
 	if user.DisplayName == "BadTestCase" {
 		return nil, errors.New("Unable to obtain playlists because reasons")
+	}
+	if user.DisplayName == "HasPlaylistsUser1" && user.ID == 1 {
+		playlists := []models.Playlist{
+			models.Playlist{SpotifyID: "10"},
+		}
+		return playlists, nil
+	}
+	if user.DisplayName == "HasPlaylistsUser2" && user.ID == 2 {
+		playlists := []models.Playlist{
+			models.Playlist{SpotifyID: "20"},
+		}
+		return playlists, nil
 	}
 	return nil, nil
 }
@@ -213,6 +231,48 @@ func TestPlaylistsController_GetMyPlaylists(t *testing.T) {
 
 			if result.StatusCode != tc.status {
 				t.Errorf("Expected status: %v; Got: %v", tc.status, result.Status)
+			}
+		})
+	}
+}
+
+func TestPlaylistsController_DeletePlaylist(t *testing.T) {
+	var testRouter = &util.AppRouter{mux.NewRouter()}
+
+	user1 := models.User{}
+	user1.ID = 1
+	user1.DisplayName = "HasPlaylistsUser1"
+
+	user2 := models.User{}
+	user2.ID = 2
+	tests := []struct {
+		name       string
+		user       interface{}
+		playlistID string
+		statusCode int
+	}{
+		{name: "authorized delete", user: user1, playlistID: "10", statusCode: 200},
+		{name: "unauthorized delete", user: user1, playlistID: "20", statusCode: 401},
+		{name: "noexistent playlist", user: user1, playlistID: "9000", statusCode: 404},
+		{name: "bad session cookie", user: nil, playlistID: "10", statusCode: 500},
+		{name: "empty playlist id", user: user1, playlistID: "error-condition", statusCode: 500},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			testRouter.AppHandler("/api/playlists/{id}", controller.DeletePlaylist).Methods(http.MethodDelete)
+			recorder := httptest.NewRecorder()
+			req, err := http.NewRequest(http.MethodDelete, "/api/playlists/"+tc.playlistID, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			ctx := context.WithValue(context.Background(), "User", tc.user)
+			req = req.WithContext(ctx)
+			testRouter.ServeHTTP(recorder, req)
+			result := recorder.Result()
+
+			if result.StatusCode != tc.statusCode {
+				t.Errorf("Expected status code: %d, Got: %d", tc.statusCode, result.StatusCode)
 			}
 		})
 	}
