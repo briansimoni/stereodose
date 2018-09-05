@@ -72,7 +72,7 @@ class UserProfile extends React.Component {
 	}
 
 	async componentDidMount() {
-		let resp = await fetch("/api/categories/");
+		let resp = await fetch("/api/categories/", { credentials: "same-origin" });
 		let categories = await resp.json();
 		let state = this.state;
 		state.categories = categories;

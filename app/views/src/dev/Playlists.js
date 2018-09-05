@@ -45,7 +45,7 @@ class Playlists extends React.Component {
 		let drug = this.props.match.params.drug;
 		let subcategory = this.props.match.params.subcategory;
 
-		fetch(`/api/playlists/?category=${drug}&subcategory=${subcategory}`)
+		fetch(`/api/playlists/?category=${drug}&subcategory=${subcategory}`, { credentials: "same-origin" })
 		.then( (response) => {
 			return response.json();
 		})

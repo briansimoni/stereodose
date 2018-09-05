@@ -69,7 +69,7 @@ class Playlist extends React.Component {
 	componentDidMount() {
 
 		let playlistID = this.props.match.params.playlist
-		fetch(`/api/playlists/${playlistID}`)
+		fetch(`/api/playlists/${playlistID}`, { credentials: "same-origin" })
 		.then( (response) => {
 			console.log(response);
 			return response.json();
