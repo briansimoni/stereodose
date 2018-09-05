@@ -133,7 +133,7 @@ class App extends React.Component {
 			this.accessToken = token.access_token;
 			return token.access_token;
 		}
-		response = await fetch("/auth/refresh");
+		response = await fetch("/auth/refresh", { credentials: "same-origin" });
 		token = await response.json();
 		this.accessToken = token.access_token;
 		return token.access_token;

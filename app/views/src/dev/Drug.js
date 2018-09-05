@@ -32,7 +32,7 @@ class Drug extends React.Component {
 	}
 
 	componentDidMount() {
-		fetch("/api/categories/")
+		fetch("/api/categories/", { credentials: "same-origin"} )
 			.then((response) => {
 				return response.json();
 			})

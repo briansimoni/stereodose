@@ -79,6 +79,7 @@ class SpotifyPlaylist extends React.Component {
 		}
 		let resp = await fetch(`/api/playlists/`, {
 			method: "POST",
+			credentials: "same-origin",
 			body: JSON.stringify({
 					SpotifyID: playlist.id,
 					Category: drug,
