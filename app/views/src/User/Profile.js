@@ -1,6 +1,7 @@
 import React from "react";
 import Spotify from "spotify-web-api-js";
 import SpotifyPlaylist from "./SpotifyPlaylist";
+import StereodosePlaylist from "./StereodosePlaylist";
 
 class UserProfile extends React.Component {
 
@@ -18,7 +19,6 @@ class UserProfile extends React.Component {
 	}
 
 	render() {
-		console.log("rendering");
 		let {spotifyPlaylists, stereodosePlaylists, categories, loading} = this.state;
 		if (spotifyPlaylists !== null && stereodosePlaylists !== null && !loading) {
 			return (
@@ -43,9 +43,22 @@ class UserProfile extends React.Component {
 				</table>
 
 				<h2>Playlists Shared to Stereodose</h2>
-				{stereodosePlaylists.map( (playlist) => {
-					return <li key={playlist.spotifyID}>{playlist.name}</li>
-				})}
+				<table>
+					<tbody>
+						<tr>
+							<th>Playlist Name</th>
+							<th>Drug</th>
+							<th>Mood</th>
+						</tr>
+					{stereodosePlaylists.map( (playlist) => {
+						return <StereodosePlaylist 
+									key={playlist.spotifyID} 
+									playlist={playlist} 
+									onUpdate={ () => {this.checkPlaylists()}}
+								/>
+					})}
+					</tbody>
+				</table>
 			</div>
 			)
 		}
@@ -98,7 +111,6 @@ class UserProfile extends React.Component {
 		let state = this.state;
 		state.spotifyPlaylists = diffedSpotifyPlaylists;
 		state.stereodosePlaylists = diffedStereodosePlaylists;
-		console.log(stereodosePlaylists);
 		state.loading = false;
 		this.setState(state);
 	}
