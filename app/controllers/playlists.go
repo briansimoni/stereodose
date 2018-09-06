@@ -122,11 +122,39 @@ func (p *PlaylistsController) CreatePlaylist(w http.ResponseWriter, r *http.Requ
 func (p *PlaylistsController) DeletePlaylist(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	ID := vars["id"]
-	err := p.DB.Playlists.DeletePlaylist(ID)
+	user, ok := r.Context().Value("User").(models.User)
+	if !ok {
+		return errors.New("Unable to obtain user from session")
+	}
+	targetPlaylist, err := p.DB.Playlists.GetByID(ID)
 	if err != nil {
-		if err.Error() == "Delete failed. Playlist Did not exist" {
-			return &statusError{errors.WithStack(err), err.Error(), http.StatusBadRequest}
+		return errors.WithStack(err)
+	}
+	if targetPlaylist == nil {
+		return &statusError{
+			Message: fmt.Sprintf("Playlist does not exist"),
+			Code:    http.StatusNotFound,
 		}
+	}
+	userPlaylists, err := p.DB.Playlists.GetMyPlaylists(user)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	authorized := false
+	for _, playlist := range userPlaylists {
+		if playlist.SpotifyID == ID {
+			authorized = true
+			break
+		}
+	}
+	if !authorized {
+		return &statusError{
+			Message: fmt.Sprintf("Unauthorized to remove this playlist"),
+			Code:    http.StatusUnauthorized,
+		}
+	}
+	err = p.DB.Playlists.DeletePlaylist(ID)
+	if err != nil {
 		return errors.WithStack(err)
 	}
 	return nil

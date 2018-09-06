@@ -17,8 +17,7 @@ class Playlist extends React.Component {
 			return <h3>Loading</h3>
 		}
 		if (error) {
-			console.log(error);
-			return <h3>eeeeeee</h3>
+			return <h3>{error.message}</h3>
 		}
 		if (playlist) {
 			return (
@@ -55,12 +54,8 @@ class Playlist extends React.Component {
 					},
 					body: JSON.stringify(data)
 				})
-				.then( (result) => {
-					console.log("play track result");
-					console.log(result);
-				})
 				.catch( (error) => {
-					console.warn(error);
+					console.error(error);
 				})
 			})
 		})
@@ -71,7 +66,6 @@ class Playlist extends React.Component {
 		let playlistID = this.props.match.params.playlist
 		fetch(`/api/playlists/${playlistID}`, { credentials: "same-origin" })
 		.then( (response) => {
-			console.log(response);
 			return response.json();
 		})
 		.then( (json) => {

@@ -22,7 +22,7 @@ export default class WebPlayback extends Component {
       this.clearStatePolling();
 	  this.props.onPlayerWaitingForDevice({ device_id: device_id });
 	  //await this.waitForDeviceToBeSelected();
-	  this.transferPlayback(device_id);
+	//   this.transferPlayback(device_id);
       this.props.onPlayerDeviceSelected();
     }
   }
@@ -133,12 +133,14 @@ export default class WebPlayback extends Component {
     await this.setupWebPlaybackEvents();
     
     // Wait for device to be ready
-    let device_data = await this.setupWaitingForDevice();
+	let device_data = await this.setupWaitingForDevice();
     this.props.onPlayerWaitingForDevice(device_data);
 
+	// let device_id = this.webPlaybackInstance._options.id;
+	// await this.transferPlayback(device_id);
+
     // Wait for device to be selected
-	//await this.waitForDeviceToBeSelected();
-	//await this.transferPlayback(device_id);
+	await this.waitForDeviceToBeSelected();
     this.props.onPlayerDeviceSelected();
   }
 

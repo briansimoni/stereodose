@@ -2,7 +2,6 @@ import React, { Component, Fragment } from 'react';
 import './Player.css';
 import WebPlaybackReact from './Spotify/WebPlaybackReact';
 
-import IntroScreen from './screens/Intro';
 import NowPlayingScreen from './screens/NowPlaying';
 
 export default class Player extends Component {
@@ -17,44 +16,22 @@ export default class Player extends Component {
 			// Player state
 			playerLoaded: false,
 			playerSelected: false,
-			playerState: null
+			playerState: null,
+
+			authError: null,
 		};
 	}
 
 	componentWillMount() {
 		this.props.getAccessToken()
 		.then( (accessToken) => {
-			console.log(accessToken);
-			this.onSuccessfulAuthorization(accessToken);
+			this.setState({
+				userAccessToken: accessToken
+			});
 		})
 		.catch( (error) => {
-			console.log(error.message);
+			this.setState({authError: error});
 		})
-		// Login().then((token) => {
-		// 	this.onSuccessfulAuthorization(token);
-		// })
-		//   LoginCallback({
-		// 	onSuccessfulAuthorization: this.onSuccessfulAuthorization.bind(this),
-		// 	onAccessTokenExpiration: this.onAccessTokenExpiration.bind(this)
-		//   });
-	}
-
-	onSuccessfulAuthorization(accessToken) {
-		this.setState({
-			userAccessToken: accessToken
-		});
-	}
-
-	onAccessTokenExpiration() {
-		this.setState({
-			userDeviceId: null,
-			userAccessToken: null,
-			playerLoaded: false,
-			playerSelected: false,
-			playerState: null
-		});
-
-		console.error("The user access token has expired.");
 	}
 
 	render() {
@@ -63,7 +40,8 @@ export default class Player extends Component {
 			userAccessToken,
 			playerLoaded,
 			playerSelected,
-			playerState
+			playerState,
+			authError
 		} = this.state;
 
 		if (userDeviceId) {
@@ -71,58 +49,53 @@ export default class Player extends Component {
 		}
 
 		let webPlaybackSdkProps = {
-			playerName: "Spotify React Player",
+			playerName: "Stereodose",
 			playerInitialVolume: 1.0,
 			playerRefreshRateMs: 100,
 			playerAutoConnect: true,
-			onPlayerRequestAccessToken: (() => userAccessToken),
+			onPlayerRequestAccessToken: (() => this.props.getAccessToken()),
 			onPlayerLoading: (() => this.setState({ playerLoaded: true })),
 			onPlayerWaitingForDevice: (data => this.setState({ playerSelected: false, userDeviceId: data.device_id })),
 			onPlayerDeviceSelected: (() => this.setState({ playerSelected: true })),
 			onPlayerStateChange: (playerState => this.setState({ playerState: playerState })),
-			onPlayerError: (playerError => console.error(playerError))
+			onPlayerError: (playerError => alert(playerError))
 		};
 
+		if (authError) {
+			return <h2>{authError.message}</h2>
+		}
+
 		return (
-			<div className="App">
-				{/* <Header /> */}
-				<main>
-					{!userAccessToken && <IntroScreen />}
-					{userAccessToken &&
-						<WebPlaybackReact {...webPlaybackSdkProps}>
+			<div>
+				{authError &&
+					<h2>{authError.message}</h2>
+				}
+				{userAccessToken &&
+					<WebPlaybackReact {...webPlaybackSdkProps}>
 
-							{!playerLoaded &&
-								<h2 className="action-orange">Loading Player</h2>
-							}
+						{!playerLoaded &&
+							<h2 className="action-orange">Loading Player</h2>
+						}
 
-							{playerLoaded && !playerSelected &&
-								<Fragment>
-									<h2 className="action-green">Loading Player</h2>
-									<h2 className="action-orange">Waiting for device to be selected</h2>
-								</Fragment>
-							}
+						{!playerSelected &&
+							<Fragment>
+								<h2 className="action-orange">Select a song to transfer Spotify Playback to Stereodose</h2>
+							</Fragment>
+						}
 
-							{playerLoaded && playerSelected && !playerState &&
-								<Fragment>
-									{/* <h2 className="action-green">Loading Player</h2> */}
-									{/* <h2 className="action-green">Waiting for device to be selected</h2> */}
-									{/* <h2 className="action-orange">Start playing music ...</h2> */}
-								</Fragment>
-							}
+						{playerLoaded && playerSelected && !playerState &&
+							<Fragment>
+								<h2 className="action-orange">Start playing music ...</h2>
+							</Fragment>
+						}
 
-							{playerLoaded && playerSelected && playerState &&
-								<Fragment>
-									<h2 className="action-green">Loading Player</h2>
-									<h2 className="action-green">Waiting for device to be selected</h2>
-									<h2 className="action-green">Start playing music!</h2>
-									<NowPlayingScreen playerState={playerState} />
-								</Fragment>
-							}
-						</WebPlaybackReact>
-					}
-				</main>
-
-				{/* <Footer /> */}
+						{playerLoaded && playerSelected && playerState &&
+							<Fragment>
+								<NowPlayingScreen playerState={playerState} />
+							</Fragment>
+						}
+					</WebPlaybackReact>
+				}
 			</div>
 		);
 	}
