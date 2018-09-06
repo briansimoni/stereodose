@@ -82,6 +82,7 @@ class UserProfile extends React.Component {
 
 	async checkPlaylists() {
 		let SDK = new Spotify();
+		// TODO: catch errors here
 		let token = await this.props.getAccessToken();
 		SDK.setAccessToken(token);
 		let userPlaylists = await SDK.getUserPlaylists();
