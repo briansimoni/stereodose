@@ -32,7 +32,11 @@ class UserStatusIndicator extends React.Component{
 		if (this.state.loggedIn === true) {
 			return (
 				<div>
-					<Link to="/profile">{this.state.username}</Link>
+					{/* <Link to="/auth/logout">logout</Link> */}
+					<ul>
+						<li><a href="/auth/logout">logout</a></li>
+						<li><Link to="/profile">{this.state.username}</Link></li>
+					</ul>
 				</div>
 			)
 		}

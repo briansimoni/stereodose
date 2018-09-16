@@ -214,6 +214,7 @@ func (a *AuthController) Logout(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 	return nil
 }
 
