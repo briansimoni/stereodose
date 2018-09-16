@@ -96,6 +96,7 @@ class SpotifyPlaylist extends React.Component {
 		if (resp.status !== 201) {
 			alert("error! " + resp.status + " " + resp.statusText);
 		}
+		this.inFlight = false;
 		this.props.onUpdate();
 	}
 }
