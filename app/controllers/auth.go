@@ -201,6 +201,22 @@ func (a *AuthController) Refresh(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+// Logout ultimately deletes the user's session
+// Since these sessions are stateless, all we have to do is set the max-age to less than 0
+func (a *AuthController) Logout(w http.ResponseWriter, r *http.Request) error {
+	s, err := a.Store.Get(r, sessionName)
+	if err != nil {
+		return err
+	}
+	// per documentation, delete the session by setting Max Age less than 0
+	s.Options.MaxAge = -1
+	err = s.Save(r, w)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func refreshToken(c *oauth2.Config, refreshToken string) (*refreshTokenResponse, error) {
 	data := url.Values{}
 	data.Set("grant_type", "refresh_token")
