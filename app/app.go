@@ -60,6 +60,7 @@ func createRouter(c *config.Config) *util.AppRouter {
 
 	authRouter := util.AppRouter{app.PathPrefix("/auth").Subrouter()}
 	authRouter.AppHandler("/login", auth.Login).Methods(http.MethodGet)
+	authRouter.AppHandler("/logout", auth.Logout).Methods(http.MethodGet)
 	authRouter.AppHandler("/callback", auth.Callback).Methods(http.MethodGet)
 	authRouter.AppHandler("/refresh", auth.Refresh).Methods(http.MethodGet)
 	authRouter.AppHandler("/token", auth.GetMyAccessToken).Methods(http.MethodGet)
@@ -69,8 +70,11 @@ func createRouter(c *config.Config) *util.AppRouter {
 	usersRouter.AppHandler("/me", users.Me).Methods(http.MethodGet)
 
 	// The order that the routes are registered does matter
+	// authPlaylistsRouter contains endpoints that require an authenticated user
+	authPlaylistsRouter := util.AppRouter{app.PathPrefix("/api/playlists").Subrouter()}
+	authPlaylistsRouter.Use(UserContextMiddleware)
 	playlistsRouter := util.AppRouter{app.PathPrefix("/api/playlists").Subrouter()}
-	playlistsRouter.Use(UserContextMiddleware)
+
 	playlistsRouter.AppHandler("/", playlists.GetPlaylists).Methods(http.MethodGet)
 	playlistsRouter.AppHandler("/", playlists.GetPlaylists).
 		Queries(
@@ -79,10 +83,11 @@ func createRouter(c *config.Config) *util.AppRouter {
 			"category", "{category:[a-zA-Z]+}",
 			"subcategory", "{subcategory:[a-zA-Z]+}").
 		Methods(http.MethodGet)
-	playlistsRouter.AppHandler("/me", playlists.GetMyPlaylists).Methods(http.MethodGet)
+
+	authPlaylistsRouter.AppHandler("/me", playlists.GetMyPlaylists).Methods(http.MethodGet)
 	playlistsRouter.AppHandler("/{id}", playlists.GetPlaylistByID).Methods(http.MethodGet)
-	playlistsRouter.AppHandler("/", playlists.CreatePlaylist).Methods(http.MethodPost)
-	playlistsRouter.AppHandler("/{id}", playlists.DeletePlaylist).Methods(http.MethodDelete)
+	authPlaylistsRouter.AppHandler("/", playlists.CreatePlaylist).Methods(http.MethodPost)
+	authPlaylistsRouter.AppHandler("/{id}", playlists.DeletePlaylist).Methods(http.MethodDelete)
 
 	categoriesRouter := util.AppRouter{app.PathPrefix("/api/categories").Subrouter()}
 	categoriesRouter.AppHandler("/", categories.GetAvailableCategories).Methods(http.MethodGet)

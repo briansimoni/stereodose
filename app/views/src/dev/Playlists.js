@@ -13,7 +13,9 @@ class Playlists extends React.Component {
 	}
 
 	render() {
-		let {loading, err, playlists} = this.state;
+		let loading = this.state.loading;
+		let err = this.state.error;
+		let playlists = this.state.playlists;
 		if (loading) {
 			return <h3>Loading</h3>
 		}
@@ -47,7 +49,10 @@ class Playlists extends React.Component {
 
 		fetch(`/api/playlists/?category=${drug}&subcategory=${subcategory}`, { credentials: "same-origin" })
 		.then( (response) => {
-			return response.json();
+			if (response.status === 200) {
+				return response.json();
+			}
+			return Promise.reject(`${response.status} ${response.statusText}`)
 		})
 		.then( (json) => {
 			this.setState({

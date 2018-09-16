@@ -7,6 +7,7 @@ class SpotifyPlaylist extends React.Component {
 	playlist // playlist name on Spotify, result of API call to Spotify
 	categories // result of categories API call
 	onUpdate // function passed in by parent
+	inFlight = false
 
 	constructor(props) {
 		super(props);
@@ -43,15 +44,15 @@ class SpotifyPlaylist extends React.Component {
 					<td>
 						<select value={this.state.drug} onChange={this.onDrugSelection}>
 							<option value="">Choose Your Drug</option>
-							{drugs.map( (drug, index) => {
-								return <option key={index} value={drug}>{drug}</option>
-							})}
+							{drugs.map( (drug, index) => 
+								<option key={index} value={drug}>{drug}</option>
+							)}
 						</select>
 					</td>
 					<td><select value={this.state.mood} onChange={this.onMoodSelection}>
-							{moodOptions.map( (mood, index) => {
-								return <option key={index} value={mood.value}>{mood.text}</option>
-							})}
+							{moodOptions.map( (mood, index) => 
+								<option key={index} value={mood.value}>{mood.text}</option>
+							)}
 						</select>
 					</td>
 					<td><button onClick={this.onShareToStereodose}>Share to Stereodose</button></td>
@@ -70,6 +71,12 @@ class SpotifyPlaylist extends React.Component {
 	}
 
 	async onShareToStereodose() {
+		// disable button while request is in flight
+		if (this.inFlight) {
+			return;
+		}
+		this.inFlight = true;
+
 		let playlist = this.props.playlist
 		let drug = this.state.drug
 		let mood = this.state.mood;
@@ -89,6 +96,7 @@ class SpotifyPlaylist extends React.Component {
 		if (resp.status !== 201) {
 			alert("error! " + resp.status + " " + resp.statusText);
 		}
+		this.inFlight = false;
 		this.props.onUpdate();
 	}
 }

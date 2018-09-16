@@ -12,23 +12,18 @@ class Drug extends React.Component {
 			if (this.state.categories !== null && !this.state.loading) {
 				return (
 					<ul>
-						<li>{this.props.match.params.drug}</li>
-						{this.state.categories.map( (category, index) => {
-							return (
-								<li key={index}>
-									<Link to={`${match.url}/${category}`}>{category}</Link>
-								</li>
-							)
-						})}
+						{this.state.categories.map( (category, index) => 
+							<li key={index}>
+								<Link to={`${match.url}/${category}`}>{category}</Link>
+							</li>
+						)}
 					</ul>
 				)
 			}
 
-			return (
-				<div>Loading...</div>
-			)
-			
-	
+		return (
+			<div>Loading...</div>
+		)
 	}
 
 	componentDidMount() {
