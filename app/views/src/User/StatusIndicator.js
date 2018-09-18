@@ -1,5 +1,8 @@
 import React from "react";
+import { Fragment } from "react";
 import { Link } from "react-router-dom";
+import profilePlaceholder from "../images/profile-placeholder.jpeg";
+import "./StatusIndicator.css";
 
 class UserStatusIndicator extends React.Component{
 	constructor(props) {
@@ -31,13 +34,13 @@ class UserStatusIndicator extends React.Component{
 
 		if (this.state.loggedIn === true) {
 			return (
-				<div>
-					{/* <Link to="/auth/logout">logout</Link> */}
-					<ul>
-						<li><a href="/auth/logout">logout</a></li>
-						<li><Link to="/profile">{this.state.username}</Link></li>
-					</ul>
-				</div>
+				<Fragment>
+					<div id="status-indicator">
+						<Link to="/profile"><img className="rounded-circle" src={profilePlaceholder} alt="profile"/></Link>
+						{/* Logout is a special case. Need to use a plain <a> tag instead of <Link>*/}
+						<a href="/auth/logout" className="nav-link mt-auto mb-auto">logout</a>
+					</div>
+				</Fragment>
 			)
 		}
 	}

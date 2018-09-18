@@ -21,16 +21,17 @@ class Playlist extends React.Component {
 		}
 		if (playlist) {
 			return (
-				<div>
+				<ul className="list-group">
 					{playlist.tracks.map( (track) => {
 						return (
 							<li 
+							className="list-group-item"
 							key={track.spotifyID} onClick={() => this.playSong(playlist.URI, track.URI)}>
 								{track.name}
 							</li>
 						)
 					})}
-				</div>
+				</ul>
 			)
 		}
 	}
