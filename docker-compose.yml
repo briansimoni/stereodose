@@ -7,7 +7,7 @@ services:
       - ./:/go/src/github.com/briansimoni/stereodose/
     working_dir: /go/src/github.com/briansimoni/stereodose/
     ports: 
-      - "3000:3000"
+      - "4000:4000"
     depends_on: 
       - db
     environment:
