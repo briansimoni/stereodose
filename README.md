@@ -38,6 +38,6 @@ npm start
 ```
 and you're all set to start writing code.
 
-It's running a proxy server that comes bundled with React. This enables hot reloading among other nice things. It listens on port 4000 and proxies requests to the golang server on port 3000.
+It's running a proxy server that comes bundled with React. This enables hot reloading among other nice things. It listens on port 3000 and proxies requests to the golang server on port 4000.
 
-To more closely simulate production builds, run `npm run build` and visit localhost:3000
+To more closely simulate production builds, run `npm run build` and visit localhost:4000
