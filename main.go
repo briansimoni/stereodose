@@ -38,7 +38,7 @@ func main() {
 	}
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "3000"
+		port = "4000"
 	}
 	stereodose := app.InitApp(c, db)
 	log.Println("Starting stereodose app on port", port)
