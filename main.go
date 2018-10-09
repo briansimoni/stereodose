@@ -16,9 +16,9 @@ func main() {
 	connectionString := os.Getenv("STEREODOSE_DB_STRING")
 	if connectionString == "" {
 		// docker-compose default
-		//connectionString = "postgresql://postgres:development@db:5432/stereodose?sslmode=disable"
+		connectionString = "postgresql://postgres:development@db:5432/stereodose?sslmode=disable"
 		// localhost default
-		connectionString = "postgresql://postgres:development@127.0.0.1:5432/stereodose?sslmode=disable"
+		// connectionString = "postgresql://postgres:development@127.0.0.1:5432/stereodose?sslmode=disable"
 	}
 	db, err := gorm.Open("postgres", connectionString)
 	if err != nil {
