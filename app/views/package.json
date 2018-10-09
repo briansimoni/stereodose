@@ -6,7 +6,7 @@
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-router-dom": "^4.3.1",
-    "react-scripts": "^1.1.5",
+    "react-scripts": "1.1.5",
     "spotify-web-api-js": "^0.24.0"
   },
   "scripts": {
@@ -15,7 +15,14 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
-  "proxy": "http://localhost:4000",
+  "proxy": {
+    "/api": {
+      "target": "http://localhost:4000"
+    },
+    "/auth": {
+      "target": "http://localhost:4000"
+    }
+  },
   "homepage": "/public",
   "browserslist": [
     ">0.2%",
