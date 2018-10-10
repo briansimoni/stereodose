@@ -270,6 +270,7 @@ func (a *AuthController) saveUserData(token *oauth2.Token, u *spotify.PrivateUse
 		Email:        u.Email,
 		SpotifyID:    u.ID,
 		Images:       u.Images,
+		Product:      u.Product,
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
 	}
