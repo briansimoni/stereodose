@@ -1,0 +1,15 @@
+nav img {
+	height: 60px;
+}
+
+#logo {
+	height: 40px;
+}
+
+#status-indicator {
+	display: flex;
+}
+
+.navbar {
+	background-color: #323232;
+}

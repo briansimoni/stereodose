@@ -29,6 +29,8 @@ type User struct {
 	AccessToken  string          `json:"accessToken"`
 	Images       []spotify.Image `json:"images"`
 	Playlists    []Playlist      `json:"playlists"`
+	// Product is the user's subscription level: "premium, free etc..."
+	Product string `json:"product"`
 }
 
 // UserImage should contain a URL or reference to an image

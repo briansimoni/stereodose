@@ -78,21 +78,29 @@ export default class Player extends Component {
 						}
 
 						{!playerSelected &&
-							<Fragment>
-								<h2 className="action-orange">Select a song to transfer Spotify Playback to Stereodose</h2>
-							</Fragment>
+							<footer className="footer fixed-bottom">
+							<div className="container">
+							  <span className="text-muted">Place sticky footer content here.</span>
+							</div>
+						  </footer>
 						}
 
 						{playerLoaded && playerSelected && !playerState &&
-							<Fragment>
-								<h2 className="action-orange">Start playing music ...</h2>
-							</Fragment>
+							<footer className="footer fixed-bottom">
+							<div className="container">
+							  <span className="text-muted">Place sticky footer content here.</span>
+							</div>
+						  </footer>
 						}
 
 						{playerLoaded && playerSelected && playerState &&
-							<Fragment>
+						<footer className="footer fixed-bottom">
+						<div className="container">
+						<Fragment>
 								<NowPlayingScreen playerState={playerState} />
 							</Fragment>
+						</div>
+					  </footer>
 						}
 					</WebPlaybackReact>
 				}

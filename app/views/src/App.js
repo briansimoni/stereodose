@@ -4,10 +4,10 @@ import Drug from './dev/Drug';
 import Playlists from './dev/Playlists';
 import Playlist from './dev/Playlist';
 import Player from './Player';
-import {HashRouter, Route, Switch} from 'react-router-dom';
+import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import UserStatusIndicator from './User/StatusIndicator';
 import UserProfile from './User/Profile';
-//import { HashRouter } from 'react-router-dom';
+import Header from './layout/Header';
 
 
 class App extends React.Component {
@@ -53,11 +53,9 @@ class App extends React.Component {
 
 	render() {
 		return (
-			<div>
-				<h1 onClick={ () => {this.getAccessToken()} }>Stereodose</h1>
-				<HashRouter>
+				<BrowserRouter>
 					<div>
-
+						<Header>
 						<Route 
 							path="/" 
 							render={ (props) => 
@@ -66,19 +64,10 @@ class App extends React.Component {
 									isUserLoggedIn={ (loggedIn) => this.loggedInPromiseResolver(loggedIn)}
 								/>
 						}/>
-						
-						<Route 
-							path="/" 
-							render={ (props) => 
-								<Player 
-								{...props} 
-								getAccessToken={ () => this.getAccessToken()}
-								setDeviceID={(deviceID) => this.setDeviceID(deviceID)}>
-								</Player>
-							}
-						/>
+						</Header>
 
-						{/* Routes wrapped in a Switch match only the first route for ambigulous matches*/}
+						<main role="main" className="container">
+						{/* Routes wrapped in a Switch match only the first route for ambiguous matches*/}
 						<Switch>
 							<Route exact path="/profile"
 								render={ (props)=>
@@ -103,9 +92,20 @@ class App extends React.Component {
 							}
 							/>
 						</Switch>
+						</main>
+						
+						<Route 
+							path="/" 
+							render={ (props) => 
+								<Player 
+								{...props} 
+								getAccessToken={ () => this.getAccessToken()}
+								setDeviceID={(deviceID) => this.setDeviceID(deviceID)}>
+								</Player>
+							}
+						/>
 					</div>
-				</HashRouter>
-			</div>
+				</BrowserRouter>
 		)
 	}
 

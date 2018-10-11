@@ -223,13 +223,12 @@ func refreshToken(c *oauth2.Config, refreshToken string) (*refreshTokenResponse,
 	data.Set("grant_type", "refresh_token")
 	data.Set("refresh_token", refreshToken)
 	body := strings.NewReader(data.Encode())
-	creds := c.ClientID + ":" + c.ClientSecret
-	basicAuth := base64.StdEncoding.EncodeToString([]byte(creds))
 	req, err := http.NewRequest(http.MethodPost, spotifyURL+"/api/token", body)
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("Authorization", "Basic "+basicAuth)
+
+	req.SetBasicAuth(c.ClientID, c.ClientSecret)
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -271,6 +270,7 @@ func (a *AuthController) saveUserData(token *oauth2.Token, u *spotify.PrivateUse
 		Email:        u.Email,
 		SpotifyID:    u.ID,
 		Images:       u.Images,
+		Product:      u.Product,
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
 	}

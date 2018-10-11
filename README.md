@@ -41,3 +41,6 @@ and you're all set to start writing code.
 It's running a proxy server that comes bundled with React. This enables hot reloading among other nice things. It listens on port 3000 and proxies requests to the golang server on port 4000.
 
 To more closely simulate production builds, run `npm run build` and visit localhost:4000
+
+### Windows Users
+Docker, Node, and npm, are all.... not that great on Windows. I was able to get docker-compose to work, but the golang file watcher I'm using doesn't work with the file notification thing through docker/windows or something. I had the most success using golang natively, and using the Postgres container by itself. Also, anticipate issues with node_modules and react build tools.
