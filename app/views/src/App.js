@@ -4,7 +4,7 @@ import Drug from './dev/Drug';
 import Playlists from './dev/Playlists';
 import Playlist from './dev/Playlist';
 import Player from './Player';
-import {HashRouter, Route, Switch} from 'react-router-dom';
+import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import UserStatusIndicator from './User/StatusIndicator';
 import UserProfile from './User/Profile';
 import Header from './layout/Header';
@@ -53,7 +53,7 @@ class App extends React.Component {
 
 	render() {
 		return (
-				<HashRouter>
+				<BrowserRouter>
 					<div>
 						<Header>
 						<Route 
@@ -105,7 +105,7 @@ class App extends React.Component {
 							}
 						/>
 					</div>
-				</HashRouter>
+				</BrowserRouter>
 		)
 	}
 
