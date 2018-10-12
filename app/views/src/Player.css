@@ -8,8 +8,13 @@ body {
 	bottom: 0;
 	width: 100%;
 	/* Set the fixed height of the footer here */
-	height: 60px;
+	height: 150px;
 	/* Vertically center the text there */
 	/* line-height: 60px; */
 	background-color: #f5f5f5;
+	padding-top: 15px;
+}
+
+#album-image {
+	height: 100px;
 }

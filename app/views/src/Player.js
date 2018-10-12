@@ -61,14 +61,15 @@ export default class Player extends Component {
 			onPlayerError: (playerError => alert(playerError))
 		};
 
-		if (authError) {
-			return <h2>{authError.message}</h2>
-		}
-
 		return (
 			<div>
 				{authError &&
-					<h2>{authError.message}</h2>
+
+					<footer className="footer fixed-bottom">
+						<div className="container">
+							<h2>{authError.message}</h2>
+						</div>
+					</footer>
 				}
 				{userAccessToken &&
 					<WebPlaybackReact {...webPlaybackSdkProps}>
@@ -80,7 +81,6 @@ export default class Player extends Component {
 						{!playerSelected &&
 							<footer className="footer fixed-bottom">
 							<div className="container">
-							  <span className="text-muted">Place sticky footer content here.</span>
 							</div>
 						  </footer>
 						}
@@ -88,7 +88,6 @@ export default class Player extends Component {
 						{playerLoaded && playerSelected && !playerState &&
 							<footer className="footer fixed-bottom">
 							<div className="container">
-							  <span className="text-muted">Place sticky footer content here.</span>
 							</div>
 						  </footer>
 						}

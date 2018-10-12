@@ -1,6 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import "./Playlists.css";
 
+// Playlists renders the playlists that correspond to a particular drug + mood
 class Playlists extends React.Component {
 
 	constructor(props) {
@@ -27,16 +29,19 @@ class Playlists extends React.Component {
 		if (playlists) {
 			let match = this.props.match;
 			return (
-				<div>
-					<ul>
-						{playlists.map( (playlist) => {
-							return (
-								<Link key={playlist.spotifyID} to={`${match.url}/${playlist.spotifyID}`}>
-									<li>{playlist.name}</li>
-								</Link>
-							)
-						})}
-					</ul>
+				<div className="row">
+					<div className="col">
+						<h2 id="choose-a-playlist">Choose A Playlist</h2>
+						<ul className="playlists">
+							{playlists.map( (playlist) => {
+								return (
+									<Link key={playlist.spotifyID} to={`${match.url}/${playlist.spotifyID}`}>
+										<li><h4>{playlist.name}</h4></li>
+									</Link>
+								)
+							})}
+						</ul>
+					</div>
 				</div>
 				
 			);

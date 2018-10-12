@@ -1,0 +1,9 @@
+.playlists {
+    list-style: none;
+    text-align: center;
+}
+
+#choose-a-playlist {
+    text-align: center;
+    color: white;
+}
