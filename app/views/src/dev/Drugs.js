@@ -1,8 +1,9 @@
 import React from 'react';
-import {
-	Link
-} from 'react-router-dom'
+import {Link} from 'react-router-dom';
+import "./Drugs.css";
 
+// Drugs renders all the drug choices
+// Weed, Ecstacy, Shrooms, LSD
 class Drugs extends React.Component {
 
 	constructor(props) {
@@ -21,20 +22,20 @@ class Drugs extends React.Component {
 			let drugNames = Object.keys(this.state.categories);
 
 			return (
-				<ul>
-					{
-						drugNames.map((drug, index) => {
-							return <li key={index}>
-								<Link to={`/${drug}`}>{drug}</Link>
-								{/* <Route
-									path={"/"+drug}
-									component={Drug}
-								/> */}
-							</li>
-						})
-					}
-				</ul>
-				
+				<div className="row">
+					<div className="col">
+						<h2 className="drug-header">Choose Your Drug</h2>
+						<ul className="drugs">
+							{
+								drugNames.map((drug, index) => 
+									<li key={index}>
+										<h3><Link to={`/${drug}`}>{drug}</Link></h3>
+									</li>
+								)
+							}
+						</ul>
+					</div>
+				</div>
 			)
 		}
 

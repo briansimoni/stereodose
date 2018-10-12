@@ -1,0 +1,9 @@
+.drugs {
+    list-style: none;
+    text-align: center;
+}
+
+.drug-header {
+    text-align: center;
+    color: white;
+}

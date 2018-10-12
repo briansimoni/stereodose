@@ -121,7 +121,7 @@ class App extends React.Component {
 	async getAccessToken() {
 		let loggedIn = await this.loggedInPromise;
 		if (loggedIn === false) {
-			throw new Error("The user is not logged in");
+			throw new Error("Sign in with Spotify Premium to Play Music");
 		}
 
 		let response =  await fetch("/auth/token", {credentials: "same-origin"});

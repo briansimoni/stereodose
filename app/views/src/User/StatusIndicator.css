@@ -3,7 +3,7 @@ nav img {
 }
 
 #logo {
-	height: 40px;
+	height: 30px;
 }
 
 #status-indicator {
@@ -11,5 +11,10 @@ nav img {
 }
 
 .navbar {
-	background-color: #323232;
+	background-color: #2e2e2e;
+}
+
+.signin-button {
+	color: #007bff;
+	cursor: pointer;
 }

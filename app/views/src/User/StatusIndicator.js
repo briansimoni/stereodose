@@ -29,7 +29,7 @@ class UserStatusIndicator extends React.Component{
 		if (this.state.loggedIn === false) {
 			return (
 				<div>
-					<h3 onClick={ () => {this.logIn()}}>Log In With Spotify</h3>
+					<h3 className="signin-button" onClick={ () => {this.logIn()}}>Sign In With Spotify</h3>
 				</div>
 			)
 		}
