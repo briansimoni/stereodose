@@ -22,7 +22,7 @@ func main() {
 	}
 	db, err := gorm.Open("postgres", connectionString)
 	if err != nil {
-		panic(err.Error())
+		log.Fatal(err.Error())
 	}
 	defer db.Close()
 	c := &config.Config{

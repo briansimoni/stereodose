@@ -8,6 +8,7 @@ import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import UserStatusIndicator from './User/StatusIndicator';
 import UserProfile from './User/Profile';
 import Header from './layout/Header';
+import NoMatch from './NoMatch';
 
 
 class App extends React.Component {
@@ -81,16 +82,19 @@ class App extends React.Component {
 							<Route exact path="/" component={Drugs} />
 							<Route exact path="/:drug" component={Drug} />
 							<Route exact path="/:drug/:subcategory" component={Playlists} />
-							<Route 
+							<Route
+								exact
 								path="/:drug/:subcategory/:playlist"
 								render={(props) => 
 								<Playlist
-								{...props} 
-								getAccessToken={ () => this.getAccessToken()} 
-								getDeviceID={ () => this.deviceIDPromise }
+									{...props} 
+									getAccessToken={ () => this.getAccessToken()} 
+									getDeviceID={ () => this.deviceIDPromise }
 								/>
 							}
 							/>
+
+							<Route component={NoMatch}/>
 						</Switch>
 						</main>
 						
