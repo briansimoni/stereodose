@@ -4,7 +4,7 @@ import Drug from './dev/Drug';
 import Playlists from './dev/Playlists';
 import Playlist from './dev/Playlist';
 import Player from './Player';
-import {BrowserRouter, Route, Switch} from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import UserStatusIndicator from './User/StatusIndicator';
 import UserProfile from './User/Profile';
 import Header from './layout/Header';
@@ -30,15 +30,15 @@ class App extends React.Component {
 			loggedIn: false
 		}
 
-		this.deviceIDPromise = new Promise( (resolve, reject) => {
+		this.deviceIDPromise = new Promise((resolve, reject) => {
 			resolve = resolve.bind(this);
 			this.deviceIDResolver = resolve;
 		});
 
-		this.loggedInPromise = new Promise( (resolve) => {
-				this.loggedInPromiseResolver = resolve;
+		this.loggedInPromise = new Promise((resolve) => {
+			this.loggedInPromiseResolver = resolve;
 		})
-		
+
 
 		// TODO: figure out how an arrow function could eliminate this line
 		this.getAccessToken = this.getAccessToken.bind(this);
@@ -54,27 +54,27 @@ class App extends React.Component {
 
 	render() {
 		return (
-				<BrowserRouter>
-					<div>
-						<Header>
-						<Route 
-							path="/" 
-							render={ (props) => 
+			<BrowserRouter>
+				<div>
+					<Header>
+						<Route
+							path="/"
+							render={(props) =>
 								<UserStatusIndicator
 									{...props}
-									isUserLoggedIn={ (loggedIn) => this.loggedInPromiseResolver(loggedIn)}
+									isUserLoggedIn={(loggedIn) => this.loggedInPromiseResolver(loggedIn)}
 								/>
-						}/>
-						</Header>
+							} />
+					</Header>
 
-						<main role="main" className="container">
+					<main role="main" className="container">
 						{/* Routes wrapped in a Switch match only the first route for ambiguous matches*/}
 						<Switch>
 							<Route exact path="/profile"
-								render={ (props)=>
+								render={(props) =>
 									<UserProfile
 										{...props}
-										getAccessToken={ ()=> this.getAccessToken()}
+										getAccessToken={() => this.getAccessToken()}
 									/>
 								}
 							/>
@@ -85,31 +85,31 @@ class App extends React.Component {
 							<Route
 								exact
 								path="/:drug/:subcategory/:playlist"
-								render={(props) => 
-								<Playlist
-									{...props} 
-									getAccessToken={ () => this.getAccessToken()} 
-									getDeviceID={ () => this.deviceIDPromise }
-								/>
-							}
+								render={(props) =>
+									<Playlist
+										{...props}
+										getAccessToken={() => this.getAccessToken()}
+										getDeviceID={() => this.deviceIDPromise}
+									/>
+								}
 							/>
 
-							<Route component={NoMatch}/>
+							<Route component={NoMatch} />
 						</Switch>
-						</main>
-						
-						<Route 
-							path="/" 
-							render={ (props) => 
-								<Player 
-								{...props} 
-								getAccessToken={ () => this.getAccessToken()}
+					</main>
+
+					<Route
+						path="/"
+						render={(props) =>
+							<Player
+								{...props}
+								getAccessToken={() => this.getAccessToken()}
 								setDeviceID={(deviceID) => this.setDeviceID(deviceID)}>
-								</Player>
-							}
-						/>
-					</div>
-				</BrowserRouter>
+							</Player>
+						}
+					/>
+				</div>
+			</BrowserRouter>
 		)
 	}
 
@@ -128,7 +128,7 @@ class App extends React.Component {
 			throw new Error("Sign in with Spotify Premium to Play Music");
 		}
 
-		let response =  await fetch("/auth/token", {credentials: "same-origin"});
+		let response = await fetch("/auth/token", { credentials: "same-origin" });
 		if (response.status !== 200) {
 			throw new Error(`Unable to fetch Spotify access token: ${response.status} ${response.statusText}`);
 		}
@@ -137,7 +137,7 @@ class App extends React.Component {
 		let expiresOn = token.expiry;
 		let now = new Date();
 		let expiresDate = new Date(expiresOn);
-		if(now < expiresDate) {
+		if (now < expiresDate) {
 			this.accessToken = token.access_token;
 			return token.access_token;
 		}

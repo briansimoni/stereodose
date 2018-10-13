@@ -19,47 +19,47 @@ class UserProfile extends React.Component {
 	}
 
 	render() {
-		let {spotifyPlaylists, stereodosePlaylists, categories, loading} = this.state;
+		let { spotifyPlaylists, stereodosePlaylists, categories, loading } = this.state;
 		if (spotifyPlaylists !== null && stereodosePlaylists !== null && !loading) {
 			return (
 				<div>
-				<h2>Playlists Available From Spotify</h2>
-				<table>
-				<tbody>
-				<tr>
-					<th>Playlist Name</th>
-					<th>Drug</th>
-					<th>Mood</th>
-				</tr>
-				{spotifyPlaylists.map( (playlist) => {
-					return <SpotifyPlaylist
-							 	key={playlist.id} 
-							 	categories={categories}
-								playlist={playlist}
-								onUpdate={ () => {this.checkPlaylists()}}
-							   />
-				})}
-				</tbody>
-				</table>
-
-				<h2>Playlists Shared to Stereodose</h2>
-				<table>
-					<tbody>
-						<tr>
-							<th>Playlist Name</th>
-							<th>Drug</th>
-							<th>Mood</th>
-						</tr>
-					{stereodosePlaylists.map( (playlist) => {
-						return <StereodosePlaylist 
-									key={playlist.spotifyID} 
-									playlist={playlist} 
-									onUpdate={ () => {this.checkPlaylists()}}
+					<h2>Playlists Available From Spotify</h2>
+					<table>
+						<tbody>
+							<tr>
+								<th>Playlist Name</th>
+								<th>Drug</th>
+								<th>Mood</th>
+							</tr>
+							{spotifyPlaylists.map((playlist) => {
+								return <SpotifyPlaylist
+									key={playlist.id}
+									categories={categories}
+									playlist={playlist}
+									onUpdate={() => { this.checkPlaylists() }}
 								/>
-					})}
-					</tbody>
-				</table>
-			</div>
+							})}
+						</tbody>
+					</table>
+
+					<h2>Playlists Shared to Stereodose</h2>
+					<table>
+						<tbody>
+							<tr>
+								<th>Playlist Name</th>
+								<th>Drug</th>
+								<th>Mood</th>
+							</tr>
+							{stereodosePlaylists.map((playlist) => {
+								return <StereodosePlaylist
+									key={playlist.spotifyID}
+									playlist={playlist}
+									onUpdate={() => { this.checkPlaylists() }}
+								/>
+							})}
+						</tbody>
+					</table>
+				</div>
 			)
 		}
 		return (
@@ -87,7 +87,7 @@ class UserProfile extends React.Component {
 		SDK.setAccessToken(token);
 		let userPlaylists = await SDK.getUserPlaylists();
 
-		let response = await fetch("/api/playlists/me", {credentials: "same-origin"});
+		let response = await fetch("/api/playlists/me", { credentials: "same-origin" });
 		let stereodosePlaylists = await response.json();
 
 		let diffedSpotifyPlaylists = [];
@@ -108,7 +108,7 @@ class UserProfile extends React.Component {
 				diffedSpotifyPlaylists.push(spotifyPlaylists[i]);
 			}
 		}
-		
+
 		let state = this.state;
 		state.spotifyPlaylists = diffedSpotifyPlaylists;
 		state.stereodosePlaylists = diffedStereodosePlaylists;

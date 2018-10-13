@@ -29,11 +29,11 @@ class SpotifyPlaylist extends React.Component {
 		let playlist = this.props.playlist;
 		let categories = this.props.categories;
 		let selectedDrug = this.state.drug;
-		let moodOptions = [{value: "", text: "Select Your Mood"}];
+		let moodOptions = [{ value: "", text: "Select Your Mood" }];
 		if (selectedDrug !== "") {
 			let moods = categories[selectedDrug];
-			moods.forEach( (mood) => {
-				moodOptions.push( {value: mood, text: mood});
+			moods.forEach((mood) => {
+				moodOptions.push({ value: mood, text: mood });
 			});
 		}
 		if (playlist && categories) {
@@ -44,16 +44,16 @@ class SpotifyPlaylist extends React.Component {
 					<td>
 						<select value={this.state.drug} onChange={this.onDrugSelection}>
 							<option value="">Choose Your Drug</option>
-							{drugs.map( (drug, index) => 
+							{drugs.map((drug, index) =>
 								<option key={index} value={drug}>{drug}</option>
 							)}
 						</select>
 					</td>
 					<td><select value={this.state.mood} onChange={this.onMoodSelection}>
-							{moodOptions.map( (mood, index) => 
-								<option key={index} value={mood.value}>{mood.text}</option>
-							)}
-						</select>
+						{moodOptions.map((mood, index) =>
+							<option key={index} value={mood.value}>{mood.text}</option>
+						)}
+					</select>
 					</td>
 					<td><button onClick={this.onShareToStereodose}>Share to Stereodose</button></td>
 				</tr>
@@ -63,11 +63,11 @@ class SpotifyPlaylist extends React.Component {
 	}
 
 	onMoodSelection(event) {
-		this.setState({mood: event.target.value});
+		this.setState({ mood: event.target.value });
 	}
 
 	onDrugSelection(event) {
-		this.setState({drug: event.target.value});
+		this.setState({ drug: event.target.value });
 	}
 
 	async onShareToStereodose() {
@@ -81,17 +81,17 @@ class SpotifyPlaylist extends React.Component {
 		let drug = this.state.drug
 		let mood = this.state.mood;
 		// if the user has not selected both drug and mood, do nothing, exit function
-		if (!(drug && mood) ) {
+		if (!(drug && mood)) {
 			return;
 		}
 		let resp = await fetch(`/api/playlists/`, {
 			method: "POST",
 			credentials: "same-origin",
 			body: JSON.stringify({
-					SpotifyID: playlist.id,
-					Category: drug,
-					Subcategory: mood
-				})
+				SpotifyID: playlist.id,
+				Category: drug,
+				Subcategory: mood
+			})
 		});
 		if (resp.status !== 201) {
 			alert("error! " + resp.status + " " + resp.statusText);

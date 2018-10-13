@@ -10,7 +10,7 @@ export default class WebPlayback extends Component {
     playerReady: false,
     playerSelected: false
   }
-    
+
   async handleState(state) {
     if (state) {
       this.props.onPlayerStateChange(state);
@@ -20,9 +20,9 @@ export default class WebPlayback extends Component {
       } = this.webPlaybackInstance;
 
       this.clearStatePolling();
-	  this.props.onPlayerWaitingForDevice({ device_id: device_id });
-	  //await this.waitForDeviceToBeSelected();
-	//   this.transferPlayback(device_id);
+      this.props.onPlayerWaitingForDevice({ device_id: device_id });
+      //await this.waitForDeviceToBeSelected();
+      //   this.transferPlayback(device_id);
       this.props.onPlayerDeviceSelected();
     }
   }
@@ -54,8 +54,8 @@ export default class WebPlayback extends Component {
   }
 
   transferPlayback(deviceID) {
-	  let SDK = new Spotify();
-	  return SDK.WebPlayback.transferPlayback([deviceID]);
+    let SDK = new Spotify();
+    return SDK.WebPlayback.transferPlayback([deviceID]);
   }
 
 
@@ -84,11 +84,11 @@ export default class WebPlayback extends Component {
         }
       }
     });
-    
+
     this.webPlaybackInstance.on("initialization_error", e => {
       this.props.onPlayerError(e.message);
     });
-    
+
     this.webPlaybackInstance.on("authentication_error", e => {
       this.props.onPlayerError(e.message);
     });
@@ -125,22 +125,22 @@ export default class WebPlayback extends Component {
   async componentWillMount() {
     // Notify the player is loading
     this.props.onPlayerLoading();
-    
+
     // Wait for Spotify to load player
     await this.waitForSpotify();
-    
+
     // Setup the instance and the callbacks
     await this.setupWebPlaybackEvents();
-    
+
     // Wait for device to be ready
-	let device_data = await this.setupWaitingForDevice();
+    let device_data = await this.setupWaitingForDevice();
     this.props.onPlayerWaitingForDevice(device_data);
 
-	// let device_id = this.webPlaybackInstance._options.id;
-	// await this.transferPlayback(device_id);
+    // let device_id = this.webPlaybackInstance._options.id;
+    // await this.transferPlayback(device_id);
 
     // Wait for device to be selected
-	await this.waitForDeviceToBeSelected();
+    await this.waitForDeviceToBeSelected();
     this.props.onPlayerDeviceSelected();
   }
 

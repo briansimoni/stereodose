@@ -12,7 +12,7 @@ export default class Player extends Component {
 			// User's session credentials
 			userDeviceId: null,
 			userAccessToken: null,
-	
+
 			// Player state
 			playerLoaded: false,
 			playerSelected: false,
@@ -24,14 +24,14 @@ export default class Player extends Component {
 
 	componentWillMount() {
 		this.props.getAccessToken()
-		.then( (accessToken) => {
-			this.setState({
-				userAccessToken: accessToken
-			});
-		})
-		.catch( (error) => {
-			this.setState({authError: error});
-		})
+			.then((accessToken) => {
+				this.setState({
+					userAccessToken: accessToken
+				});
+			})
+			.catch((error) => {
+				this.setState({ authError: error });
+			})
 	}
 
 	render() {
@@ -80,26 +80,26 @@ export default class Player extends Component {
 
 						{!playerSelected &&
 							<footer className="footer fixed-bottom">
-							<div className="container">
-							</div>
-						  </footer>
+								<div className="container">
+								</div>
+							</footer>
 						}
 
 						{playerLoaded && playerSelected && !playerState &&
 							<footer className="footer fixed-bottom">
-							<div className="container">
-							</div>
-						  </footer>
+								<div className="container">
+								</div>
+							</footer>
 						}
 
 						{playerLoaded && playerSelected && playerState &&
-						<footer className="footer fixed-bottom">
-						<div className="container">
-						<Fragment>
-								<NowPlayingScreen playerState={playerState} />
-							</Fragment>
-						</div>
-					  </footer>
+							<footer className="footer fixed-bottom">
+								<div className="container">
+									<Fragment>
+										<NowPlayingScreen playerState={playerState} />
+									</Fragment>
+								</div>
+							</footer>
 						}
 					</WebPlaybackReact>
 				}

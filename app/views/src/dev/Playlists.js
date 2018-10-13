@@ -21,7 +21,7 @@ class Playlists extends React.Component {
 		if (loading) {
 			return <h3>Loading</h3>
 		}
-		
+
 		if (err) {
 			return <h3>Error: {err}</h3>
 		}
@@ -33,7 +33,7 @@ class Playlists extends React.Component {
 					<div className="col">
 						<h2 id="choose-a-playlist">Choose A Playlist</h2>
 						<ul className="playlists">
-							{playlists.map( (playlist) => {
+							{playlists.map((playlist) => {
 								return (
 									<Link key={playlist.spotifyID} to={`${match.url}/${playlist.spotifyID}`}>
 										<li><h4>{playlist.name}</h4></li>
@@ -43,7 +43,7 @@ class Playlists extends React.Component {
 						</ul>
 					</div>
 				</div>
-				
+
 			);
 		}
 	}
@@ -53,24 +53,24 @@ class Playlists extends React.Component {
 		let subcategory = this.props.match.params.subcategory;
 
 		fetch(`/api/playlists/?category=${drug}&subcategory=${subcategory}`, { credentials: "same-origin" })
-		.then( (response) => {
-			if (response.status === 200) {
-				return response.json();
-			}
-			return Promise.reject(`${response.status} ${response.statusText}`)
-		})
-		.then( (json) => {
-			this.setState({
-				loading: false,
-				playlists: json
+			.then((response) => {
+				if (response.status === 200) {
+					return response.json();
+				}
+				return Promise.reject(`${response.status} ${response.statusText}`)
 			})
-		})
-		.catch( (err) => {
-			this.setState({
-				loading: false,
-				error: err
+			.then((json) => {
+				this.setState({
+					loading: false,
+					playlists: json
+				})
 			})
-		});
+			.catch((err) => {
+				this.setState({
+					loading: false,
+					error: err
+				})
+			});
 	}
 }
 
