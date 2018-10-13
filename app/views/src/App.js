@@ -8,6 +8,7 @@ import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import UserStatusIndicator from './User/StatusIndicator';
 import UserProfile from './User/Profile';
 import Header from './layout/Header';
+import NoMatch from './NoMatch';
 
 
 class App extends React.Component {
@@ -81,16 +82,19 @@ class App extends React.Component {
 							<Route exact path="/" component={Drugs} />
 							<Route exact path="/:drug" component={Drug} />
 							<Route exact path="/:drug/:subcategory" component={Playlists} />
-							<Route 
+							<Route
+								exact
 								path="/:drug/:subcategory/:playlist"
 								render={(props) => 
 								<Playlist
-								{...props} 
-								getAccessToken={ () => this.getAccessToken()} 
-								getDeviceID={ () => this.deviceIDPromise }
+									{...props} 
+									getAccessToken={ () => this.getAccessToken()} 
+									getDeviceID={ () => this.deviceIDPromise }
 								/>
 							}
 							/>
+
+							<Route component={NoMatch}/>
 						</Switch>
 						</main>
 						
@@ -125,6 +129,10 @@ class App extends React.Component {
 		}
 
 		let response =  await fetch("/auth/token", {credentials: "same-origin"});
+		if (response.status !== 200) {
+			throw new Error(`Unable to fetch Spotify access token: ${response.status} ${response.statusText}`);
+		}
+
 		let token = await response.json();
 		let expiresOn = token.expiry;
 		let now = new Date();
@@ -134,6 +142,9 @@ class App extends React.Component {
 			return token.access_token;
 		}
 		response = await fetch("/auth/refresh", { credentials: "same-origin" });
+		if (response.status !== 200) {
+			throw new Error(`Unable to refresh Spotify access token: ${response.status} ${response.statusText}`);
+		}
 		token = await response.json();
 		this.accessToken = token.access_token;
 		return token.access_token;

@@ -29,7 +29,7 @@ export default class NowPlaying extends Component {
         <div className="col-3">
           <img id="album-image" src={album_image} alt={track_name} />
         </div>
-        <div classname="col">
+        <div className="col">
           <p><a href={track_uri}>{track_name}</a> by <a href={artist_uri}>{artist_name}</a></p>
           <p><a href={album_uri}>{album_name}</a></p>
         </div>
