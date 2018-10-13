@@ -1,155 +1,154 @@
 import React from 'react';
-import Drugs from './dev/Drugs';
-import Drug from './dev/Drug';
-import Playlists from './dev/Playlists';
-import Playlist from './dev/Playlist';
-import Player from './Player';
-import {BrowserRouter, Route, Switch} from 'react-router-dom';
-import UserStatusIndicator from './User/StatusIndicator';
-import UserProfile from './User/Profile';
-import Header from './layout/Header';
-import NoMatch from './NoMatch';
-
+import Drugs from './screens/Drugs';
+import Drug from './screens/Drug';
+import Playlists from './screens/Playlists';
+import Playlist from './screens/Playlist';
+import Player from './player/Player';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import UserStatusIndicator from './user/StatusIndicator';
+import UserProfile from './user/Profile';
+import Header from './user/Header';
+import NoMatch from './404';
 
 class App extends React.Component {
 
-	accessToken
-	deviceIDPromise
-	deviceIDResolver
+  accessToken
+  deviceIDPromise
+  deviceIDResolver
 
-	// loggedInPromise resolves at a later time with the user's logged in status (true/false)
-	loggedInPromise
-	// callback function that can be called to resolve when we know that the user is logged in or not
-	loggedInPromiseResolver
+  // loggedInPromise resolves at a later time with the user's logged in status (true/false)
+  loggedInPromise
+  // callback function that can be called to resolve when we know that the user is logged in or not
+  loggedInPromiseResolver
 
-	constructor(props) {
-		super(props);
+  constructor(props) {
+    super(props);
 
-		this.state = {
-			accessToken: null,
-			loggedIn: false
-		}
+    this.state = {
+      accessToken: null,
+      loggedIn: false
+    }
 
-		this.deviceIDPromise = new Promise( (resolve, reject) => {
-			resolve = resolve.bind(this);
-			this.deviceIDResolver = resolve;
-		});
+    this.deviceIDPromise = new Promise((resolve, reject) => {
+      resolve = resolve.bind(this);
+      this.deviceIDResolver = resolve;
+    });
 
-		this.loggedInPromise = new Promise( (resolve) => {
-				this.loggedInPromiseResolver = resolve;
-		})
-		
+    this.loggedInPromise = new Promise((resolve) => {
+      this.loggedInPromiseResolver = resolve;
+    })
 
-		// TODO: figure out how an arrow function could eliminate this line
-		this.getAccessToken = this.getAccessToken.bind(this);
-		this.setDeviceID = this.setDeviceID.bind(this);
-		this.isUserLoggedIn = this.isUserLoggedIn.bind(this);
-	}
 
-	isUserLoggedIn(loggedIn) {
-		let state = this.state;
-		state.loggedIn = loggedIn;
-		this.setState(state);
-	}
+    // TODO: figure out how an arrow function could eliminate this line
+    this.getAccessToken = this.getAccessToken.bind(this);
+    this.setDeviceID = this.setDeviceID.bind(this);
+    this.isUserLoggedIn = this.isUserLoggedIn.bind(this);
+  }
 
-	render() {
-		return (
-				<BrowserRouter>
-					<div>
-						<Header>
-						<Route 
-							path="/" 
-							render={ (props) => 
-								<UserStatusIndicator
-									{...props}
-									isUserLoggedIn={ (loggedIn) => this.loggedInPromiseResolver(loggedIn)}
-								/>
-						}/>
-						</Header>
+  isUserLoggedIn(loggedIn) {
+    let state = this.state;
+    state.loggedIn = loggedIn;
+    this.setState(state);
+  }
 
-						<main role="main" className="container">
-						{/* Routes wrapped in a Switch match only the first route for ambiguous matches*/}
-						<Switch>
-							<Route exact path="/profile"
-								render={ (props)=>
-									<UserProfile
-										{...props}
-										getAccessToken={ ()=> this.getAccessToken()}
-									/>
-								}
-							/>
+  render() {
+    return (
+      <BrowserRouter>
+        <div>
+          <Header>
+            <Route
+              path="/"
+              render={(props) =>
+                <UserStatusIndicator
+                  {...props}
+                  isUserLoggedIn={(loggedIn) => this.loggedInPromiseResolver(loggedIn)}
+                />
+              } />
+          </Header>
 
-							<Route exact path="/" component={Drugs} />
-							<Route exact path="/:drug" component={Drug} />
-							<Route exact path="/:drug/:subcategory" component={Playlists} />
-							<Route
-								exact
-								path="/:drug/:subcategory/:playlist"
-								render={(props) => 
-								<Playlist
-									{...props} 
-									getAccessToken={ () => this.getAccessToken()} 
-									getDeviceID={ () => this.deviceIDPromise }
-								/>
-							}
-							/>
+          <main role="main" className="container">
+            {/* Routes wrapped in a Switch match only the first route for ambiguous matches*/}
+            <Switch>
+              <Route exact path="/profile"
+                render={(props) =>
+                  <UserProfile
+                    {...props}
+                    getAccessToken={() => this.getAccessToken()}
+                  />
+                }
+              />
 
-							<Route component={NoMatch}/>
-						</Switch>
-						</main>
-						
-						<Route 
-							path="/" 
-							render={ (props) => 
-								<Player 
-								{...props} 
-								getAccessToken={ () => this.getAccessToken()}
-								setDeviceID={(deviceID) => this.setDeviceID(deviceID)}>
-								</Player>
-							}
-						/>
-					</div>
-				</BrowserRouter>
-		)
-	}
+              <Route exact path="/" component={Drugs} />
+              <Route exact path="/:drug" component={Drug} />
+              <Route exact path="/:drug/:subcategory" component={Playlists} />
+              <Route
+                exact
+                path="/:drug/:subcategory/:playlist"
+                render={(props) =>
+                  <Playlist
+                    {...props}
+                    getAccessToken={() => this.getAccessToken()}
+                    getDeviceID={() => this.deviceIDPromise}
+                  />
+                }
+              />
 
-	// pass setDeviceID to the player component so we can lift "state" up
-	// and then move it over to peers
-	setDeviceID(deviceID) {
-		this.deviceIDResolver(deviceID);
-	}
+              <Route component={NoMatch} />
+            </Switch>
+          </main>
 
-	// getAccessToken will return a Promise to either get the access token
-	// Should be able to pass this function around as a prop to components that need a token
-	// i.e. <Player> and <Playlist>
-	async getAccessToken() {
-		let loggedIn = await this.loggedInPromise;
-		if (loggedIn === false) {
-			throw new Error("Sign in with Spotify Premium to Play Music");
-		}
+          <Route
+            path="/"
+            render={(props) =>
+              <Player
+                {...props}
+                getAccessToken={() => this.getAccessToken()}
+                setDeviceID={(deviceID) => this.setDeviceID(deviceID)}>
+              </Player>
+            }
+          />
+        </div>
+      </BrowserRouter>
+    )
+  }
 
-		let response =  await fetch("/auth/token", {credentials: "same-origin"});
-		if (response.status !== 200) {
-			throw new Error(`Unable to fetch Spotify access token: ${response.status} ${response.statusText}`);
-		}
+  // pass setDeviceID to the player component so we can lift "state" up
+  // and then move it over to peers
+  setDeviceID(deviceID) {
+    this.deviceIDResolver(deviceID);
+  }
 
-		let token = await response.json();
-		let expiresOn = token.expiry;
-		let now = new Date();
-		let expiresDate = new Date(expiresOn);
-		if(now < expiresDate) {
-			this.accessToken = token.access_token;
-			return token.access_token;
-		}
-		response = await fetch("/auth/refresh", { credentials: "same-origin" });
-		if (response.status !== 200) {
-			throw new Error(`Unable to refresh Spotify access token: ${response.status} ${response.statusText}`);
-		}
-		token = await response.json();
-		this.accessToken = token.access_token;
-		return token.access_token;
+  // getAccessToken will return a Promise to either get the access token
+  // Should be able to pass this function around as a prop to components that need a token
+  // i.e. <Player> and <Playlist>
+  async getAccessToken() {
+    let loggedIn = await this.loggedInPromise;
+    if (loggedIn === false) {
+      throw new Error("Sign in with Spotify Premium to Play Music");
+    }
 
-	}
+    let response = await fetch("/auth/token", { credentials: "same-origin" });
+    if (response.status !== 200) {
+      throw new Error(`Unable to fetch Spotify access token: ${response.status} ${response.statusText}`);
+    }
+
+    let token = await response.json();
+    let expiresOn = token.expiry;
+    let now = new Date();
+    let expiresDate = new Date(expiresOn);
+    if (now < expiresDate) {
+      this.accessToken = token.access_token;
+      return token.access_token;
+    }
+    response = await fetch("/auth/refresh", { credentials: "same-origin" });
+    if (response.status !== 200) {
+      throw new Error(`Unable to refresh Spotify access token: ${response.status} ${response.statusText}`);
+    }
+    token = await response.json();
+    this.accessToken = token.access_token;
+    return token.access_token;
+
+  }
 }
 
 export default App;
