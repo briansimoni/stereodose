@@ -1,15 +1,14 @@
 import React from 'react';
-import Drugs from './dev/Drugs';
-import Drug from './dev/Drug';
-import Playlists from './dev/Playlists';
-import Playlist from './dev/Playlist';
-import Player from './Player';
+import Drugs from './screens/Drugs';
+import Drug from './screens/Drug';
+import Playlists from './screens/Playlists';
+import Playlist from './screens/Playlist';
+import Player from './player/Player';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import UserStatusIndicator from './User/StatusIndicator';
-import UserProfile from './User/Profile';
-import Header from './layout/Header';
-import NoMatch from './NoMatch';
-
+import UserStatusIndicator from './user/StatusIndicator';
+import UserProfile from './user/Profile';
+import Header from './user/Header';
+import NoMatch from './404';
 
 class App extends React.Component {
 

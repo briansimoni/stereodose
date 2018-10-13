@@ -1,8 +1,8 @@
 import React, { Component, Fragment } from 'react';
 import './Player.css';
-import WebPlaybackReact from './Spotify/WebPlaybackReact';
+import WebPlaybackReact from './WebPlaybackReact';
 
-import NowPlayingScreen from './screens/NowPlaying';
+import NowPlayingScreen from './NowPlaying';
 
 export default class Player extends Component {
 
