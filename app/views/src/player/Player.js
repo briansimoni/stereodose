@@ -66,7 +66,7 @@ export default class Player extends Component {
         {authError &&
 
           <footer className="footer fixed-bottom">
-            <div className="container">
+            <div className="container-fluid">
               <h2>{authError.message}</h2>
             </div>
           </footer>
@@ -80,21 +80,21 @@ export default class Player extends Component {
 
             {!playerSelected &&
               <footer className="footer fixed-bottom">
-                <div className="container">
+                <div className="container-fluid">
                 </div>
               </footer>
             }
 
             {playerLoaded && playerSelected && !playerState &&
               <footer className="footer fixed-bottom">
-                <div className="container">
+                <div className="container-fluid">
                 </div>
               </footer>
             }
 
             {playerLoaded && playerSelected && playerState &&
               <footer className="footer fixed-bottom">
-                <div className="container">
+                <div className="container-fluid">
                   <Fragment>
                     <NowPlayingScreen playerState={playerState} />
                   </Fragment>
