@@ -26,14 +26,14 @@ export default class NowPlaying extends Component {
     return (
       <Fragment>
         <div className="row">
-          <div className="col-md-1">
+          <div className="col-sm-1">
             <img id="album-image" src={album_image} alt={track_name} />
           </div>
           <div className="col-md-1">
-            <div class="row">
+            <div className="row justify-content-center">
               <span><a href={track_uri}>{track_name}</a> by <a href={artist_uri}>{artist_name}</a></span>
             </div>
-            <div className="row">
+            <div className="row justify-content-center">
               <span><a href={album_uri}>{album_name}</a></span>
             </div>
           </div>

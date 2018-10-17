@@ -17,4 +17,11 @@ body {
 
 #album-image {
 	height: 100px;
+	display: none;
+}
+
+@media only screen and (min-width: 576px) {
+    #album-image {
+        display: inline;
+    }
 }
