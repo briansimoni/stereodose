@@ -64,9 +64,7 @@ class UserProfile extends React.Component {
     }
     return (
       <div>
-        <h2>Playlists From Spotify</h2>
-
-        <h2>Playlists Shared to Stereodose</h2>
+        <h2>Loading...</h2>
       </div>
     );
   }
