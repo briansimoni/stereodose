@@ -39,6 +39,8 @@ export default class NowPlaying extends Component {
           </div>
           <div className="col-md-8 text-center">
             <p>ID: {id} | Position: {position_ms} | Duration: {duration_ms}</p>
+            <br />
+            <button onClick={this.props.onPlayPause} id="play-pause" className={playerState.paused ? "button play": "button pause"} alt="play-pause"></button>
           </div>
         </div>
       </Fragment>

@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import './Player.css';
 import WebPlaybackReact from './WebPlaybackReact';
+import Spotify from 'spotify-web-api-js';
 
 import NowPlayingScreen from './NowPlaying';
 
@@ -20,6 +21,8 @@ export default class Player extends Component {
 
       authError: null,
     };
+
+    this.onPlayPause = this.onPlayPause.bind(this);
   }
 
   componentWillMount() {
@@ -32,6 +35,24 @@ export default class Player extends Component {
       .catch((error) => {
         this.setState({ authError: error });
       })
+  }
+
+  async onPlayPause() {
+    let options = {device_id: this.state.userDeviceId};
+    let SDK = new Spotify();
+    let token;
+    try {
+      token = await this.props.getAccessToken();
+    } catch (err) {
+      alert(err.message);
+    }
+    SDK.setAccessToken(token);
+    let paused = this.state.playerState.paused;
+    if (paused) {
+      SDK.play(options);
+    } else {
+      SDK.pause(options);
+    }
   }
 
   render() {
@@ -96,7 +117,7 @@ export default class Player extends Component {
               <footer className="footer fixed-bottom">
                 <div className="container-fluid">
                   <Fragment>
-                    <NowPlayingScreen playerState={playerState} />
+                    <NowPlayingScreen playerState={playerState} onPlayPause={this.onPlayPause} />
                   </Fragment>
                 </div>
               </footer>
