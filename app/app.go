@@ -87,6 +87,7 @@ func createRouter(c *config.Config) *util.AppRouter {
 	authPlaylistsRouter.AppHandler("/me", playlists.GetMyPlaylists).Methods(http.MethodGet)
 	playlistsRouter.AppHandler("/{id}", playlists.GetPlaylistByID).Methods(http.MethodGet)
 	authPlaylistsRouter.AppHandler("/", playlists.CreatePlaylist).Methods(http.MethodPost)
+	authPlaylistsRouter.AppHandler("/{id}/image", playlists.UploadImage).Methods(http.MethodPost)
 	authPlaylistsRouter.AppHandler("/{id}", playlists.DeletePlaylist).Methods(http.MethodDelete)
 
 	categoriesRouter := util.AppRouter{app.PathPrefix("/api/categories").Subrouter()}
@@ -94,7 +95,7 @@ func createRouter(c *config.Config) *util.AppRouter {
 
 	app.HandleFunc("/", serveReactApp)
 	// Serving the React app on 404's enables the use of arbitrary routes with react browser-router
-	// Otherwise a requet to /some/arbitrary/path from a diferent origin would simply 404
+	// Otherwise a requet to /some/arbitrary/path from a different origin would simply 404
 	// Could use the hash router for a looser coupling but /#/some/path is ugly
 	app.NotFoundHandler = (http.HandlerFunc(serveReactApp))
 

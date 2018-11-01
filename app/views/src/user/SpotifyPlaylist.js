@@ -15,6 +15,8 @@ class SpotifyPlaylist extends React.Component {
       throw new Error("SpotifyPlaylist requires playlist, categories, and onUpdate props");
     }
 
+    this.fileInputRef = React.createRef();
+
     this.state = {
       drug: "",
       mood: ""
@@ -23,6 +25,7 @@ class SpotifyPlaylist extends React.Component {
     this.onDrugSelection = this.onDrugSelection.bind(this);
     this.onMoodSelection = this.onMoodSelection.bind(this);
     this.onShareToStereodose = this.onShareToStereodose.bind(this);
+    this.uploadImage = this.uploadImage.bind(this);
   }
 
   render() {
@@ -49,11 +52,15 @@ class SpotifyPlaylist extends React.Component {
               )}
             </select>
           </td>
-          <td><select value={this.state.mood} onChange={this.onMoodSelection}>
-            {moodOptions.map((mood, index) =>
-              <option key={index} value={mood.value}>{mood.text}</option>
-            )}
-          </select>
+          <td>
+            <select value={this.state.mood} onChange={this.onMoodSelection}>
+              {moodOptions.map((mood, index) =>
+                <option key={index} value={mood.value}>{mood.text}</option>
+              )}
+            </select>
+          </td>
+          <td>
+            <input ref={this.fileInputRef} type="file" id="file-upload" name="playlist-image" onChange={this.uploadImage}></input>
           </td>
           <td><button onClick={this.onShareToStereodose}>Share to Stereodose</button></td>
         </tr>
@@ -68,6 +75,27 @@ class SpotifyPlaylist extends React.Component {
 
   onDrugSelection(event) {
     this.setState({ drug: event.target.value });
+  }
+
+  async uploadImage(event) {
+    try {
+      const id = this.props.playlist.id;
+      const data = new FormData();
+      data.append('playlist-image', this.fileInputRef.current.files[0]);
+      data.append('filename', 'playlist-image');
+      let response = await fetch(`/api/playlists/${id}/image`, {
+        method: "POST",
+        body: data
+      });
+      if (response.status !== 201) {
+        throw new Error(`Error uploading image, ${response.status}: ${response.statusText}`);
+      }
+      alert("image uploaded successfully")
+    } catch (err) {
+      // TODO: render something to the user
+      // throw(err);
+      alert(err);
+    }
   }
 
   async onShareToStereodose() {

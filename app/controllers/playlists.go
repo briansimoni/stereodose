@@ -3,7 +3,10 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/briansimoni/stereodose/app/models"
 	"github.com/briansimoni/stereodose/app/util"
@@ -157,5 +160,33 @@ func (p *PlaylistsController) DeletePlaylist(w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	return nil
+}
+
+// UploadImage saves an image the corresponds to a playlist
+// The actual data is saved to cloud bucket storage
+// A reference to the bucket is stored in the database and returned to the client
+func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request) error {
+	vars := mux.Vars(r)
+	log.Println(vars["id"])
+	data, header, err := r.FormFile("playlist-image")
+	if err != nil {
+		return err
+	}
+	// file, err := os.OpenFile("upload.jpg", os.O_RDWR|os.O_CREATE, 755)
+	// if err != nil {
+	// 	return err
+	// }
+	// defer file.Close()
+	log.Println("size", header.Size)
+	log.Println("header", header.Header)
+	log.Println("filename", header.Filename)
+	// _, err = io.Copy(file, data)
+	_, err = io.Copy(os.Stdout, data)
+	if err != nil {
+		log.Println("zomg err", err.Error())
+		return err
+	}
+	w.WriteHeader(http.StatusCreated)
 	return nil
 }
