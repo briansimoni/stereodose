@@ -48,7 +48,6 @@ class Playlists extends React.Component {
     }
   }
 
-  // TODO: if drug or subcategory is not found, 404
   async componentDidMount() {
     let drug = this.props.match.params.drug;
     let subcategory = this.props.match.params.subcategory;
