@@ -48,30 +48,32 @@ class Playlists extends React.Component {
     }
   }
 
-  componentDidMount() {
+  // TODO: if drug or subcategory is not found, 404
+  async componentDidMount() {
     let drug = this.props.match.params.drug;
     let subcategory = this.props.match.params.subcategory;
 
-    fetch(`/api/playlists/?category=${drug}&subcategory=${subcategory}`, { credentials: "same-origin" })
-      .then((response) => {
-        if (response.status === 200) {
-          return response.json();
-        }
-        return Promise.reject(`${response.status} ${response.statusText}`)
-      })
-      .then((json) => {
-        this.setState({
-          loading: false,
-          playlists: json
-        })
-      })
-      .catch((err) => {
-        this.setState({
-          loading: false,
-          error: err
-        })
+    try {
+      let response = await fetch(`/api/playlists/?category=${drug}&subcategory=${subcategory}`, { credentials: "same-origin" });
+      if (response.status !== 200) {
+        throw new Error(`Error fetching playlists ${response.status}, ${response.statusText}`);
+      }
+      let playlists = await response.json();
+      if (playlists.length === 0) {
+        throw new Error(`No playlists found for drug: ${drug}, mood: ${subcategory}`);
+      }
+      this.setState({
+        loading: false,
+        playlists: playlists
       });
+    } catch (err) {
+      this.setState({
+        loading: false,
+        error: err.message
+      });
+    }
   }
+
 }
 
 export default Playlists
