@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -8,10 +9,16 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/briansimoni/stereodose/app/models"
 	"github.com/briansimoni/stereodose/app/util"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
+
+	"github.com/google/go-cloud/blob"
+	"github.com/google/go-cloud/blob/s3blob"
 )
 
 // PlaylistsController is a collection of RESTful Handlers for Playlists
@@ -189,4 +196,46 @@ func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request
 	}
 	w.WriteHeader(http.StatusCreated)
 	return nil
+}
+
+func gimmeBucket() {
+	ctx := context.Background()
+	// Open a connection to the bucket.
+	var (
+		b   *blob.Bucket
+		err error
+	)
+	cloud := "aws"
+	bucketName := "stereodose"
+	switch cloud {
+	case "gcp":
+		b, err = setupGCP(ctx, bucketName)
+	case "aws":
+		// AWS is handled below in the next code sample.
+		b, err = setupAWS(ctx, bucketName)
+	default:
+		log.Fatalf("Failed to recognize cloud. Want gcp or aws, got: %s", cloud)
+	}
+	if err != nil {
+		log.Fatalf("Failed to setup bucket: %s", err)
+	}
+	log.Println(b)
+}
+
+func setupAWS(ctx context.Context, bucket string) (*blob.Bucket, error) {
+	c := &aws.Config{
+		// Either hard-code the region or use AWS_REGION.
+		Region: aws.String("us-east-2"),
+		// credentials.NewEnvCredentials assumes two environment variables are
+		// present:
+		// 1. AWS_ACCESS_KEY_ID, and
+		// 2. AWS_SECRET_ACCESS_KEY.
+		Credentials: credentials.NewEnvCredentials(),
+	}
+	s := session.Must(session.NewSession(c))
+	return s3blob.OpenBucket(ctx, s, bucket)
+}
+
+func setupGCP(ctx context.Context, bucket string) (*blob.Bucket, error) {
+	return nil, nil
 }
