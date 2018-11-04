@@ -32,13 +32,15 @@ If you don't want to use a .env file, you can use regular system environment var
 
 Once you have the variables set:
 ```
-docker-compose up
-# new terminal
+# terminal 1
 cd app/views/
-npm install
+npm install && npm run build
+# terminal 2
+docker-compose up
+# terminal 1
 npm start
 ```
-and you're all set to start writing code.
+and you're all set to start writing code. You only have to run `npm run build` on the first setup.
 
 It's running a proxy server that comes bundled with React. This enables hot reloading among other nice things. It listens on port 3000 and proxies requests to the golang server on port 4000.
 
