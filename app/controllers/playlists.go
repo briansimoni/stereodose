@@ -93,6 +93,7 @@ func (p *PlaylistsController) CreatePlaylist(w http.ResponseWriter, r *http.Requ
 		SpotifyID   string `json:"SpotifyID"`
 		Category    string `json:"Category"`
 		SubCategory string `json:"SubCategory"`
+		ImageURL    string `json:"ImageURL"`
 	}
 	var data jsonBody
 	defer r.Body.Close()
@@ -115,7 +116,7 @@ func (p *PlaylistsController) CreatePlaylist(w http.ResponseWriter, r *http.Requ
 		return errors.New("Unable to obtain user from session")
 	}
 
-	_, err = p.DB.Playlists.CreatePlaylistBySpotifyID(user, data.SpotifyID, data.Category, data.SubCategory)
+	_, err = p.DB.Playlists.CreatePlaylistBySpotifyID(user, data.SpotifyID, data.Category, data.SubCategory, data.ImageURL)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -168,7 +169,8 @@ func (p *PlaylistsController) DeletePlaylist(w http.ResponseWriter, r *http.Requ
 
 // UploadImage saves an image the corresponds to a playlist
 // The actual data is saved to cloud bucket storage
-// A reference to the bucket is stored in the database and returned to the client
+// A permalink to the object is stored in the database and returned to the client
+// TODO: resize to optimal dimensions
 func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request) error {
 	data, header, err := r.FormFile("playlist-image")
 	if err != nil {
@@ -214,12 +216,12 @@ func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request
 
 	// write some useful JSON back
 	imageCreatedResponse := struct {
-		Status int    `json:"status"`
-		Link   string `json:"link"`
+		Status   int    `json:"status"`
+		ImageURL string `json:"imageURL"`
 	}{
 		Status: http.StatusCreated,
 		// TODO: somehow not hardcode this
-		Link: "https://s3.amazonaws.com/stereodose/" + imageName,
+		ImageURL: "https://s3.amazonaws.com/stereodose/" + imageName,
 	}
 
 	w.WriteHeader(http.StatusCreated)

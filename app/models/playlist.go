@@ -17,7 +17,8 @@ type PlaylistService interface {
 	GetPlaylists(offset, limit, category, subcategory string) ([]Playlist, error)
 	GetByID(ID string) (*Playlist, error)
 	GetMyPlaylists(user User) ([]Playlist, error)
-	CreatePlaylistBySpotifyID(user User, playlistID, category, subCategory string) (*Playlist, error)
+	// TODO: reafactor this to take a Playlist struct instead of a ton of strings
+	CreatePlaylistBySpotifyID(user User, playlistID, category, subCategory, image string) (*Playlist, error)
 	DeletePlaylist(spotifyID string) error
 }
 
@@ -32,14 +33,15 @@ type Playlist struct {
 	SubCategory   string    `json:"subCategory"`
 	Collaborative bool      `json:"collaborative"`
 	//ExternalURLs  map[string]string `json:"external_urls"`
-	Endpoint   string          `json:"href"`
-	Images     []PlaylistImage `json:"images"`
-	Name       string          `json:"name"`
-	IsPublic   bool            `json:"public"`
-	SnapshotID string          `json:"snapshot_id"`
-	Tracks     []Track         `json:"tracks" gorm:"many2many:playlist_tracks"`
-	URI        string          `json:"URI"`
-	UserID     uint            `json:"userID"`
+	Endpoint       string          `json:"href"`
+	Images         []PlaylistImage `json:"images"`
+	Name           string          `json:"name"`
+	IsPublic       bool            `json:"public"`
+	SnapshotID     string          `json:"snapshot_id"`
+	Tracks         []Track         `json:"tracks" gorm:"many2many:playlist_tracks"`
+	URI            string          `json:"URI"`
+	UserID         uint            `json:"userID"`
+	BucketImageURL string          `json:"bucketImageURL"`
 }
 
 // PlaylistImage should contain a URL or reference to an image
@@ -94,7 +96,7 @@ func (s *StereodosePlaylistService) GetMyPlaylists(user User) ([]Playlist, error
 
 // CreatePlaylistBySpotifyID is given a user and playlistID
 // It uses the information to call the Spotify API and save the information to the local db
-func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlistID, category, subCategory string) (*Playlist, error) {
+func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlistID, category, subCategory, image string) (*Playlist, error) {
 	// 1. get the tracks for the playlist
 	// 2. create playlist, add tracks
 	// 3. add to db
@@ -114,16 +116,17 @@ func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlis
 		return nil, err
 	}
 	playlist := &Playlist{
-		SpotifyID:     string(list.ID),
-		Collaborative: list.Collaborative,
-		Endpoint:      list.Endpoint,
-		Name:          list.Name,
-		IsPublic:      list.IsPublic,
-		SnapshotID:    list.SnapshotID,
-		URI:           string(list.URI),
-		UserID:        user.ID,
-		Category:      category,
-		SubCategory:   subCategory,
+		SpotifyID:      string(list.ID),
+		Collaborative:  list.Collaborative,
+		Endpoint:       list.Endpoint,
+		Name:           list.Name,
+		IsPublic:       list.IsPublic,
+		SnapshotID:     list.SnapshotID,
+		URI:            string(list.URI),
+		UserID:         user.ID,
+		Category:       category,
+		SubCategory:    subCategory,
+		BucketImageURL: image,
 	}
 	for _, image := range list.Images {
 		playlist.Images = append(playlist.Images, PlaylistImage{Image: image})

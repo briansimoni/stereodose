@@ -44,7 +44,7 @@ func (f *fakePlaylistService) GetByID(ID string) (*models.Playlist, error) {
 	return playlist, nil
 }
 
-func (f *fakePlaylistService) CreatePlaylistBySpotifyID(user models.User, spotifyID, category, subcategory string) (*models.Playlist, error) {
+func (f *fakePlaylistService) CreatePlaylistBySpotifyID(user models.User, spotifyID, category, subcategory, image string) (*models.Playlist, error) {
 	if spotifyID == "alreadyExists" {
 		return nil, errors.New("Playlist with this id already exists")
 	}

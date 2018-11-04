@@ -8,6 +8,7 @@ class SpotifyPlaylist extends React.Component {
   categories // result of categories API call
   onUpdate // function passed in by parent
   inFlight = false
+  bucketImage // The permalink to an image after it is uploaded
 
   constructor(props) {
     super(props);
@@ -90,7 +91,9 @@ class SpotifyPlaylist extends React.Component {
       if (response.status !== 201) {
         throw new Error(`Error uploading image, ${response.status}: ${response.statusText}`);
       }
-      alert("image uploaded successfully")
+      const json = await response.json();
+      this.bucketImage = json.imageURL;
+      console.log(json);
     } catch (err) {
       // TODO: render something to the user
       // throw(err);
@@ -118,7 +121,8 @@ class SpotifyPlaylist extends React.Component {
       body: JSON.stringify({
         SpotifyID: playlist.id,
         Category: drug,
-        Subcategory: mood
+        Subcategory: mood,
+        ImageURL: this.bucketImage
       })
     });
     if (resp.status !== 201) {

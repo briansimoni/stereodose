@@ -150,6 +150,7 @@ func TestAuthController_Logout(t *testing.T) {
 // literally goes through an entirely fake http cycle to have gorilla sessions
 // create a Set-Cookie response
 // then parse the header, return a new http.Cookie for testing
+// The cookie needs to be created with the same secret, otherwise the digital signatures won't match
 func generateFakeCookie() (*http.Cookie, error) {
 	testStore := sessions.NewCookieStore([]byte("something-very-secret"))
 	req, err := http.NewRequest(http.MethodGet, "/", nil)
