@@ -66,6 +66,14 @@
   version = "v0.4.0"
 
 [[projects]]
+  digest = "1:3a26588bc48b96825977c1b3df964f8fd842cd6860cc26370588d3563433cf11"
+  name = "github.com/google/uuid"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "d460ce9f8df2e77fb1ba55ca87fafed96c607494"
+  version = "v1.0.0"
+
+[[projects]]
   digest = "1:c79fb010be38a59d657c48c6ba1d003a8aa651fa56b579d959d74573b7dff8e1"
   name = "github.com/gorilla/context"
   packages = ["."]
@@ -207,6 +215,7 @@
     "github.com/aws/aws-sdk-go/aws/session",
     "github.com/google/go-cloud/blob",
     "github.com/google/go-cloud/blob/s3blob",
+    "github.com/google/uuid",
     "github.com/gorilla/handlers",
     "github.com/gorilla/mux",
     "github.com/gorilla/sessions",

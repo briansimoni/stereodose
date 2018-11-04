@@ -12,6 +12,7 @@ import (
 	"github.com/briansimoni/stereodose/app/models"
 	"github.com/briansimoni/stereodose/app/util"
 	"github.com/briansimoni/stereodose/config"
+	"github.com/google/go-cloud/blob"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
@@ -22,6 +23,7 @@ var (
 	store        *sessions.CookieStore
 	db           *gorm.DB
 	stereoDoseDB *models.StereoDoseDB
+	cloudBucket  *blob.Bucket
 	file         *os.File
 	indexHTML    []byte
 	err          error
@@ -39,6 +41,11 @@ func InitApp(c *config.Config, db *gorm.DB) *util.AppRouter {
 	}
 	store = sessions.NewCookieStore(authKey, encryptionKey)
 
+	cloudBucket, err = setupBucket("aws", "stereodose")
+	if err != nil {
+		log.Fatal("Unable to setup cloud bucket storage", err.Error())
+	}
+
 	stereoDoseDB = models.NewStereodoseDB(db, store)
 	return createRouter(c)
 }
@@ -51,7 +58,7 @@ func createRouter(c *config.Config) *util.AppRouter {
 
 	categories := controllers.NewCategoriesController()
 	users := controllers.NewUsersController(stereoDoseDB)
-	playlists := controllers.NewPlaylistsController(stereoDoseDB)
+	playlists := controllers.NewPlaylistsController(stereoDoseDB, cloudBucket)
 	auth := controllers.NewAuthController(stereoDoseDB, store, c)
 
 	// Serve all of the static files

@@ -60,7 +60,7 @@ class SpotifyPlaylist extends React.Component {
             </select>
           </td>
           <td>
-            <input ref={this.fileInputRef} type="file" id="file-upload" name="playlist-image" onChange={this.uploadImage}></input>
+            <input ref={this.fileInputRef} type="file" id="file-upload" name="playlist-image" accept=".jpg,.jpeg,.png"onChange={this.uploadImage}></input>
           </td>
           <td><button onClick={this.onShareToStereodose}>Share to Stereodose</button></td>
         </tr>

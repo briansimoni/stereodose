@@ -14,6 +14,8 @@ STEREODOSE_CLIENT_SECRET=someclientsecret
 STEREODOSE_REDIRECT_URL=http://localhost:4000/auth/callback
 STEREODOSE_AUTH_KEY=somesecretkeythatyoucangenerate
 STEREODOSE_ENCRYPTION_KEY=somesecretkeythatyoucangenerate
+AWS_ACCESS_KEY_ID=someaccesskey
+AWS_SECRET_ACCESS_KEY=somesecret
 ```
 
 Obtain the client ID and secret by creating an app in the Spotify developer dashboard, and set the callback to http://localhost:3000/auth/callback

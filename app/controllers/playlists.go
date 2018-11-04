@@ -4,31 +4,27 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
-	"log"
+	"io/ioutil"
 	"net/http"
-	"os"
+	"strings"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/briansimoni/stereodose/app/models"
 	"github.com/briansimoni/stereodose/app/util"
+	"github.com/google/go-cloud/blob"
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
-
-	"github.com/google/go-cloud/blob"
-	"github.com/google/go-cloud/blob/s3blob"
 )
 
 // PlaylistsController is a collection of RESTful Handlers for Playlists
 type PlaylistsController struct {
-	DB *models.StereoDoseDB
+	DB     *models.StereoDoseDB
+	Bucket *blob.Bucket
 }
 
 // NewPlaylistsController returns a pointer to PlaylistsController
-func NewPlaylistsController(db *models.StereoDoseDB) *PlaylistsController {
-	return &PlaylistsController{DB: db}
+func NewPlaylistsController(db *models.StereoDoseDB, b *blob.Bucket) *PlaylistsController {
+	return &PlaylistsController{DB: db, Bucket: b}
 }
 
 // GetPlaylists will return a subset of all the playlists in the DB
@@ -174,68 +170,59 @@ func (p *PlaylistsController) DeletePlaylist(w http.ResponseWriter, r *http.Requ
 // The actual data is saved to cloud bucket storage
 // A reference to the bucket is stored in the database and returned to the client
 func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request) error {
-	vars := mux.Vars(r)
-	log.Println(vars["id"])
 	data, header, err := r.FormFile("playlist-image")
 	if err != nil {
 		return err
 	}
-	// file, err := os.OpenFile("upload.jpg", os.O_RDWR|os.O_CREATE, 755)
-	// if err != nil {
-	// 	return err
-	// }
-	// defer file.Close()
-	log.Println("size", header.Size)
-	log.Println("header", header.Header)
-	log.Println("filename", header.Filename)
-	// _, err = io.Copy(file, data)
-	_, err = io.Copy(os.Stdout, data)
+
+	// Deny if greater than 4mb
+	if header.Size > 4000000 {
+		return &statusError{
+			Message: "Image was too large",
+			Code:    http.StatusRequestEntityTooLarge,
+		}
+	}
+
+	opts := &blob.WriterOptions{}
+	ctx := context.Background()
+	image, err := ioutil.ReadAll(data)
 	if err != nil {
-		log.Println("zomg err", err.Error())
 		return err
 	}
-	w.WriteHeader(http.StatusCreated)
-	return nil
-}
 
-func gimmeBucket() {
-	ctx := context.Background()
-	// Open a connection to the bucket.
-	var (
-		b   *blob.Bucket
-		err error
-	)
-	cloud := "aws"
-	bucketName := "stereodose"
-	switch cloud {
-	case "gcp":
-		b, err = setupGCP(ctx, bucketName)
-	case "aws":
-		// AWS is handled below in the next code sample.
-		b, err = setupAWS(ctx, bucketName)
-	default:
-		log.Fatalf("Failed to recognize cloud. Want gcp or aws, got: %s", cloud)
+	// Only allow web-safe image files
+	contentType := http.DetectContentType(image)
+	if contentType != "image/jpeg" && contentType != "image/png" && contentType != "image/gif" {
+		return &statusError{
+			Message: "Invalid file type. Try jpeg, png, or gif",
+			Code:    http.StatusBadRequest,
+		}
 	}
+
+	// I place a random uuid in the image name so that there are no naming collisions
+	// The playlistID is in the name to simply relate the image back to the playlist
+	id := uuid.New().String()
+	playlistID := mux.Vars(r)["id"]
+	suffix := strings.Split(contentType, "/")[1]
+
+	// the images/ prefix is the target folder inside of the bucket
+	imageName := fmt.Sprintf("images/%s-%s.%s", id, playlistID, suffix)
+	err = p.Bucket.WriteAll(ctx, imageName, image, opts)
 	if err != nil {
-		log.Fatalf("Failed to setup bucket: %s", err)
+		return err
 	}
-	log.Println(b)
-}
 
-func setupAWS(ctx context.Context, bucket string) (*blob.Bucket, error) {
-	c := &aws.Config{
-		// Either hard-code the region or use AWS_REGION.
-		Region: aws.String("us-east-2"),
-		// credentials.NewEnvCredentials assumes two environment variables are
-		// present:
-		// 1. AWS_ACCESS_KEY_ID, and
-		// 2. AWS_SECRET_ACCESS_KEY.
-		Credentials: credentials.NewEnvCredentials(),
+	// write some useful JSON back
+	imageCreatedResponse := struct {
+		Status int    `json:"status"`
+		Link   string `json:"link"`
+	}{
+		Status: http.StatusCreated,
+		// TODO: somehow not hardcode this
+		Link: "https://s3.amazonaws.com/stereodose/" + imageName,
 	}
-	s := session.Must(session.NewSession(c))
-	return s3blob.OpenBucket(ctx, s, bucket)
-}
 
-func setupGCP(ctx context.Context, bucket string) (*blob.Bucket, error) {
-	return nil, nil
+	w.WriteHeader(http.StatusCreated)
+	util.JSON(w, &imageCreatedResponse)
+	return nil
 }
