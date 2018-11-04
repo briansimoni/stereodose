@@ -1,9 +1,11 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/briansimoni/stereodose/app/models"
@@ -95,19 +97,18 @@ func TestAuthController_Login(t *testing.T) {
 }
 
 func TestAuthController_Logout(t *testing.T) {
-	var testCookie = "MTUzNzA1NTE5NHxEdi1CQkFFQ180SUFBUkFCRUFBQUl2LUNBQUVHYzNSeWFXNW5EQVlBQkhSbGMzUUdjM1J5YVc1bkRBWUFCSFJsYzNRPXwyqjFZ4_cFvxYc9RY3ky3ub-ozjzImzCbKlH0wuxqeEw=="
+	testStore := sessions.NewCookieStore([]byte("something-very-secret"))
 	testDB := &models.StereoDoseDB{
 		Users:     &fakeUserService{},
 		Playlists: &fakePlaylistService{},
 	}
-	testStore := sessions.NewCookieStore([]byte("something-very-secret"))
 	req1, _ := http.NewRequest(http.MethodGet, "/auth/logout", nil)
-	res1 := httptest.NewRecorder()
-	c := http.Cookie{
-		Name:  sessionName,
-		Value: testCookie,
+	testCookie, err := generateFakeCookie()
+	if err != nil {
+		t.Fatal(err.Error())
 	}
-	req1.AddCookie(&c)
+	res1 := httptest.NewRecorder()
+	req1.AddCookie(testCookie)
 
 	type fields struct {
 		DB     *models.StereoDoseDB
@@ -144,4 +145,34 @@ func TestAuthController_Logout(t *testing.T) {
 			}
 		})
 	}
+}
+
+// literally goes through an entirely fake http cycle to have gorilla sessions
+// create a Set-Cookie response
+// then parse the header, return a new http.Cookie for testing
+func generateFakeCookie() (*http.Cookie, error) {
+	testStore := sessions.NewCookieStore([]byte("something-very-secret"))
+	req, err := http.NewRequest(http.MethodGet, "/", nil)
+	if err != nil {
+		return nil, err
+	}
+	sess, err := testStore.Get(req, sessionName)
+	if err != nil {
+		return nil, err
+	}
+	recorder := httptest.NewRecorder()
+	sess.Save(req, recorder)
+	response := recorder.Result()
+	cookieValue := response.Header.Get("Set-Cookie")
+	// cookieValue is in the form: name=value; path=path; expires, date; Max-Age=maxage
+	value := strings.Split(cookieValue, " ")[0]
+	value = strings.Split(value, "=")[1]
+	value = strings.Trim(value, ";")
+	log.Println(cookieValue)
+	log.Println(value)
+	c := &http.Cookie{
+		Name:  sessionName,
+		Value: value,
+	}
+	return c, nil
 }
