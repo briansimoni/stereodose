@@ -97,9 +97,14 @@ func createRouter(c *config.Config) *util.AppRouter {
 	// Serving the React app on 404's enables the use of arbitrary routes with react browser-router
 	// Otherwise a requet to /some/arbitrary/path from a different origin would simply 404
 	// Could use the hash router for a looser coupling but /#/some/path is ugly
-	app.NotFoundHandler = (http.HandlerFunc(serveReactApp))
+	app.NotFoundHandler = http.HandlerFunc(serveReactApp404)
 
 	return app
+}
+
+func serveReactApp404(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotFound)
+	fmt.Fprint(w, string(indexHTML))
 }
 
 func serveReactApp(w http.ResponseWriter, r *http.Request) {
