@@ -2,7 +2,7 @@
 
 drug-inspired music app
 
-[![Build Status](https://travis-ci.org/briansimoni/stereodose.svg?branch=gorm)](https://travis-ci.org/briansimoni/stereodose)
+[![Build Status](https://travis-ci.org/briansimoni/stereodose.svg?branch=master)](https://travis-ci.org/briansimoni/stereodose)
 
 ## Setup
 
