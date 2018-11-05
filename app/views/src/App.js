@@ -12,7 +12,7 @@ import NoMatch from './404';
 
 class App extends React.Component {
 
-  accessToken
+  accessToken = null
   deviceIDPromise
   deviceIDResolver
 
@@ -118,7 +118,8 @@ class App extends React.Component {
     this.deviceIDResolver(deviceID);
   }
 
-  // getAccessToken will return a Promise to either get the access token
+  // getAccessToken will return a Promise to resolve to a Spotify API access_token
+  // The token is cached in the member variable of this object and updated upon expiry
   // Should be able to pass this function around as a prop to components that need a token
   // i.e. <Player> and <Playlist>
   async getAccessToken() {
@@ -126,28 +127,40 @@ class App extends React.Component {
     if (loggedIn === false) {
       throw new Error("Sign in with Spotify Premium to Play Music");
     }
+    let token;
+    if (this.accessToken === null) {
+      let response = await fetch("/auth/token", { credentials: "same-origin" });
+      if (response.status !== 200) {
+        throw new Error(`Unable to fetch Spotify access token: ${response.status} ${response.statusText}`);
+      }
 
-    let response = await fetch("/auth/token", { credentials: "same-origin" });
-    if (response.status !== 200) {
-      throw new Error(`Unable to fetch Spotify access token: ${response.status} ${response.statusText}`);
+      token = await response.json();
+    } else {
+      token = this.accessToken;
     }
 
-    let token = await response.json();
-    let expiresOn = token.expiry;
-    let now = new Date();
-    let expiresDate = new Date(expiresOn);
-    if (now < expiresDate) {
-      this.accessToken = token.access_token;
+    if (!this.tokenIsExpired(token)) {
+      this.accessToken = token;
       return token.access_token;
     }
-    response = await fetch("/auth/refresh", { credentials: "same-origin" });
+    let response = await fetch("/auth/refresh", { credentials: "same-origin" });
     if (response.status !== 200) {
       throw new Error(`Unable to refresh Spotify access token: ${response.status} ${response.statusText}`);
     }
     token = await response.json();
-    this.accessToken = token.access_token;
+    this.accessToken = token;
     return token.access_token;
 
+  }
+
+  tokenIsExpired(token) {
+    let expiresOn = token.expiry;
+    let now = new Date();
+    let expiresDate = new Date(expiresOn);
+    if (now < expiresDate) {
+      return false;
+    }
+    return true;
   }
 }
 
