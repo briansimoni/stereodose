@@ -3,6 +3,10 @@
     text-align: center;
 }
 
+.playlists img {
+    max-width: 250px;
+}
+
 #choose-a-playlist {
     text-align: center;
     color: white;

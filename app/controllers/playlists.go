@@ -186,7 +186,6 @@ func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request
 	}
 
 	opts := &blob.WriterOptions{}
-	ctx := context.Background()
 	image, err := ioutil.ReadAll(data)
 	if err != nil {
 		return err
@@ -209,6 +208,7 @@ func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request
 
 	// the images/ prefix is the target folder inside of the bucket
 	imageName := fmt.Sprintf("images/%s-%s.%s", id, playlistID, suffix)
+	ctx := context.Background()
 	err = p.Bucket.WriteAll(ctx, imageName, image, opts)
 	if err != nil {
 		return err

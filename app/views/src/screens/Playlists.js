@@ -27,22 +27,42 @@ class Playlists extends React.Component {
     }
 
     if (playlists) {
-      let match = this.props.match;
+      const match = this.props.match;
+      // reduce a large array into multidimensinal array
+      // where we have m x 3 matrix (m rows of 3 columns)
+      // this makes it way easier to render with react
+      // With Bootstrap remember total row width is 12 columns.
+      // So columns of length 4 mean you get 3 columns per row
+      const rows = playlists.reduce( (accumulator, currentPlaylist, index) =>{
+        if (index % 3 === 0) {
+          return accumulator.concat([playlists.slice(index, index + 3)])
+        }
+        return accumulator;
+      }, [])
+
       return (
-        <div className="row">
-          <div className="col">
-            <h2 id="choose-a-playlist">Choose A Playlist</h2>
-            <ul className="playlists">
-              {playlists.map((playlist) => {
-                return (
-                  <Link key={playlist.spotifyID} to={`${match.url}/${playlist.spotifyID}`}>
-                    <li><h4>{playlist.name}</h4></li>
-                  </Link>
-                )
+            <div className="playlists">
+              
+              <h2 id="choose-a-playlist">Choose A Playlist</h2>
+
+              {rows.map((row, index) => {
+                  return (
+                    <div className="row" key={index}>
+                      {row.map( (playlist) => {
+                        const bucketImageURL = playlist.bucketImageURL ?  playlist.bucketImageURL: "https://via.placeholder.com/250x200";
+                        return (
+                          <div className="col-md-4" key={playlist.spotifyID}>
+                            <img src={bucketImageURL} alt="playlist-artwork"/> 
+                              <Link to={`${match.url}/${playlist.spotifyID}`}>
+                                <h4>{playlist.name}</h4>
+                              </Link>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )
               })}
-            </ul>
-          </div>
-        </div>
+            </div>
 
       );
     }
