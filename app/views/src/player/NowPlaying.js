@@ -17,8 +17,6 @@ export default class NowPlaying extends Component {
         uri: artist_uri
       }],
       album: {
-        name: album_name,
-        uri: album_uri,
         images: [{ url: album_image }]
       }
     } = playerState.track_window.current_track;
@@ -33,9 +31,9 @@ export default class NowPlaying extends Component {
             <div className="row justify-content-center">
               <span><a href={track_uri}>{track_name}</a> by <a href={artist_uri}>{artist_name}</a></span>
             </div>
-            <div className="row justify-content-center">
+            {/* <div className="row justify-content-center">
               <span><a href={album_uri}>{album_name}</a></span>
-            </div>
+            </div> */}
           </div>
           <div className="col-md-8 text-center">
             <br />

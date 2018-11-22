@@ -41,7 +41,7 @@ export default class Player extends Component {
   }
 
   async onPlayPause() {
-    let SDK = this.getSDK();
+    let SDK = await this.getSDK();
     let options = {device_id: this.state.userDeviceId};
     let paused = this.state.playerState.paused;
     if (paused) {

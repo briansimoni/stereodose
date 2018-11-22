@@ -31,3 +31,11 @@ ul.moods, ul.drugs, #moods {
 .song {
     cursor: pointer;
 }
+
+#playlist-heading {
+    text-align: center;
+}
+
+#playlist-heading > img {
+    height: 40vh
+}

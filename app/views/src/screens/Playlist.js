@@ -23,6 +23,10 @@ class Playlist extends React.Component {
       return (
         <div className="row">
           <div className="col">
+            <div id="playlist-heading">
+              <h2>{playlist.name}</h2>
+              <img src={playlist.bucketImageURL} alt="playlist-artwork"/>
+            </div>
             <ul className="list-group">
               {playlist.tracks.map( (track) => {
                 return (
