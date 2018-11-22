@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "./Playlists.css";
+import "./Screens.css";
 
 // Playlists renders the playlists that correspond to a particular drug + mood
 class Playlists extends React.Component {

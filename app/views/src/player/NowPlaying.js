@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Fragment } from 'react';
+import ProgressBar from './ProgressBar';
 
 export default class NowPlaying extends Component {
   render() {
@@ -8,7 +9,6 @@ export default class NowPlaying extends Component {
       playerState: { position: position_ms }
     } = this.props;
     let {
-      id,
       uri: track_uri,
       name: track_name,
       duration_ms,
@@ -38,9 +38,13 @@ export default class NowPlaying extends Component {
             </div>
           </div>
           <div className="col-md-8 text-center">
-            <p>ID: {id} | Position: {position_ms} | Duration: {duration_ms}</p>
             <br />
-            <button onClick={this.props.onPlayPause} id="play-pause" className={playerState.paused ? "button play": "button pause"} alt="play-pause"></button>
+            <div className="controls">
+              <div onClick={this.props.onPreviousSong} className="arrow-left"></div>
+              <div onClick={this.props.onPlayPause} id="play-pause" className={playerState.paused ? "button play": "button pause"} alt="play-pause-button"></div>
+              <div onClick={this.props.onNextSong} className="arrow-right"></div>
+            </div>
+            <ProgressBar position={position_ms} duration={duration_ms}/>
           </div>
         </div>
       </Fragment>

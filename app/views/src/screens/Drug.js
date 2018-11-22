@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import "./Drug.css";
+import "./Screens.css";
 
 // Drug renders the mood choices for the chosen Drug
 // Weed -> Chill, Groovin, Thug Life
@@ -17,7 +17,7 @@ class Drug extends React.Component {
           <div className="row">
             <div className="col">
               <h2 className="mood-choice-header">Choose Your Mood</h2>
-              <ul className="moods">
+              <ul id="moods" className="moods">
                 {this.state.categories.map( (category, index) => 
                   <li key={index}>
                     <h4><Link to={`${match.url}/${category}`}>{category}</Link></h4>

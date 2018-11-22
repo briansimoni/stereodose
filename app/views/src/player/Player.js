@@ -22,7 +22,10 @@ export default class Player extends Component {
       authError: null,
     };
 
+    this.getSDK = this.getSDK.bind(this);
     this.onPlayPause = this.onPlayPause.bind(this);
+    this.nextSong = this.nextSong.bind(this);
+    this.previousSong = this.previousSong.bind(this);
   }
 
   componentWillMount() {
@@ -38,7 +41,29 @@ export default class Player extends Component {
   }
 
   async onPlayPause() {
+    let SDK = this.getSDK();
     let options = {device_id: this.state.userDeviceId};
+    let paused = this.state.playerState.paused;
+    if (paused) {
+      SDK.play(options);
+    } else {
+      SDK.pause(options);
+    }
+  }
+
+  async nextSong() {
+    let options = {device_id: this.state.userDeviceId};
+    let SDK = await this.getSDK();
+    SDK.skipToNext(options);
+  }
+
+  async previousSong() {
+    let options = {device_id: this.state.userDeviceId};
+    let SDK = await this.getSDK();
+    SDK.skipToPrevious(options);
+  }
+
+  async getSDK() {
     let SDK = new Spotify();
     let token;
     try {
@@ -47,12 +72,7 @@ export default class Player extends Component {
       alert(err.message);
     }
     SDK.setAccessToken(token);
-    let paused = this.state.playerState.paused;
-    if (paused) {
-      SDK.play(options);
-    } else {
-      SDK.pause(options);
-    }
+    return SDK;
   }
 
   render() {
@@ -117,7 +137,12 @@ export default class Player extends Component {
               <footer className="footer fixed-bottom">
                 <div className="container-fluid">
                   <Fragment>
-                    <NowPlayingScreen playerState={playerState} onPlayPause={this.onPlayPause} />
+                    <NowPlayingScreen 
+                      playerState={playerState}
+                      onPlayPause={this.onPlayPause}
+                      onNextSong={this.nextSong}
+                      onPreviousSong={this.previousSong}
+                    />
                   </Fragment>
                 </div>
               </footer>

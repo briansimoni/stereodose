@@ -1,6 +1,6 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
-import "./Drugs.css";
+import "./Screens.css";
 
 // Drugs renders all the drug choices
 // Weed, Ecstacy, Shrooms, LSD

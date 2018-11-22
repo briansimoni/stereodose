@@ -1,0 +1,29 @@
+.playlists {
+    list-style: none;
+    text-align: center;
+}
+
+.playlists img {
+    max-width: 250px;
+}
+
+#choose-a-playlist {
+    text-align: center;
+    color: white;
+}
+
+.drug-header {
+    text-align: center;
+    color: white;
+}
+
+ul.moods, ul.drugs, #moods {
+    padding-left: 0px;
+    list-style: none;
+    text-align: center;
+}
+
+.mood-choice-header {
+    text-align: center;
+    color: white;
+}
