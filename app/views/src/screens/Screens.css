@@ -27,3 +27,7 @@ ul.moods, ul.drugs, #moods {
     text-align: center;
     color: white;
 }
+
+.song {
+    cursor: pointer;
+}

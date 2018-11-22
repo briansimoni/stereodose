@@ -27,7 +27,7 @@ class Playlist extends React.Component {
               {playlist.tracks.map( (track) => {
                 return (
                   <li 
-                  className="list-group-item"
+                  className="song list-group-item"
                   key={track.spotifyID} onClick={() => this.playSong(playlist.URI, track.URI)}>
                     {track.name}
                   </li>
