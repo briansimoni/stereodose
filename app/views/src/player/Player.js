@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react';
 import './Player.css';
 import WebPlaybackReact from './WebPlaybackReact';
 import Spotify from 'spotify-web-api-js';
+import DisabledPlayer from './DisabledPlayer';
 
 import NowPlayingScreen from './NowPlaying';
 
@@ -108,7 +109,7 @@ export default class Player extends Component {
 
           <footer className="footer fixed-bottom">
             <div className="container-fluid">
-              <h2>{authError.message}</h2>
+              <h2 onClick={ () => {window.location = "/auth/login"} } id="player-message-not-signed-in">{authError.message}</h2>
             </div>
           </footer>
         }
@@ -122,6 +123,7 @@ export default class Player extends Component {
             {!playerSelected &&
               <footer className="footer fixed-bottom">
                 <div className="container-fluid">
+                  <DisabledPlayer/>
                 </div>
               </footer>
             }
@@ -129,6 +131,7 @@ export default class Player extends Component {
             {playerLoaded && playerSelected && !playerState &&
               <footer className="footer fixed-bottom">
                 <div className="container-fluid">
+                  <DisabledPlayer/>
                 </div>
               </footer>
             }
