@@ -89,11 +89,11 @@ class SpotifyPlaylist extends React.Component {
         body: data
       });
       if (response.status !== 201) {
-        throw new Error(`Error uploading image, ${response.status}: ${response.statusText}`);
+        const errorMessage = await response.text();
+        throw new Error(`Problem uploading image, ${errorMessage} ${response.status}: ${response.statusText}`);
       }
       const json = await response.json();
       this.bucketImage = json.imageURL;
-      console.log(json);
     } catch (err) {
       // TODO: render something to the user
       // throw(err);

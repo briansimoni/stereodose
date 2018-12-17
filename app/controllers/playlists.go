@@ -192,10 +192,23 @@ func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request
 	}
 
 	// Only allow web-safe image files
-	contentType := http.DetectContentType(image)
-	if contentType != "image/jpeg" && contentType != "image/png" && contentType != "image/gif" {
+	actualContentType := http.DetectContentType(image)
+	validContentTypes := []string{
+		"image/jpeg",
+		"image/jpg",
+		"image/png",
+		"image/gif",
+		"image/webp",
+	}
+	valid := false
+	for _, contentType := range validContentTypes {
+		if actualContentType == contentType {
+			valid = true
+		}
+	}
+	if !valid {
 		return &statusError{
-			Message: "Invalid file type. Try jpeg, png, or gif",
+			Message: fmt.Sprintf("%s is an invalid file type. Try jpeg, jpg, png, or gif", actualContentType),
 			Code:    http.StatusBadRequest,
 		}
 	}
@@ -204,14 +217,17 @@ func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request
 	// The playlistID is in the name to simply relate the image back to the playlist
 	id := uuid.New().String()
 	playlistID := mux.Vars(r)["id"]
-	suffix := strings.Split(contentType, "/")[1]
+	suffix := strings.Split(actualContentType, "/")[1]
 
 	// the images/ prefix is the target folder inside of the bucket
 	imageName := fmt.Sprintf("images/%s-%s.%s", id, playlistID, suffix)
 	ctx := context.Background()
 	err = p.Bucket.WriteAll(ctx, imageName, image, opts)
 	if err != nil {
-		return err
+		return &statusError{
+			Message: fmt.Sprintf("Error uploading to S3 bucket: %s", err.Error()),
+			Code:    http.StatusInternalServerError,
+		}
 	}
 
 	// write some useful JSON back
