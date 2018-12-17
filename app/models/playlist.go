@@ -3,6 +3,7 @@ package models
 import (
 	"errors"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -145,6 +146,7 @@ func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlis
 			PreviewURL:  track.PreviewURL,
 			TrackNumber: track.TrackNumber,
 			URI:         string(track.URI),
+			Artists:     simpleArtistsToString(track.Artists),
 		}
 		playlist.Tracks = append(playlist.Tracks, trackToAdd)
 	}
@@ -154,6 +156,16 @@ func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlis
 		return nil, err
 	}
 	return playlist, nil
+}
+
+// simpleArtistToString is a converts an array of SimpleArtists, to one string.
+// more convenient that creating yet more tables and requiring more joins
+func simpleArtistsToString(artists []spotify.SimpleArtist) string {
+	data := make([]string, 0)
+	for _, artist := range artists {
+		data = append(data, artist.Name)
+	}
+	return strings.Join(data, ", ")
 }
 
 // DeletePlaylist hard deletes the playlist (only from the StereodoseDB)

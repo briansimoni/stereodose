@@ -12,4 +12,5 @@ type Track struct {
 	PreviewURL  string    `json:"previewURL"`
 	TrackNumber int       `json:"trackNumber"`
 	URI         string    `json:"URI"`
+	Artists     string    `json:"artists"`
 }

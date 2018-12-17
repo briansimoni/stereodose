@@ -2,6 +2,8 @@ package models
 
 import (
 	"testing"
+
+	"github.com/zmb3/spotify"
 )
 
 func TestStereodosePlaylistService_CreatePlaylistBySpotifyID(t *testing.T) {
@@ -94,4 +96,33 @@ func TestStereodosePlaylistService_CreatePlaylistBySpotifyID(t *testing.T) {
 	// if err != nil {
 	// 	t.Fatal(err.Error())
 	// }
+}
+
+func Test_simpleArtistsToString(t *testing.T) {
+	parkwayDrive := spotify.SimpleArtist{
+		Name: "Parkway Drive",
+	}
+	eminem := spotify.SimpleArtist{
+		Name: "Eminem",
+	}
+	ironMaiden := spotify.SimpleArtist{
+		Name: "Iron Maiden",
+	}
+
+	tests := []struct {
+		name    string
+		artists []spotify.SimpleArtist
+		want    string
+	}{
+		{name: "Three artists", artists: []spotify.SimpleArtist{parkwayDrive, eminem, ironMaiden}, want: "Parkway Drive, Eminem, Iron Maiden"},
+		{name: "One artist", artists: []spotify.SimpleArtist{ironMaiden}, want: "Iron Maiden"},
+		{name: "No artist", artists: []spotify.SimpleArtist{}, want: ""},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := simpleArtistsToString(tt.artists); got != tt.want {
+				t.Errorf("simpleArtistToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
