@@ -28,10 +28,6 @@ ul.moods, ul.drugs, #moods {
     color: white;
 }
 
-.song {
-    cursor: pointer;
-}
-
 #playlist-heading {
     text-align: center;
 }

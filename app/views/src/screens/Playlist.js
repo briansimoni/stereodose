@@ -1,4 +1,5 @@
 import React from "react";
+import Track from "./Track";
 
 class Playlist extends React.Component {
 
@@ -30,10 +31,10 @@ class Playlist extends React.Component {
             <ul className="list-group">
               {playlist.tracks.map( (track) => {
                 return (
-                  <li 
-                  className="song list-group-item"
-                  key={track.spotifyID} onClick={() => this.playSong(playlist.URI, track.URI)}>
-                    {track.name}
+                  <li
+                  className="list-group-item"
+                  key={track.spotifyID}>
+                    <Track track={track} playlist={playlist} onPlay={() => {this.playSong(playlist.URI, track.URI)}}/>
                   </li>
                 )
               })}
