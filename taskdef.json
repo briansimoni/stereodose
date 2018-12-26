@@ -4,7 +4,14 @@
   "containerDefinitions": [
     {
       "dnsSearchDomains": null,
-      "logConfiguration": null,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/stereodose",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
       "entryPoint": null,
       "portMappings": [
         {
@@ -80,7 +87,7 @@
     "EC2",
     "FARGATE"
   ],
-  "taskDefinitionArn": "arn:aws:ecs:us-east-1:502859415194:task-definition/stereodose:1",
+  "taskDefinitionArn": "arn:aws:ecs:us-east-1:502859415194:task-definition/stereodose:8",
   "family": "stereodose",
   "requiresAttributes": [
     {
@@ -117,7 +124,25 @@
       "targetId": null,
       "targetType": null,
       "value": null,
+      "name": "ecs.capability.execution-role-awslogs"
+    },
+    {
+      "targetId": null,
+      "targetType": null,
+      "value": null,
+      "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+    },
+    {
+      "targetId": null,
+      "targetType": null,
+      "value": null,
       "name": "ecs.capability.secrets.ssm.environment-variables"
+    },
+    {
+      "targetId": null,
+      "targetType": null,
+      "value": null,
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
     }
   ],
   "pidMode": null,
@@ -126,7 +151,7 @@
   ],
   "networkMode": "awsvpc",
   "cpu": "256",
-  "revision": 1,
+  "revision": 8,
   "status": "ACTIVE",
   "volumes": []
 }

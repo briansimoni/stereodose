@@ -4,6 +4,8 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -18,6 +20,7 @@ import (
 	endpoint "golang.org/x/oauth2/spotify"
 
 	"github.com/gorilla/sessions"
+	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 )
 
@@ -75,10 +78,17 @@ type refreshTokenResponse struct {
 
 // Login is the handler that you can send the user to initiate an authorization code flow
 func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
+
+	// debug ALB
+	for header, _ := range r.Header {
+		log.Println(header, r.Header.Get(header))
+	}
+
 	s, err := a.Store.Get(r, sessionName)
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	// build a cryptographically random state to prevent csrf attacks
 	b := make([]byte, 32)
 	_, err = rand.Read(b)
 	if err != nil {
@@ -88,11 +98,29 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 	s.Values["State"] = state
 	s.Save(r, w)
 
-	url := a.Config.AuthCodeURL(state, oauth2.AccessTypeOnline)
-	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+	// We dynamically set the port to support and cloud provider blue/green
+	// simply get the port from the incoming request
+	port := r.URL.Port()
+	redirectURL, err := url.Parse(a.Config.RedirectURL)
+	if err != nil {
+		return err
+	}
+	redirect := fmt.Sprintf("%s://%s%s%s", redirectURL.Scheme, redirectURL.Host, port, redirectURL.RequestURI())
+	copiedConfig := &oauth2.Config{}
+	err = copier.Copy(copiedConfig, a.Config)
+	if err != nil {
+		return err
+	}
+	copiedConfig.RedirectURL = redirect
+
+	redir := copiedConfig.AuthCodeURL(state, oauth2.AccessTypeOnline)
+	http.Redirect(w, r, redir, http.StatusTemporaryRedirect)
 	return nil
 }
 
+// Callback is a handler function that the user is redirected to in the OAuth flow
+// In this step of authorization, we exchange a code for an access token
+// and we query the user's profile on Spotify to get their identity
 func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error {
 	s, err := a.Store.Get(r, sessionName)
 	if err != nil {
