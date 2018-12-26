@@ -18,6 +18,8 @@ AWS_ACCESS_KEY_ID=someaccesskey
 AWS_SECRET_ACCESS_KEY=somesecret
 ```
 
+You can optionally specify STEREODOSE_DB_STRING and PORT variables
+
 Obtain the client ID and secret by creating an app in the Spotify developer dashboard, and set the callback to http://localhost:3000/auth/callback
 and
 http://localhost:4000/auth/callback
@@ -30,14 +32,15 @@ You can generate a random AUTH_KEY and ENCRYPTION_KEY by switching to the script
 
 If you don't want to use a .env file, you can use regular system environment variables instead.
 
-Once you have the variables set:
+Once you have the variables set, on the **the very first run only** you need to
+
+`cd /app/views/ && npm install && npm run build`
+
+for all successive starts of your dev environment:
 ```
-# terminal 1
-cd app/views/
-npm install && npm run build
-# terminal 2
 docker-compose up
-# terminal 1
+# new terminal
+cd app/views/
 npm start
 ```
 and you're all set to start writing code. You only have to run `npm run build` on the first setup.
@@ -47,4 +50,4 @@ It's running a proxy server that comes bundled with React. This enables hot relo
 To more closely simulate production builds, run `npm run build` and visit localhost:4000
 
 ### Windows Users
-Docker, Node, and npm, are all.... not that great on Windows. I was able to get docker-compose to work, but the golang file watcher I'm using doesn't work with the file notification thing through docker/windows or something. I had the most success using golang natively, and using the Postgres container by itself. Also, anticipate issues with node_modules and react build tools.
+In my experience, Docker isn't that great on Windows but sometimes a quick restart of the daemon/VM gets my containers to work. The golang file watcher does not work at all from inside a container. I recommend running the db from it's own container and then using native golang.

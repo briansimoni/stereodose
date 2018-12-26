@@ -1,6 +1,7 @@
 package config
 
 import "errors"
+import "net/url"
 
 // Config contains all of the variables that
 // are needed for Stereodose to function
@@ -24,6 +25,11 @@ func (c *Config) Verify() error {
 	if c.RedirectURL == "" {
 		return errors.New("STEREODOSE_REDIRECT_URL was empty string")
 	}
+	_, err := url.Parse(c.RedirectURL)
+	if err != nil {
+		return err
+	}
+
 	if c.AuthKey == "" {
 		return errors.New("STEREODOSE_AUTH_KEY was empty string")
 	}

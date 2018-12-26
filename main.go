@@ -13,8 +13,6 @@ import (
 )
 
 func main() {
-	// debug logging
-	log.Println(os.Getenv("STEREODOSE_CLIENT_ID"))
 	connectionString := os.Getenv("STEREODOSE_DB_STRING")
 	if connectionString == "" {
 		// docker-compose default
