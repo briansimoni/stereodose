@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -79,11 +78,6 @@ type refreshTokenResponse struct {
 // Login is the handler that you can send the user to initiate an authorization code flow
 func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 
-	// debug ALB
-	for header, _ := range r.Header {
-		log.Println(header, r.Header.Get(header))
-	}
-
 	s, err := a.Store.Get(r, sessionName)
 	if err != nil {
 		return errors.WithStack(err)
@@ -98,22 +92,28 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 	s.Values["State"] = state
 	s.Save(r, w)
 
-	// We dynamically set the port to support and cloud provider blue/green
-	// simply get the port from the incoming request
-	port := r.URL.Port()
-	redirectURL, err := url.Parse(a.Config.RedirectURL)
-	if err != nil {
-		return err
-	}
-	redirect := fmt.Sprintf("%s://%s%s%s", redirectURL.Scheme, redirectURL.Host, port, redirectURL.RequestURI())
-	copiedConfig := &oauth2.Config{}
-	err = copier.Copy(copiedConfig, a.Config)
-	if err != nil {
-		return err
-	}
-	copiedConfig.RedirectURL = redirect
+	// If we are behind a proxy, we dynamically grab the port based on the X-Forwarded-Port header
+	// This support more diverse cloud deployments without having to add more configuration
+	if r.Header.Get("X-Forwarded-Port") != "" && r.Header.Get("X-Forwarded-Port") != "443" {
+		port := r.URL.Port()
+		redirectURL, err := url.Parse(a.Config.RedirectURL)
+		if err != nil {
+			return err
+		}
+		redirect := fmt.Sprintf("%s://%s%s%s", redirectURL.Scheme, redirectURL.Host, port, redirectURL.RequestURI())
+		copiedConfig := &oauth2.Config{}
+		err = copier.Copy(copiedConfig, a.Config)
+		if err != nil {
+			return err
+		}
+		copiedConfig.RedirectURL = redirect
 
-	redir := copiedConfig.AuthCodeURL(state, oauth2.AccessTypeOnline)
+		redir := copiedConfig.AuthCodeURL(state, oauth2.AccessTypeOnline)
+		http.Redirect(w, r, redir, http.StatusTemporaryRedirect)
+		return nil
+	}
+
+	redir := a.Config.AuthCodeURL(state, oauth2.AccessTypeOnline)
 	http.Redirect(w, r, redir, http.StatusTemporaryRedirect)
 	return nil
 }
