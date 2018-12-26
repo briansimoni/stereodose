@@ -1,10 +1,12 @@
-version: 0.0
-Resources:
-  - TargetService:
-    Type: AWS::ECS::Service
-    Properties:
-      TaskDefinition: "arn:aws:ecs:us-east-1:502859415194:task-definition/stereodose:1"
+--- 
+Resources: 
+  - 
+    Properties: 
       LoadBalancerInfo: 
-          ContainerName: "stereodose" 
-          ContainerPort: 80
-      PlatformVersion: "LATEST"
+        ContainerName: stereodose
+        ContainerPort: 80
+      PlatformVersion: LATEST
+      TaskDefinition: "arn:aws:ecs:us-east-1:502859415194:task-definition/stereodose:1"
+    TargetService: ~
+    Type: "AWS::ECS::Service"
+version: 0.0
