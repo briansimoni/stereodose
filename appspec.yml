@@ -7,5 +7,4 @@ Resources:
       LoadBalancerInfo: 
           ContainerName: "stereodose" 
           ContainerPort: 80
-# Optional properties
       PlatformVersion: "LATEST"
