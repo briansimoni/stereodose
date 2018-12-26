@@ -1,34 +1,132 @@
 {
+  "ipcMode": null,
+  "executionRoleArn": "arn:aws:iam::502859415194:role/StereodoseECSTaskRunnerRole",
+  "containerDefinitions": [
+    {
+      "dnsSearchDomains": null,
+      "logConfiguration": null,
+      "entryPoint": null,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "protocol": "tcp",
+          "containerPort": 80
+        }
+      ],
+      "command": null,
+      "linuxParameters": null,
+      "cpu": 0,
+      "environment": [
+        {
+          "name": "PORT",
+          "value": "80"
+        }
+      ],
+      "ulimits": null,
+      "dnsServers": null,
+      "mountPoints": [],
+      "workingDirectory": null,
+      "secrets": [
+        {
+          "valueFrom": "STEREODOSE_AUTH_KEY",
+          "name": "STEREODOSE_AUTH_KEY"
+        },
+        {
+          "valueFrom": "STEREODOSE_CLIENT_ID",
+          "name": "STEREODOSE_CLIENT_ID"
+        },
+        {
+          "valueFrom": "STEREODOSE_CLIENT_SECRET",
+          "name": "STEREODOSE_CLIENT_SECRET"
+        },
+        {
+          "valueFrom": "STEREODOSE_DB_STRING",
+          "name": "STEREODOSE_DB_STRING"
+        },
+        {
+          "valueFrom": "STEREODOSE_ENCRYPTION_KEY",
+          "name": "STEREODOSE_ENCRYPTION_KEY"
+        },
+        {
+          "valueFrom": "STEREODOSE_REDIRECT_URL",
+          "name": "STEREODOSE_REDIRECT_URL"
+        }
+      ],
+      "dockerSecurityOptions": null,
+      "memory": null,
+      "memoryReservation": null,
+      "volumesFrom": [],
+      "image": "502859415194.dkr.ecr.us-east-1.amazonaws.com/stereodose:latest",
+      "disableNetworking": null,
+      "interactive": null,
+      "healthCheck": null,
+      "essential": true,
+      "links": null,
+      "hostname": null,
+      "extraHosts": null,
+      "pseudoTerminal": null,
+      "user": null,
+      "readonlyRootFilesystem": null,
+      "dockerLabels": null,
+      "systemControls": null,
+      "privileged": null,
+      "name": "stereodose"
+    }
+  ],
+  "placementConstraints": [],
+  "memory": "512",
+  "taskRoleArn": "arn:aws:iam::502859415194:role/StereodoseECSTaskRunnerRole",
+  "compatibilities": [
+    "EC2",
+    "FARGATE"
+  ],
+  "taskDefinitionArn": "arn:aws:ecs:us-east-1:502859415194:task-definition/stereodose:1",
+  "family": "stereodose",
+  "requiresAttributes": [
+    {
+      "targetId": null,
+      "targetType": null,
+      "value": null,
+      "name": "ecs.capability.execution-role-ecr-pull"
+    },
+    {
+      "targetId": null,
+      "targetType": null,
+      "value": null,
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+    },
+    {
+      "targetId": null,
+      "targetType": null,
+      "value": null,
+      "name": "ecs.capability.task-eni"
+    },
+    {
+      "targetId": null,
+      "targetType": null,
+      "value": null,
+      "name": "com.amazonaws.ecs.capability.ecr-auth"
+    },
+    {
+      "targetId": null,
+      "targetType": null,
+      "value": null,
+      "name": "com.amazonaws.ecs.capability.task-iam-role"
+    },
+    {
+      "targetId": null,
+      "targetType": null,
+      "value": null,
+      "name": "ecs.capability.secrets.ssm.environment-variables"
+    }
+  ],
+  "pidMode": null,
   "requiresCompatibilities": [
     "FARGATE"
   ],
-  "containerDefinitions": [
-    {
-      "name": "nginx",
-      "image": "nginx:latest",
-      "memory": 256,
-      "cpu": 256,
-      "essential": true,
-      "portMappings": [
-        {
-          "containerPort": 80,
-          "protocol": "tcp"
-        }
-      ],
-      "logConfiguration":{
-            "logDriver":"awslogs",
-            "options":{
-               "awslogs-group":"awslogs-nginx-ecs",
-               "awslogs-region":"us-east-1",
-               "awslogs-stream-prefix":"ecs"
-            }
-      }
-    }
-  ],
-  "volumes": [],
   "networkMode": "awsvpc",
-  "placementConstraints": [],
-  "family": "nginx",
-  "memory": "512",
-  "cpu": "256"
+  "cpu": "256",
+  "revision": 1,
+  "status": "ACTIVE",
+  "volumes": []
 }
