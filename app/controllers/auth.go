@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -94,7 +95,9 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 
 	// If we are behind a proxy, we dynamically grab the port based on the X-Forwarded-Port header
 	// This support more diverse cloud deployments without having to add more configuration
-	if r.Header.Get("X-Forwarded-Port") != "" && r.Header.Get("X-Forwarded-Port") != "443" {
+	log.Println("X-Forwarded-Port")
+	if r.Header.Get("X-Forwarded-Port") != "" {
+		log.Println("here")
 		port := r.URL.Port()
 		redirectURL, err := url.Parse(a.Config.RedirectURL)
 		if err != nil {
