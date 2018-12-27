@@ -103,7 +103,7 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 		if err != nil {
 			return err
 		}
-		redirect := fmt.Sprintf("%s://%s%s%s", redirectURL.Scheme, redirectURL.Host, port, redirectURL.RequestURI())
+		redirect := fmt.Sprintf("%s://%s:%s%s", redirectURL.Scheme, redirectURL.Host, port, redirectURL.RequestURI())
 		copiedConfig := &oauth2.Config{}
 		err = copier.Copy(copiedConfig, a.Config)
 		if err != nil {
