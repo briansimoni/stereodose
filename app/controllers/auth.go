@@ -98,7 +98,7 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 	log.Println(r.Header.Get("X-Forwarded-Port"))
 	if r.Header.Get("X-Forwarded-Port") != "" {
 		log.Println("here")
-		port := r.URL.Port()
+		port := r.Header.Get("X-Forwarded-Port")
 		redirectURL, err := url.Parse(a.Config.RedirectURL)
 		if err != nil {
 			return err
