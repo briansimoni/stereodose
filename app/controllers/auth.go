@@ -94,7 +94,7 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 
 	// If we are behind a proxy, we dynamically grab the port based on the X-Forwarded-Port header
 	// This support more diverse cloud deployments without having to add more configuration
-	if r.Header.Get("X-Forwarded-Port") != "" {
+	if r.Header.Get("X-Forwarded-Port") != "" && r.Header.Get("X-Forwarded-Port") != "443" {
 		port := r.Header.Get("X-Forwarded-Port")
 		redirectURL, err := url.Parse(a.Config.RedirectURL)
 		if err != nil {
@@ -133,7 +133,7 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error 
 
 	// if behind load balancer, dynamically check the port so we build the correct redirect uri
 	var tok *oauth2.Token
-	if r.Header.Get("X-Forwarded-Port") != "" {
+	if r.Header.Get("X-Forwarded-Port") != "" && r.Header.Get("X-Forwarded-Port") != "443" {
 		port := r.Header.Get("X-Forwarded-Port")
 		redirectURL, err := url.Parse(a.Config.RedirectURL)
 		if err != nil {
