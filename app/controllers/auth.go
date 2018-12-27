@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -95,9 +94,7 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 
 	// If we are behind a proxy, we dynamically grab the port based on the X-Forwarded-Port header
 	// This support more diverse cloud deployments without having to add more configuration
-	log.Println(r.Header.Get("X-Forwarded-Port"))
 	if r.Header.Get("X-Forwarded-Port") != "" {
-		log.Println("here")
 		port := r.Header.Get("X-Forwarded-Port")
 		redirectURL, err := url.Parse(a.Config.RedirectURL)
 		if err != nil {
@@ -134,9 +131,31 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error 
 		return err
 	}
 
-	tok, err := a.Config.Exchange(r.Context(), r.URL.Query().Get("code"))
-	if err != nil {
-		return errors.New("Error obtaining token from Spotify: " + err.Error())
+	// if behind load balancer, dynamically check the port so we build the correct redirect uri
+	var tok *oauth2.Token
+	if r.Header.Get("X-Forwarded-Port") != "" {
+		port := r.Header.Get("X-Forwarded-Port")
+		redirectURL, err := url.Parse(a.Config.RedirectURL)
+		if err != nil {
+			return err
+		}
+		redirect := fmt.Sprintf("%s://%s:%s%s", redirectURL.Scheme, redirectURL.Host, port, redirectURL.RequestURI())
+		copiedConfig := &oauth2.Config{}
+		err = copier.Copy(copiedConfig, a.Config)
+		if err != nil {
+			return err
+		}
+		copiedConfig.RedirectURL = redirect
+
+		tok, err = copiedConfig.Exchange(r.Context(), r.URL.Query().Get("code"))
+		if err != nil {
+			return errors.New("Error obtaining token from Spotify: " + err.Error())
+		}
+	} else {
+		tok, err = a.Config.Exchange(r.Context(), r.URL.Query().Get("code"))
+		if err != nil {
+			return errors.New("Error obtaining token from Spotify: " + err.Error())
+		}
 	}
 
 	s.Values[token] = *tok
