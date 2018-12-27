@@ -5,7 +5,7 @@
       "TargetService": {
         "Type": "AWS::ECS::Service",
         "Properties": {
-          "TaskDefinition": "arn:aws:ecs:us-east-1:502859415194:task-definition/stereodose:8",
+          "TaskDefinition": "arn:aws:ecs:us-east-1:502859415194:task-definition/stereodose:19",
           "LoadBalancerInfo": {
             "ContainerName": "stereodose",
             "ContainerPort": 80

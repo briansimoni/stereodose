@@ -57,6 +57,14 @@
         {
           "valueFrom": "STEREODOSE_REDIRECT_URL",
           "name": "STEREODOSE_REDIRECT_URL"
+        },
+        {
+          "valueFrom": "CLOUD_ACCESS_KEY_ID",
+          "name": "AWS_ACCESS_KEY_ID"
+        },
+        {
+          "valueFrom": "CLOUD_SECRET_ACCESS_KEY",
+          "name": "AWS_SECRET_ACCESS_KEY"
         }
       ],
       "dockerSecurityOptions": null,
@@ -87,7 +95,7 @@
     "EC2",
     "FARGATE"
   ],
-  "taskDefinitionArn": "arn:aws:ecs:us-east-1:502859415194:task-definition/stereodose:8",
+  "taskDefinitionArn": "arn:aws:ecs:us-east-1:502859415194:task-definition/stereodose:19",
   "family": "stereodose",
   "requiresAttributes": [
     {
@@ -151,7 +159,7 @@
   ],
   "networkMode": "awsvpc",
   "cpu": "256",
-  "revision": 8,
+  "revision": 19,
   "status": "ACTIVE",
   "volumes": []
 }
