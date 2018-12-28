@@ -51,7 +51,7 @@ type StereodoseUserService struct {
 // if it doesn't it creates one, otherwise it returns a pointer to user
 func (u *StereodoseUserService) ByID(ID uint) (*User, error) {
 	user := &User{}
-	err := u.db.Debug().Preload("Playlists").Find(user, "id = ?", ID).Error
+	err := u.db.Preload("Playlists").Find(user, "id = ?", ID).Error
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (u *StereodoseUserService) ByID(ID uint) (*User, error) {
 
 // FirstOrCreate finds the first matched User or creates a new one
 func (u *StereodoseUserService) FirstOrCreate(user *User, tok *oauth2.Token) (*User, error) {
-	err := u.db.Debug().FirstOrCreate(user, "spotify_id = ?", user.SpotifyID).Error
+	err := u.db.FirstOrCreate(user, "spotify_id = ?", user.SpotifyID).Error
 	if err != nil {
 		return nil, err
 	}

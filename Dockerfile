@@ -21,6 +21,7 @@ COPY --from=go /go/src/github.com/briansimoni/stereodose/app/views ./app/views/
 WORKDIR /stereodose/app/views/
 RUN npm install
 RUN npm run build
+RUN rm -rf node_modules
 
 
 # Finally, take both artifacts and copy to a small, production ready image

@@ -63,7 +63,7 @@ type StereodosePlaylistService struct {
 func (s *StereodosePlaylistService) GetPlaylists(offset, limit, category, subcategory string) ([]Playlist, error) {
 	playlists := []Playlist{}
 
-	err := s.db.Debug().
+	err := s.db.
 		Offset(offset).
 		Limit(limit).
 		Where("category = ? AND sub_category = ?", category, subcategory).
@@ -78,7 +78,7 @@ func (s *StereodosePlaylistService) GetPlaylists(offset, limit, category, subcat
 // GetByID returns a playlist populated with all of its tracks
 func (s *StereodosePlaylistService) GetByID(ID string) (*Playlist, error) {
 	playlist := &Playlist{}
-	err := s.db.Debug().Preload("Tracks").Find(playlist, "spotify_id = ?", ID).Error
+	err := s.db.Preload("Tracks").Find(playlist, "spotify_id = ?", ID).Error
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (s *StereodosePlaylistService) GetByID(ID string) (*Playlist, error) {
 // GetMyPlaylists returns all of the playlists that belong to a particular User
 func (s *StereodosePlaylistService) GetMyPlaylists(user User) ([]Playlist, error) {
 	playlists := []Playlist{}
-	err := s.db.Debug().Find(&playlists, "user_id = ?", user.ID).Error
+	err := s.db.Find(&playlists, "user_id = ?", user.ID).Error
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +151,7 @@ func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlis
 		playlist.Tracks = append(playlist.Tracks, trackToAdd)
 	}
 
-	err = s.db.Debug().Save(playlist).Error
+	err = s.db.Save(playlist).Error
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +176,7 @@ func (s *StereodosePlaylistService) DeletePlaylist(spotifyID string) error {
 	playlist := &Playlist{
 		SpotifyID: spotifyID,
 	}
-	result := s.db.Debug().Delete(playlist)
+	result := s.db.Delete(playlist)
 	if result.Error != nil {
 		return result.Error
 	}
