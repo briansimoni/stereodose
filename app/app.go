@@ -26,6 +26,7 @@ var (
 	cloudBucket  *blob.Bucket
 	file         *os.File
 	indexHTML    []byte
+	robotsTXT    []byte
 	err          error
 )
 
@@ -64,6 +65,8 @@ func createRouter(c *config.Config) *util.AppRouter {
 	// Serve all of the static files
 	fs := http.StripPrefix("/public/", http.FileServer(http.Dir("app/views/build/")))
 	app.PathPrefix("/public/").Handler(fs)
+
+	app.HandleFunc("/robots.txt", serveRobotsTxt)
 
 	authRouter := util.AppRouter{app.PathPrefix("/auth").Subrouter()}
 	authRouter.AppHandler("/login", auth.Login).Methods(http.MethodGet)
@@ -120,17 +123,32 @@ func serveReactApp(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(indexHTML))
 }
 
-// load the contents of index.html into memory only when the app starts up
+func serveRobotsTxt(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, robotsTXT)
+}
+
+// load the contents of index.html and robots.txt into memory only when the app starts up
 // instead of on each request
 func init() {
 	file, err = os.Open("./app/views/build/index.html")
 	if err != nil {
 		log.Fatalf("Unable to open index.html: %s", err.Error())
 	}
+	defer file.Close()
 
 	indexHTML, err = ioutil.ReadAll(file)
 	if err != nil {
 		log.Fatalf("Unable to read the contets of index.html, %s", err.Error())
+	}
+
+	robotsFile, err := os.Open("./app/views/public/robots.txt")
+	if err != nil {
+		log.Fatalf("Unable to open robots.txt: %s", err.Error())
+	}
+	defer robotsFile.Close()
+	robotsTXT, err = ioutil.ReadAll(robotsFile)
+	if err != nil {
+		log.Fatalf("Unable to read contents of robots.txt %s", err.Error())
 	}
 }
 
