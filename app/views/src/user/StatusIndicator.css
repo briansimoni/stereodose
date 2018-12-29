@@ -10,10 +10,6 @@ nav img {
 	display: flex;
 }
 
-.navbar {
-	background-color: #2e2e2e;
-}
-
 .signin-button {
 	color: #007bff;
 	cursor: pointer;

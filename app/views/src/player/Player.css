@@ -1,6 +1,6 @@
 
 body {
-	/* Margin bottom by footer height */
+	/* Margin bottom by footer height plus the margin between other stuff*/
 	margin-bottom: 200px;
 }
 
