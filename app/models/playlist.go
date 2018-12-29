@@ -112,7 +112,7 @@ func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlis
 	tok := &oauth2.Token{AccessToken: user.AccessToken}
 	c := spotify.Authenticator{}.NewClient(tok)
 
-	list, err := c.GetPlaylist(user.SpotifyID, spotify.ID(playlistID))
+	list, err := c.GetPlaylist(spotify.ID(playlistID))
 	if err != nil {
 		return nil, err
 	}
@@ -132,13 +132,13 @@ func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlis
 	for _, image := range list.Images {
 		playlist.Images = append(playlist.Images, PlaylistImage{Image: image})
 	}
-	tracksPage, err := c.GetPlaylistTracks(user.SpotifyID, spotify.ID(playlist.SpotifyID))
+	tracks, err := getAllPlaylistTracks(c, spotify.ID(playlist.SpotifyID))
 	if err != nil {
 		return nil, err
 	}
-	for _, trk := range tracksPage.Tracks {
+	for i, trk := range tracks {
 		track := trk.Track
-		log.Println(track.Name)
+		log.Println(i, track.Name)
 		trackToAdd := Track{
 			SpotifyID:   string(track.ID),
 			Name:        track.Name,
@@ -156,6 +156,39 @@ func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlis
 		return nil, err
 	}
 	return playlist, nil
+}
+
+// getAllPlaylistTracks will go through all the pages and build a giant list
+// the spotify returns a maximum of 100 tracks per page
+// it will probably need to make requests synchronously, so it may be slow
+// it would be be best to indicate that a long operation is happening to the end user
+func getAllPlaylistTracks(c spotify.Client, ID spotify.ID) ([]spotify.PlaylistTrack, error) {
+	tracks := make([]spotify.PlaylistTrack, 0)
+	limit := new(int)
+	offset := new(int)
+	*limit = 100
+	*offset = 0
+
+	moreTracks := true
+
+	for moreTracks {
+		opts := &spotify.Options{
+			Limit:  limit,
+			Offset: offset,
+		}
+		page, err := c.GetPlaylistTracksOpt(ID, opts, "")
+		if err != nil {
+			return nil, err
+		}
+		if len(page.Tracks) < 100 {
+			moreTracks = false
+		}
+		*offset = *offset + 100
+		for _, track := range page.Tracks {
+			tracks = append(tracks, track)
+		}
+	}
+	return tracks, nil
 }
 
 // simpleArtistToString is a converts an array of SimpleArtists, to one string.
