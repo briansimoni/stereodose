@@ -66,7 +66,7 @@ func createRouter(c *config.Config) *util.AppRouter {
 	fs := http.StripPrefix("/public/", http.FileServer(http.Dir("app/views/build/")))
 	app.PathPrefix("/public/").Handler(fs)
 
-	app.HandleFunc("/robots.txt", string(robotsTXT))
+	app.HandleFunc("/robots.txt", serveRobotsTxt)
 
 	authRouter := util.AppRouter{app.PathPrefix("/auth").Subrouter()}
 	authRouter.AppHandler("/login", auth.Login).Methods(http.MethodGet)
@@ -124,7 +124,7 @@ func serveReactApp(w http.ResponseWriter, r *http.Request) {
 }
 
 func serveRobotsTxt(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, robotsTXT)
+	fmt.Fprint(w, string(robotsTXT))
 }
 
 // load the contents of index.html and robots.txt into memory only when the app starts up
