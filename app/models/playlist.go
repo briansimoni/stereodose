@@ -34,15 +34,16 @@ type Playlist struct {
 	SubCategory   string    `json:"subCategory"`
 	Collaborative bool      `json:"collaborative"`
 	//ExternalURLs  map[string]string `json:"external_urls"`
-	Endpoint       string          `json:"href"`
-	Images         []PlaylistImage `json:"images"`
-	Name           string          `json:"name"`
-	IsPublic       bool            `json:"public"`
-	SnapshotID     string          `json:"snapshot_id"`
-	Tracks         []Track         `json:"tracks" gorm:"many2many:playlist_tracks"`
-	URI            string          `json:"URI"`
-	UserID         uint            `json:"userID"`
-	BucketImageURL string          `json:"bucketImageURL"`
+	Endpoint           string          `json:"href"`
+	Images             []PlaylistImage `json:"images"`
+	Name               string          `json:"name"`
+	IsPublic           bool            `json:"public"`
+	SnapshotID         string          `json:"snapshot_id"`
+	Tracks             []Track         `json:"tracks" gorm:"many2many:playlist_tracks"`
+	URI                string          `json:"URI"`
+	UserID             uint            `json:"userID"`
+	BucketImageURL     string          `json:"bucketImageURL"`
+	BucketThumbnailURL string          `json:"bucketThumbnailURL"`
 }
 
 // PlaylistImage should contain a URL or reference to an image

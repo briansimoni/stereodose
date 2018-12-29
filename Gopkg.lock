@@ -66,12 +66,12 @@
   version = "v0.4.0"
 
 [[projects]]
-  digest = "1:3a26588bc48b96825977c1b3df964f8fd842cd6860cc26370588d3563433cf11"
+  digest = "1:236d7e1bdb50d8f68559af37dbcf9d142d56b431c9b2176d41e2a009b664cda8"
   name = "github.com/google/uuid"
   packages = ["."]
   pruneopts = "UT"
-  revision = "d460ce9f8df2e77fb1ba55ca87fafed96c607494"
-  version = "v1.0.0"
+  revision = "9b3b1e0f5f99ae461456d768e7d301a7acdaa2d8"
+  version = "v1.1.0"
 
 [[projects]]
   digest = "1:c79fb010be38a59d657c48c6ba1d003a8aa651fa56b579d959d74573b7dff8e1"
@@ -177,6 +177,19 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:e07483c90d27239c7121fb733d0a6c42ab229f67ecf0c2edcceb13ef1599d8a5"
+  name = "golang.org/x/image"
+  packages = [
+    "riff",
+    "vp8",
+    "vp8l",
+    "webp",
+  ]
+  pruneopts = "UT"
+  revision = "cd38e8056d9b27bb2f265effa37fb0ea6b8a7f0f"
+
+[[projects]]
+  branch = "master"
   digest = "1:d6b719875cf8091fbab38527d81d34e71f4521b9ee9ccfbd4a32cff2ac5af96e"
   name = "golang.org/x/net"
   packages = [
@@ -232,6 +245,7 @@
     "github.com/jinzhu/gorm/dialects/postgres",
     "github.com/pkg/errors",
     "github.com/zmb3/spotify",
+    "golang.org/x/image/webp",
     "golang.org/x/oauth2",
     "golang.org/x/oauth2/spotify",
   ]

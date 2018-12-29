@@ -8,6 +8,15 @@ import (
 	"net/http"
 	"strings"
 
+	// register jpeg type
+	_ "image/jpeg"
+	// register png type
+	_ "image/png"
+	// register gif type
+	_ "image/gif"
+	// register webp type
+	_ "golang.org/x/image/webp"
+
 	"github.com/briansimoni/stereodose/app/models"
 	"github.com/briansimoni/stereodose/app/util"
 	"github.com/google/go-cloud/blob"
@@ -242,5 +251,19 @@ func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request
 
 	w.WriteHeader(http.StatusCreated)
 	util.JSON(w, &imageCreatedResponse)
+	return nil
+}
+
+// uploadImage actually handles the call to S3 or GCP
+func (p *PlaylistsController) uploadImage(img []byte, imageName string) error {
+	ctx := context.Background()
+	opts := &blob.WriterOptions{}
+	err := p.Bucket.WriteAll(ctx, imageName, img, opts)
+	if err != nil {
+		return &statusError{
+			Message: fmt.Sprintf("Error uploading to S3 bucket: %s", err.Error()),
+			Code:    http.StatusInternalServerError,
+		}
+	}
 	return nil
 }
