@@ -66,7 +66,7 @@ func createRouter(c *config.Config) *util.AppRouter {
 	fs := http.StripPrefix("/public/", http.FileServer(http.Dir("app/views/build/")))
 	app.PathPrefix("/public/").Handler(fs)
 
-	app.HandleFunc("/robots.txt", serveRobotsTxt)
+	app.HandleFunc("/robots.txt", string(robotsTXT))
 
 	authRouter := util.AppRouter{app.PathPrefix("/auth").Subrouter()}
 	authRouter.AppHandler("/login", auth.Login).Methods(http.MethodGet)
