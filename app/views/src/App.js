@@ -133,7 +133,6 @@ class App extends React.Component {
       if (response.status !== 200) {
         throw new Error(`Unable to fetch Spotify access token: ${response.status} ${response.statusText}`);
       }
-
       token = await response.json();
     } else {
       token = this.accessToken;
@@ -148,9 +147,11 @@ class App extends React.Component {
       throw new Error(`Unable to refresh Spotify access token: ${response.status} ${response.statusText}`);
     }
     token = await response.json();
+    // the token from the refresh endpoint does not have an expiry
+    // it has "expires_in" in seconds (probably 3600)
+    token.expiry = new Date().setSeconds(token.expires_in);
     this.accessToken = token;
     return token.access_token;
-
   }
 
   tokenIsExpired(token) {
