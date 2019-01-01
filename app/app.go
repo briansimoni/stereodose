@@ -20,15 +20,16 @@ import (
 )
 
 var (
-	store        *sessions.CookieStore
-	db           *gorm.DB
-	stereoDoseDB *models.StereoDoseDB
-	cloudBucket  *blob.Bucket
-	file         *os.File
-	indexHTML    []byte
-	robotsTXT    []byte
-	manifest     []byte
-	err          error
+	store         *sessions.CookieStore
+	db            *gorm.DB
+	stereoDoseDB  *models.StereoDoseDB
+	cloudBucket   *blob.Bucket
+	file          *os.File
+	indexHTML     []byte
+	robotsTXT     []byte
+	manifest      []byte
+	serviceWorker []byte
+	err           error
 )
 
 // InitApp puts together the Router to use as the app's main HTTP handler
@@ -62,14 +63,14 @@ func createRouter(c *config.Config) *util.AppRouter {
 	// // For a progressive web app to work with a service worker not served from
 	// // the "/" directory we have to do this.
 	// // See https://www.w3.org/TR/service-workers-1/#extended-http-headers
-	app.Use(func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path == "/public/service-worker.js" {
-				w.Header().Add("Service-Worker-Allowed", "/")
-			}
-			next.ServeHTTP(w, r)
-		})
-	})
+	// app.Use(func(next http.Handler) http.Handler {
+	// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	// 		if r.URL.Path == "/public/service-worker.js" {
+	// 			w.Header().Add("Service-Worker-Allowed", "/")
+	// 		}
+	// 		next.ServeHTTP(w, r)
+	// 	})
+	// })
 
 	categories := controllers.NewCategoriesController()
 	users := controllers.NewUsersController(stereoDoseDB)
@@ -82,6 +83,7 @@ func createRouter(c *config.Config) *util.AppRouter {
 
 	app.HandleFunc("/robots.txt", serveRobotsTxt)
 	app.HandleFunc("/manifest.json", serveManifest)
+	app.HandleFunc("/sw.js", serveServiceWorker)
 
 	authRouter := util.AppRouter{app.PathPrefix("/auth").Subrouter()}
 	authRouter.AppHandler("/login", auth.Login).Methods(http.MethodGet)
@@ -146,6 +148,11 @@ func serveManifest(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(manifest))
 }
 
+func serveServiceWorker(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/javascript")
+	fmt.Fprint(w, string(serviceWorker))
+}
+
 // load the contents of index.html and robots.txt into memory only when the app starts up
 // instead of on each request
 func init() {
@@ -178,6 +185,16 @@ func init() {
 	manifest, err = ioutil.ReadAll(manifestFile)
 	if err != nil {
 		log.Fatalf("Unable to read contents of manifest.json %s", err.Error())
+	}
+
+	serviceWorkerFlie, err := os.Open("./app/views/build/sw.js")
+	if err != nil {
+		log.Fatalf("Unable to open manifest.json")
+	}
+	defer serviceWorkerFlie.Close()
+	serviceWorker, err = ioutil.ReadAll(serviceWorkerFlie)
+	if err != nil {
+		log.Fatalf("Unable to read contents of serviceworker.json %s", err.Error())
 	}
 }
 
