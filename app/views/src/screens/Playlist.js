@@ -15,7 +15,7 @@ class Playlist extends React.Component {
   render() {
     let {loading, playlist, error} = this.state;
     if (loading) {
-      return <h3>Loading</h3>
+      return <div></div>
     }
     if (error) {
       return <h3>{error.message}</h3>

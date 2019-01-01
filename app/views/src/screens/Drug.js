@@ -26,7 +26,7 @@ class Drug extends React.Component {
             <ul id="moods" className="moods">
               {this.state.categories[drug].map( (category, index) => 
                 <li key={index}>
-                  <h4><Link to={`${match.url}/${category}`}>{category}</Link></h4>
+                  <h3><Link to={`${match.url}/${category}`}>{category}</Link></h3>
                 </li>
               )}
             </ul>
@@ -36,7 +36,7 @@ class Drug extends React.Component {
     }
 
     return (
-      <div>Loading...</div>
+      <div></div>
     )
   }
 

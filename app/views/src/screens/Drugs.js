@@ -15,7 +15,7 @@ class Drugs extends React.Component {
 
   render() {
     if (this.state.loading) {
-      return <p>Loading...</p>
+      return <div></div>
     }
 
     if (this.state.categories !== null) {

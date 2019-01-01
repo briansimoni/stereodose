@@ -19,7 +19,7 @@ class Playlists extends React.Component {
     let err = this.state.error;
     let playlists = this.state.playlists;
     if (loading) {
-      return <h3>Loading</h3>
+      return <div></div>
     }
 
     if (err) {
@@ -42,7 +42,6 @@ class Playlists extends React.Component {
 
       return (
             <div className="playlists">
-              
               <h2 id="choose-a-playlist">Choose A Playlist</h2>
 
               {rows.map((row, index) => {
