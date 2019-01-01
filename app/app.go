@@ -27,6 +27,7 @@ var (
 	file         *os.File
 	indexHTML    []byte
 	robotsTXT    []byte
+	manifest     []byte
 	err          error
 )
 
@@ -57,9 +58,10 @@ func createRouter(c *config.Config) *util.AppRouter {
 		return handlers.LoggingHandler(os.Stdout, next)
 	})
 
-	// For a progressive web app to work with a service worker not served from
-	// the "/" directory we have to do this.
-	// See https://www.w3.org/TR/service-workers-1/#extended-http-headers
+	// TODO: just move all the files that have to be served from "/" to their own handler funcs
+	// // For a progressive web app to work with a service worker not served from
+	// // the "/" directory we have to do this.
+	// // See https://www.w3.org/TR/service-workers-1/#extended-http-headers
 	app.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.URL.Path == "/public/service-worker.js" {
@@ -79,6 +81,7 @@ func createRouter(c *config.Config) *util.AppRouter {
 	app.PathPrefix("/public/").Handler(fs)
 
 	app.HandleFunc("/robots.txt", serveRobotsTxt)
+	app.HandleFunc("/manifest.json", serveManifest)
 
 	authRouter := util.AppRouter{app.PathPrefix("/auth").Subrouter()}
 	authRouter.AppHandler("/login", auth.Login).Methods(http.MethodGet)
@@ -139,6 +142,10 @@ func serveRobotsTxt(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(robotsTXT))
 }
 
+func serveManifest(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, string(manifest))
+}
+
 // load the contents of index.html and robots.txt into memory only when the app starts up
 // instead of on each request
 func init() {
@@ -161,6 +168,16 @@ func init() {
 	robotsTXT, err = ioutil.ReadAll(robotsFile)
 	if err != nil {
 		log.Fatalf("Unable to read contents of robots.txt %s", err.Error())
+	}
+
+	manifestFile, err := os.Open("./app/views/public/manifest.json")
+	if err != nil {
+		log.Fatalf("Unable to open manifest.json")
+	}
+	defer manifestFile.Close()
+	manifest, err = ioutil.ReadAll(manifestFile)
+	if err != nil {
+		log.Fatalf("Unable to read contents of manifest.json %s", err.Error())
 	}
 }
 
