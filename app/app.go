@@ -57,6 +57,18 @@ func createRouter(c *config.Config) *util.AppRouter {
 		return handlers.LoggingHandler(os.Stdout, next)
 	})
 
+	// For a progressive web app to work with a service worker not served from
+	// the "/" directory we have to do this.
+	// See https://www.w3.org/TR/service-workers-1/#extended-http-headers
+	app.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path == "/public/service-worker.js" {
+				w.Header().Add("Service-Worker-Allowed", "/")
+			}
+			next.ServeHTTP(w, r)
+		})
+	})
+
 	categories := controllers.NewCategoriesController()
 	users := controllers.NewUsersController(stereoDoseDB)
 	playlists := controllers.NewPlaylistsController(stereoDoseDB, cloudBucket)
