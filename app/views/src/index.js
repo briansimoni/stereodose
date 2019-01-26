@@ -8,14 +8,10 @@ import { detect } from 'detect-browser';
 const browser = detect();
 // handle the case where we don't detect the browser
 if (browser) {
-  console.log(browser.name);
-  console.log(browser.version);
-  console.log(browser.os);
-  const notSupportedMessage = 'Spotify does not work on this os/browser. Try using Chrome. See https://developer.spotify.com/documentation/web-playback-sdk/#supported-browsers';
+  const notSupportedMessage = 'Spotify does not work on this os/browser. See https://developer.spotify.com/documentation/web-playback-sdk/#supported-browsers';
   if (browser.os === 'Android OS' && browser.name === 'firefox') {
     alert(notSupportedMessage);
   }
-
   if (browser.name === 'safari') {
     alert(notSupportedMessage);
   }
