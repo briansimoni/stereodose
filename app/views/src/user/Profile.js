@@ -2,6 +2,7 @@ import React from "react";
 import Spotify from "spotify-web-api-js";
 import SpotifyPlaylist from "./SpotifyPlaylist";
 import StereodosePlaylist from "./StereodosePlaylist";
+import Tabs from "./Tabs";
 
 class UserProfile extends React.Component {
 
@@ -23,42 +24,54 @@ class UserProfile extends React.Component {
     if (spotifyPlaylists !== null && stereodosePlaylists !== null && !loading) {
       return (
         <div>
-          <h2>Playlists Available From Spotify</h2>
-          <table>
-            <tbody>
-              <tr>
-                <th>Playlist Name</th>
-                <th>Drug</th>
-                <th>Mood</th>
-              </tr>
-              {spotifyPlaylists.map((playlist) => {
-                return <SpotifyPlaylist
-                  key={playlist.id}
-                  categories={categories}
-                  playlist={playlist}
-                  onUpdate={() => { this.checkPlaylists() }}
-                />
-              })}
-            </tbody>
-          </table>
 
-          <h2>Playlists Shared to Stereodose</h2>
-          <table>
-            <tbody>
-              <tr>
-                <th>Playlist Name</th>
-                <th>Drug</th>
-                <th>Mood</th>
-              </tr>
-              {stereodosePlaylists.map((playlist) => {
-                return <StereodosePlaylist
-                  key={playlist.spotifyID}
-                  playlist={playlist}
-                  onUpdate={() => { this.checkPlaylists() }}
-                />
-              })}
-            </tbody>
-          </table>
+
+          {/* each child of <Tabs> needs to be a <div> with a label attribute*/}
+          <Tabs>
+            <div label="Playlists Shared to Stereodose">
+              <h2 id="tab-content-title">Playlists Shared to Stereodose</h2>
+              <table className="table">
+                <tbody>
+                  <tr>
+                    <th>Playlist Name</th>
+                    <th>Drug</th>
+                    <th>Mood</th>
+                    <th>Delete?</th>
+                  </tr>
+                  {stereodosePlaylists.map((playlist) => {
+                    return <StereodosePlaylist
+                      key={playlist.spotifyID}
+                      playlist={playlist}
+                      onUpdate={() => { this.checkPlaylists() }}
+                    />
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            <div label="Playlists Available">
+              <h2>Playlists Available From Spotify</h2>
+              <table className="table">
+                <tbody>
+                  <tr>
+                    <th>Playlist Name</th>
+                    <th>Drug</th>
+                    <th>Mood</th>
+                    <th>Image</th>
+                    <th></th>
+                  </tr>
+                  {spotifyPlaylists.map((playlist) => {
+                    return <SpotifyPlaylist
+                      key={playlist.id}
+                      categories={categories}
+                      playlist={playlist}
+                      onUpdate={() => { this.checkPlaylists() }}
+                    />
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </Tabs>
         </div>
       )
     }

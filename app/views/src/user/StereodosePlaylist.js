@@ -10,8 +10,8 @@ class StereodosePlaylist extends React.Component {
       <tr>
         <td>{this.props.playlist.name}</td>
         <td>{this.props.playlist.category}</td>
-        <td>{this.props.playlist.subcategory}</td>
-        <td><button onClick={this.deleteFromStereodose}>Delete from Stereodose</button></td>
+        <td>{this.props.playlist.subCategory}</td>
+        <td><button type="button" className="btn btn-danger" onClick={this.deleteFromStereodose}>Delete from Stereodose</button></td>
       </tr>
     )
   }
