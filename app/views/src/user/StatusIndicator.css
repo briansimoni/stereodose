@@ -14,3 +14,12 @@ nav img {
 	color: #007bff;
 	cursor: pointer;
 }
+
+#tab-content-title {
+	margin-top: 30px;
+	text-align: center;
+}
+
+span.nav-link {
+	cursor: pointer;
+}

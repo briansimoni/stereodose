@@ -29,7 +29,7 @@ class UserProfile extends React.Component {
           {/* each child of <Tabs> needs to be a <div> with a label attribute*/}
           <Tabs>
             <div label="Playlists Shared to Stereodose">
-              <h2 className="justify-content-center">Playlists Shared to Stereodose</h2>
+              <h2 id="tab-content-title">Playlists Shared to Stereodose</h2>
               <table className="table">
                 <tbody>
                   <tr>
@@ -51,12 +51,14 @@ class UserProfile extends React.Component {
 
             <div label="Playlists Available">
               <h2>Playlists Available From Spotify</h2>
-              <table>
+              <table className="table">
                 <tbody>
                   <tr>
                     <th>Playlist Name</th>
                     <th>Drug</th>
                     <th>Mood</th>
+                    <th>Image</th>
+                    <th></th>
                   </tr>
                   {spotifyPlaylists.map((playlist) => {
                     return <SpotifyPlaylist
