@@ -1,4 +1,6 @@
 import React from "react";
+// react-octicons increases build artifact by over 20 kb
+import {TrashcanIcon} from 'react-octicons'
 
 class StereodosePlaylist extends React.Component {
   constructor(props) {
@@ -11,7 +13,11 @@ class StereodosePlaylist extends React.Component {
         <td>{this.props.playlist.name}</td>
         <td>{this.props.playlist.category}</td>
         <td>{this.props.playlist.subCategory}</td>
-        <td><button type="button" className="btn btn-danger" onClick={this.deleteFromStereodose}>Delete from Stereodose</button></td>
+        <td>
+          <button type="button" className="btn btn-danger" onClick={this.deleteFromStereodose}>
+            <TrashcanIcon/>
+          </button>
+        </td>
       </tr>
     )
   }
