@@ -18,9 +18,9 @@ class ShareSpotifyPlaylist extends React.Component {
       selectedPlaylist: null,
       selectedDrug: null,
       selectedMood: null,
-      imagePermaLink: null,
+      imageBlob: null,
       // inFlight is a boolean to usesd to disable stuff while requests are pending
-      inFlight: false
+      inFlight: false,
     }
 
     this.onSelectPlaylist = this.onSelectPlaylist.bind(this);
@@ -32,20 +32,20 @@ class ShareSpotifyPlaylist extends React.Component {
 
   render() {
     const { playlists, categories } = this.props;
-    const { selectedPlaylist, selectedDrug, selectedMood, imagePermaLink } = this.state;
+    const { selectedPlaylist, selectedDrug, selectedMood, imageBlob } = this.state;
     if (!playlists) {
       return <div></div>
     }
 
     if (selectedMood) {
       let buttonDisabled = true;
-      if (imagePermaLink) {
+      if (imageBlob) {
         buttonDisabled = false;
       }
 
       return (
         <Fragment>
-          <PickImage onUploadImage={this.uploadImage} />
+          <PickImage onBlobCreated={this.onBlobCreated} />
           <SharePlaylistButton
             disabled={buttonDisabled}
             onShareStereodose={this.shareToStereodose}
@@ -82,6 +82,10 @@ class ShareSpotifyPlaylist extends React.Component {
     }
   }
 
+  onBlobCreated = blob => {
+    this.setState({imageBlob: blob});
+  }
+
   onSelectPlaylist(playlist) {
     this.setState({ selectedPlaylist: playlist });
   }
@@ -94,14 +98,9 @@ class ShareSpotifyPlaylist extends React.Component {
     this.setState({ selectedMood: mood })
   }
 
-  async uploadImage(fileRef) {
-    console.log(fileRef);
-    if (!fileRef.current.files[0]) {
-      return;
-    }
-    try {
+  async uploadImage(blob) {
       const data = new FormData();
-      data.append('playlist-image', fileRef.current.files[0]);
+      data.append('playlist-image', blob);
       data.append('filename', 'playlist-image');
       let response = await fetch(`/api/playlists/${this.state.selectedPlaylist.id}/image`, {
         method: "POST",
@@ -112,10 +111,7 @@ class ShareSpotifyPlaylist extends React.Component {
         throw new Error(`Problem uploading image, ${errorMessage} ${response.status}: ${response.statusText}`);
       }
       const json = await response.json();
-      this.setState({ imagePermaLink: json.imageURL });
-    } catch (err) {
-      alert(err);
-    }
+      return json.imageURL;
   }
 
   async shareToStereodose() {
@@ -124,6 +120,7 @@ class ShareSpotifyPlaylist extends React.Component {
       return;
     }
     this.setState({inFlight: true});
+    const imageURL = await this.uploadImage(this.state.imageBlob);
 
     const { selectedPlaylist, selectedMood, selectedDrug } = this.state;
     let resp = await fetch(`/api/playlists/`, {
@@ -133,7 +130,7 @@ class ShareSpotifyPlaylist extends React.Component {
         SpotifyID: selectedPlaylist.id,
         Category: selectedDrug,
         Subcategory: selectedMood,
-        ImageURL: this.imagePermaLink
+        ImageURL: imageURL
       })
     });
     if (resp.status !== 201) {
