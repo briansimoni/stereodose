@@ -22,11 +22,6 @@ export default class Player extends Component {
 
       authError: null,
     };
-
-    this.getSDK = this.getSDK.bind(this);
-    this.onPlayPause = this.onPlayPause.bind(this);
-    this.nextSong = this.nextSong.bind(this);
-    this.previousSong = this.previousSong.bind(this);
   }
 
   componentWillMount() {
@@ -41,7 +36,7 @@ export default class Player extends Component {
       })
   }
 
-  async onPlayPause() {
+  onPlayPause = async () => {
     let SDK = await this.getSDK();
     let options = {device_id: this.state.userDeviceId};
     let paused = this.state.playerState.paused;
@@ -52,19 +47,19 @@ export default class Player extends Component {
     }
   }
 
-  async nextSong() {
+  nextSong = async() => {
     let options = {device_id: this.state.userDeviceId};
     let SDK = await this.getSDK();
     SDK.skipToNext(options);
   }
 
-  async previousSong() {
+  previousSong = async() => {
     let options = {device_id: this.state.userDeviceId};
     let SDK = await this.getSDK();
     SDK.skipToPrevious(options);
   }
 
-  async getSDK() {
+  getSDK = async() => {
     let SDK = new Spotify();
     let token;
     try {

@@ -22,12 +22,6 @@ class ShareSpotifyPlaylist extends React.Component {
       // inFlight is a boolean to usesd to disable stuff while requests are pending
       inFlight: false,
     }
-
-    this.onSelectPlaylist = this.onSelectPlaylist.bind(this);
-    this.onSelectDrug = this.onSelectDrug.bind(this);
-    this.onSelectMood = this.onSelectMood.bind(this);
-    this.uploadImage = this.uploadImage.bind(this);
-    this.shareToStereodose = this.shareToStereodose.bind(this);
   }
 
   render() {
@@ -86,19 +80,19 @@ class ShareSpotifyPlaylist extends React.Component {
     this.setState({imageBlob: blob});
   }
 
-  onSelectPlaylist(playlist) {
+  onSelectPlaylist  = playlist => {
     this.setState({ selectedPlaylist: playlist });
   }
 
-  onSelectDrug(drug) {
+  onSelectDrug = drug => {
     this.setState({ selectedDrug: drug });
   }
 
-  onSelectMood(mood) {
+  onSelectMood = mood => {
     this.setState({ selectedMood: mood })
   }
 
-  async uploadImage(blob) {
+  uploadImage = async blob => {
       const data = new FormData();
       data.append('playlist-image', blob);
       data.append('filename', 'playlist-image');
@@ -114,7 +108,7 @@ class ShareSpotifyPlaylist extends React.Component {
       return json.imageURL;
   }
 
-  async shareToStereodose() {
+  shareToStereodose = async() => {
     // disable button while request is in flight
     if (this.state.inFlight) {
       return;

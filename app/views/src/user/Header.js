@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from "react-router-dom";
 import stereodoseLogo from "../images/logo.png";
 
-export default (props) => {
+export default function Header(props) {
   return (
     <header>
       <nav className="navbar">

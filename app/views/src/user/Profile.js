@@ -15,8 +15,6 @@ class UserProfile extends React.Component {
       categories: null,
       loading: true
     }
-
-    this.checkPlaylists = this.checkPlaylists.bind(this);
   }
 
   render() {
@@ -77,7 +75,7 @@ class UserProfile extends React.Component {
     this.checkPlaylists();
   }
 
-  async checkPlaylists() {
+  checkPlaylists = async() => {
     let SDK = new Spotify();
     // TODO: catch errors here
     let token = await this.props.getAccessToken();

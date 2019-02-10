@@ -37,15 +37,9 @@ class App extends React.Component {
     this.loggedInPromise = new Promise((resolve) => {
       this.loggedInPromiseResolver = resolve;
     })
-
-
-    // TODO: figure out how an arrow function could eliminate this line
-    this.getAccessToken = this.getAccessToken.bind(this);
-    this.setDeviceID = this.setDeviceID.bind(this);
-    this.isUserLoggedIn = this.isUserLoggedIn.bind(this);
   }
 
-  isUserLoggedIn(loggedIn) {
+  isUserLoggedIn = loggedIn => {
     let state = this.state;
     state.loggedIn = loggedIn;
     this.setState(state);
@@ -114,7 +108,7 @@ class App extends React.Component {
 
   // pass setDeviceID to the player component so we can lift "state" up
   // and then move it over to peers
-  setDeviceID(deviceID) {
+  setDeviceID = deviceID => {
     this.deviceIDResolver(deviceID);
   }
 
@@ -122,7 +116,7 @@ class App extends React.Component {
   // The token is cached in the member variable of this object and updated upon expiry
   // Should be able to pass this function around as a prop to components that need a token
   // i.e. <Player> and <Playlist>
-  async getAccessToken() {
+  getAccessToken = async () => {
     let loggedIn = await this.loggedInPromise;
     if (loggedIn === false) {
       throw new Error("Sign in with Spotify Premium to Play Music");
