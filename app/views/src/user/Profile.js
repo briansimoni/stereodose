@@ -1,6 +1,6 @@
 import React from "react";
 import Spotify from "spotify-web-api-js";
-import SpotifyPlaylist from "./SpotifyPlaylist";
+import ShareSpotifyPlaylist from "./Sharing/ShareSpotifyPlaylist";
 import StereodosePlaylist from "./StereodosePlaylist";
 import Tabs from "./Tabs";
 
@@ -51,25 +51,11 @@ class UserProfile extends React.Component {
 
             <div label="Playlists Available">
               <h2>Playlists Available From Spotify</h2>
-              <table className="table">
-                <tbody>
-                  <tr>
-                    <th>Playlist Name</th>
-                    <th>Drug</th>
-                    <th>Mood</th>
-                    <th>Image</th>
-                    <th></th>
-                  </tr>
-                  {spotifyPlaylists.map((playlist) => {
-                    return <SpotifyPlaylist
-                      key={playlist.id}
-                      categories={categories}
-                      playlist={playlist}
-                      onUpdate={() => { this.checkPlaylists() }}
-                    />
-                  })}
-                </tbody>
-              </table>
+              <ShareSpotifyPlaylist
+                playlists={spotifyPlaylists}
+                categories={categories}
+                onUpdate={() => { this.checkPlaylists() }}
+              />
             </div>
           </Tabs>
         </div>
