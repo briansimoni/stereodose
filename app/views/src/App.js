@@ -5,7 +5,6 @@ import Playlists from './screens/Playlists';
 import Playlist from './screens/Playlist';
 import Player from './player/Player';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import UserStatusIndicator from './user/StatusIndicator';
 import UserProfile from './user/Profile';
 import Header from './user/Header';
 import NoMatch from './404';
@@ -49,16 +48,18 @@ class App extends React.Component {
     return (
       <BrowserRouter>
         <div>
-          <Header>
-            <Route
-              path="/"
-              render={(props) =>
-                <UserStatusIndicator
-                  {...props}
-                  isUserLoggedIn={(loggedIn) => this.loggedInPromiseResolver(loggedIn)}
-                />
-              } />
-          </Header>
+
+
+          <Route
+            path="/"
+            render={(props) =>
+              <Header {...props}
+                isUserLoggedIn={(loggedIn) =>
+                  this.loggedInPromiseResolver(loggedIn)
+                }
+              />
+            }
+          />
 
           <main role="main" className="container">
             {/* Routes wrapped in a Switch match only the first route for ambiguous matches*/}
@@ -102,7 +103,7 @@ class App extends React.Component {
             }
           />
         </div>
-      </BrowserRouter>
+      </BrowserRouter >
     )
   }
 

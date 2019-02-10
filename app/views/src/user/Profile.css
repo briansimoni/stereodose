@@ -6,10 +6,6 @@ nav img {
 	height: 30px;
 }
 
-#status-indicator {
-	display: flex;
-}
-
 .signin-button {
 	color: #007bff;
 	cursor: pointer;
@@ -27,4 +23,13 @@ span.nav-link {
 .list-group-item-action {
 	color: #007bff;
 	text-align: center;
+	cursor: pointer;
+}
+
+.navbar-toggler {
+	float: right;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: #007bff;
 }

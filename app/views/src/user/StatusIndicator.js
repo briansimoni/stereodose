@@ -1,6 +1,6 @@
 import React from "react";
+import { Fragment } from "react";
 import { Link } from "react-router-dom";
-import profilePlaceholder from "../images/profile-placeholder.jpeg";
 import "./Profile.css";
 
 // UserStatusIndicator encapsulates the logic of the user's status:
@@ -27,19 +27,26 @@ class UserStatusIndicator extends React.Component {
 
     if (this.state.loggedIn === false) {
       return (
-        <div>
-          <h3 className="signin-button" onClick={() => { this.logIn() }}>Sign In With Spotify</h3>
-        </div>
+        <li className="nav-item">
+          <span onClick={() => { this.logIn() }} className="nav-link">Sign In</span>
+        </li>
       )
     }
 
     if (this.state.loggedIn === true) {
       return (
-        <div id="status-indicator">
-          <Link to="/profile"><img className="rounded-circle" src={profilePlaceholder} alt="profile" /></Link>
+        <Fragment>
+
+
+          <li className="nav-item">
+            <Link className="nav-link" to="/profile">Profile</Link>
+          </li>
           {/* Logout is a special case. Need to use a plain <a> tag instead of <Link>*/}
-          <a href="/auth/logout" className="nav-link mt-auto mb-auto">logout</a>
-        </div>
+          <li className="nav-item">
+            <a href="/auth/logout" className="nav-link">logout</a>
+          </li>
+
+        </Fragment>
       )
     }
   }
