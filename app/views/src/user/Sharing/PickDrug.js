@@ -5,14 +5,18 @@ export default function PickDrug(props) {
   const drugs = Object.keys(categories);
   return (
     <div>
-      <h4>Choose Drug for {playlist.name}</h4>
-      <ul>
+      <h2 id="tab-content-title">Choose Drug for {playlist.name}</h2>
+      <div className="list-group">
         {drugs.map((drug, index) =>
-          <li key={index} onClick={() => { onSelectDrug(drug) }}>
+          <button
+            type="button"
+            className="list-group-item list-group-item-action"
+            key={index}
+            onClick={() => { onSelectDrug(drug) }}>
             {drug}
-          </li>
+          </button>
         )}
-      </ul>
+      </div>
     </div>
   )
 }

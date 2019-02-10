@@ -87,7 +87,6 @@ export default class PickImage extends React.Component {
 
   render() {
     let fileInputRef = React.createRef();
-    // const { onUploadImage } = this.props;
     const { src, crop } = this.state;
     return (
       <div>
@@ -101,6 +100,9 @@ export default class PickImage extends React.Component {
             onChange={this.onSelectFile} />
 
         </form>
+        {!src &&
+          <img alt="playlist placeholder" src="https://via.placeholder.com/350"/>
+        }
         {src &&
           <ReactCrop
             src={src}

@@ -39,11 +39,27 @@ class ShareSpotifyPlaylist extends React.Component {
 
       return (
         <Fragment>
-          <PickImage onBlobCreated={this.onBlobCreated} />
-          <SharePlaylistButton
-            disabled={buttonDisabled}
-            onShareStereodose={this.shareToStereodose}
-            inFlight={this.state.inFlight} />
+          <div>
+            <h2 id="tab-content-title">Upload An Image</h2>
+          </div>
+
+          <div className="text-center">
+            <PickImage onBlobCreated={this.onBlobCreated} />
+          </div>
+
+          <div className="text-center">
+            <h4>Playlist: {this.state.selectedPlaylist.name}</h4>
+            <h4>Drug: {this.state.selectedDrug}</h4>
+            <h4>Mood: {this.state.selectedMood}</h4>
+          </div>
+
+          <div className="text-center">
+            <SharePlaylistButton
+              disabled={buttonDisabled}
+              onShareStereodose={this.shareToStereodose}
+              inFlight={this.state.inFlight} />
+          </div>
+
         </Fragment>
       )
     }
@@ -77,10 +93,10 @@ class ShareSpotifyPlaylist extends React.Component {
   }
 
   onBlobCreated = blob => {
-    this.setState({imageBlob: blob});
+    this.setState({ imageBlob: blob });
   }
 
-  onSelectPlaylist  = playlist => {
+  onSelectPlaylist = playlist => {
     this.setState({ selectedPlaylist: playlist });
   }
 
@@ -93,27 +109,27 @@ class ShareSpotifyPlaylist extends React.Component {
   }
 
   uploadImage = async blob => {
-      const data = new FormData();
-      data.append('playlist-image', blob);
-      data.append('filename', 'playlist-image');
-      let response = await fetch(`/api/playlists/${this.state.selectedPlaylist.id}/image`, {
-        method: "POST",
-        body: data
-      });
-      if (response.status !== 201) {
-        const errorMessage = await response.text();
-        throw new Error(`Problem uploading image, ${errorMessage} ${response.status}: ${response.statusText}`);
-      }
-      const json = await response.json();
-      return json.imageURL;
+    const data = new FormData();
+    data.append('playlist-image', blob);
+    data.append('filename', 'playlist-image');
+    let response = await fetch(`/api/playlists/${this.state.selectedPlaylist.id}/image`, {
+      method: "POST",
+      body: data
+    });
+    if (response.status !== 201) {
+      const errorMessage = await response.text();
+      throw new Error(`Problem uploading image, ${errorMessage} ${response.status}: ${response.statusText}`);
+    }
+    const json = await response.json();
+    return json.imageURL;
   }
 
-  shareToStereodose = async() => {
+  shareToStereodose = async () => {
     // disable button while request is in flight
     if (this.state.inFlight) {
       return;
     }
-    this.setState({inFlight: true});
+    this.setState({ inFlight: true });
     const imageURL = await this.uploadImage(this.state.imageBlob);
 
     const { selectedPlaylist, selectedMood, selectedDrug } = this.state;

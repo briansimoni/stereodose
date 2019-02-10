@@ -1,8 +1,7 @@
 import React from "react";
-import { Fragment } from "react";
 import { Link } from "react-router-dom";
 import profilePlaceholder from "../images/profile-placeholder.jpeg";
-import "./StatusIndicator.css";
+import "./Profile.css";
 
 // UserStatusIndicator encapsulates the logic of the user's status:
 // logged in or not; Spotify premium or not
@@ -36,13 +35,11 @@ class UserStatusIndicator extends React.Component {
 
     if (this.state.loggedIn === true) {
       return (
-        <Fragment>
-          <div id="status-indicator">
-            <Link to="/profile"><img className="rounded-circle" src={profilePlaceholder} alt="profile" /></Link>
-            {/* Logout is a special case. Need to use a plain <a> tag instead of <Link>*/}
-            <a href="/auth/logout" className="nav-link mt-auto mb-auto">logout</a>
-          </div>
-        </Fragment>
+        <div id="status-indicator">
+          <Link to="/profile"><img className="rounded-circle" src={profilePlaceholder} alt="profile" /></Link>
+          {/* Logout is a special case. Need to use a plain <a> tag instead of <Link>*/}
+          <a href="/auth/logout" className="nav-link mt-auto mb-auto">logout</a>
+        </div>
       )
     }
   }

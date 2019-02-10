@@ -3,6 +3,7 @@ import Spotify from "spotify-web-api-js";
 import ShareSpotifyPlaylist from "./Sharing/ShareSpotifyPlaylist";
 import StereodosePlaylist from "./StereodosePlaylist";
 import Tabs from "./Tabs";
+import "./Profile.css";
 
 class UserProfile extends React.Component {
 
@@ -22,8 +23,6 @@ class UserProfile extends React.Component {
     if (spotifyPlaylists !== null && stereodosePlaylists !== null && !loading) {
       return (
         <div>
-
-
           {/* each child of <Tabs> needs to be a <div> with a label attribute*/}
           <Tabs>
             <div label="Playlists Shared to Stereodose">
@@ -48,7 +47,6 @@ class UserProfile extends React.Component {
             </div>
 
             <div label="Playlists Available">
-              <h2>Playlists Available From Spotify</h2>
               <ShareSpotifyPlaylist
                 playlists={spotifyPlaylists}
                 categories={categories}

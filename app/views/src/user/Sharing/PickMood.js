@@ -4,14 +4,18 @@ export default function PickMood(props) {
   const { playlist, drug, categories, onSelectMood } = props;
   return (
     <div>
-      <h4>Choose Mood for {playlist.name}</h4>
-      <ul>
+      <h2 id="tab-content-title">Choose Mood for {playlist.name}</h2>
+      <div className="list-group">
         {categories[drug].map((mood, index) =>
-          <li key={index} onClick={() => { onSelectMood(mood) }}>
+          <button
+            type="button"
+            className="list-group-item list-group-item-action"
+            key={index}
+            onClick={() => { onSelectMood(mood) }}>
             {mood}
-          </li>
+          </button>
         )}
-      </ul>
+      </div>
     </div>
   )
 }

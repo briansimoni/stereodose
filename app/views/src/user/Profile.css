@@ -23,3 +23,8 @@ nav img {
 span.nav-link {
 	cursor: pointer;
 }
+
+.list-group-item-action {
+	color: #007bff;
+	text-align: center;
+}
