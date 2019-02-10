@@ -1,6 +1,6 @@
 import React from "react";
 import Spotify from "spotify-web-api-js";
-import ShareSpotifyPlaylist from "./Sharing/ShareSpotifyPlaylist";
+import ShareSpotifyPlaylist from "./sharing/ShareSpotifyPlaylist";
 import StereodosePlaylist from "./StereodosePlaylist";
 import Tabs from "./Tabs";
 import "./Profile.css";
