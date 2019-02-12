@@ -13,7 +13,7 @@ class Playlist extends React.Component {
   }
 
   render() {
-    let {loading, playlist, error} = this.state;
+    let { loading, playlist, error } = this.state;
     if (loading) {
       return <div></div>
     }
@@ -26,15 +26,15 @@ class Playlist extends React.Component {
           <div className="col">
             <div id="playlist-heading">
               <h2>{playlist.name}</h2>
-              <img src={playlist.bucketImageURL} alt="playlist-artwork"/>
+              <img src={playlist.bucketImageURL} alt="playlist-artwork" />
             </div>
             <ul className="list-group">
-              {playlist.tracks.map( (track) => {
+              {playlist.tracks.map((track) => {
                 return (
                   <li
-                  className="list-group-item"
-                  key={track.spotifyID}>
-                    <Track track={track} playlist={playlist} onPlay={() => {this.playSong(playlist.URI, track.URI)}}/>
+                    className="list-group-item"
+                    key={track.spotifyID}>
+                    <Track track={track} playlist={playlist} onPlay={() => { this.playSong(playlist, track.URI) }} />
                   </li>
                 )
               })}
@@ -45,12 +45,54 @@ class Playlist extends React.Component {
     }
   }
 
+  // getContextURIs is designed so that we get an array of track URIs
+  // For very large playlists, we need to get just a slice relative to the selected track
+  // so that we can avoid HTTP 413 (request too large) errors
+  getContextURIs(playlist, trackURI) {
+    const trackURIs = playlist.tracks.map((track) => track.URI);
+    // Taking a guess at the payload maximum size
+    // With trial and error, length of 500 seems to be pretty safe
+    // Only use slices in the case where the playlist is very large
+    if (playlist.tracks.length < 500) {
+      return trackURIs;
+    }
+    const trackIndex = trackURI.indexOf(trackURI);
+    return this.getSlice(trackURIs, trackIndex, 500);
+  }
+
+  // a is the array
+  // i is the index of the selected element
+  // l is the length of the desired slice
+  getSlice = (a, i, l) => {
+    const lowerDistance = Math.floor(l / 2);
+    const upperDistance = Math.ceil(l / 2);
+
+    // beginning
+    if (i - lowerDistance < 0) {
+      const firstHalf = a.slice(i - lowerDistance);
+      const secondHalf = a.slice(0, l - firstHalf.length);
+      return firstHalf.concat(secondHalf);
+    }
+
+    // end
+    if (i + upperDistance > a.length) {
+      const firstHalf = a.slice(i - lowerDistance, a.length);
+      const secondHalf = a.slice(0, l - firstHalf.length);
+      return firstHalf.concat(secondHalf);
+    }
+
+    // middle
+    return a.slice(i - lowerDistance, i + upperDistance);
+  }
+
   // playSong makes an API call directly to Spotify
-  async playSong(context, uri) {
+  // playlist can simply be the playlist object from component state
+  async playSong(playlist, selectedTrack) {
+    const uris = this.getContextURIs(playlist, selectedTrack);
     let data = {
-      "context_uri": context,
+      "uris": uris,
       "offset": {
-        "uri": uri
+        "uri": selectedTrack
       }
     }
 
@@ -60,7 +102,7 @@ class Playlist extends React.Component {
 
       const response = await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceID}`, {
         method: "PUT",
-        headers : {
+        headers: {
           "Authorization": `Bearer ${accessToken}`,
           "Content-Type": "application/json"
         },
@@ -71,7 +113,7 @@ class Playlist extends React.Component {
         const errorMessage = await response.text();
         throw new Error(`${errorMessage}, ${response.status}, ${response.statusText}`);
       }
-    } catch(err) {
+    } catch (err) {
       alert(err.message);
     }
   }
