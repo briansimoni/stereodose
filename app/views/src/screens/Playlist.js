@@ -56,7 +56,7 @@ class Playlist extends React.Component {
     if (playlist.tracks.length < 500) {
       return trackURIs;
     }
-    const trackIndex = trackURI.indexOf(trackURI);
+    const trackIndex = trackURIs.indexOf(trackURI);
     return this.getSlice(trackURIs, trackIndex, 500);
   }
 
