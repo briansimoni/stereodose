@@ -17,16 +17,16 @@ export default function Track(props) {
     <div className="row">
 
       <div className="col-2">
-        <button className="track-play-button" onClick={onPlay}>play</button>
+        <button className="track-play-button btn" onClick={onPlay}>play</button>
       </div>
 
       <div className="col-8">
-        <h4 className="track-name">{track.name}</h4>
-        <h5 className="artists">{track.artists}</h5>
+        <h5 className="track-name">{track.name}</h5>
+        <h6 className="artists">{track.artists}</h6>
       </div>
 
       <div className="col-2">
-        <h5 className="track-duration">{displayTime}</h5>
+        <h6 className="track-duration">{displayTime}</h6>
       </div>
     </div>
   );

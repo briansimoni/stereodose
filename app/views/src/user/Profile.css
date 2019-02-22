@@ -7,7 +7,7 @@ nav img {
 }
 
 .signin-button {
-	color: #007bff;
+	color: #008f0c;
 	cursor: pointer;
 }
 
@@ -21,7 +21,7 @@ span.nav-link {
 }
 
 .list-group-item-action {
-	color: #007bff;
+	color: #008f0c;
 	text-align: center;
 	cursor: pointer;
 }
@@ -31,5 +31,5 @@ span.nav-link {
 }
 
 .navbar-dark .navbar-nav .nav-link {
-    color: #007bff;
+    color: #008f0c;
 }

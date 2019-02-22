@@ -16,3 +16,7 @@ html {
 .list-group-item {
   background-color: #2e2e2e;
 }
+
+a {
+  color: #008f0c;
+}

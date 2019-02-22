@@ -33,7 +33,7 @@ class Playlists extends React.Component {
       // this makes it way easier to render with react
       // With Bootstrap remember total row width is 12 columns.
       // So columns of length 4 mean you get 3 columns per row
-      const rows = playlists.reduce( (accumulator, currentPlaylist, index) =>{
+      const rows = playlists.reduce((accumulator, currentPlaylist, index) => {
         if (index % 3 === 0) {
           return accumulator.concat([playlists.slice(index, index + 3)])
         }
@@ -41,27 +41,30 @@ class Playlists extends React.Component {
       }, [])
 
       return (
-            <div className="playlists">
-              <h2 id="choose-a-playlist">Choose A Playlist</h2>
+        <div className="playlists">
+          <h2 id="choose-a-playlist">Choose A Playlist</h2>
 
-              {rows.map((row, index) => {
+          {rows.map((row, index) => {
+            return (
+              <div className="row" key={index}>
+                {row.map((playlist) => {
+                  const bucketImageURL = playlist.bucketImageURL ? playlist.bucketImageURL : "https://via.placeholder.com/250x200";
                   return (
-                    <div className="row" key={index}>
-                      {row.map( (playlist) => {
-                        const bucketImageURL = playlist.bucketImageURL ?  playlist.bucketImageURL: "https://via.placeholder.com/250x200";
-                        return (
-                          <div className="col-md-4" key={playlist.spotifyID}>
-                            <img src={bucketImageURL} alt="playlist-artwork"/> 
-                              <Link to={`${match.url}/${playlist.spotifyID}`}>
-                                <h4>{playlist.name}</h4>
-                              </Link>
-                          </div>
-                        )
-                      })}
+                    <div className="col-md-4" key={playlist.spotifyID}>
+                      <Link to={`${match.url}/${playlist.spotifyID}`}>
+                        <img src={bucketImageURL} alt="playlist-artwork" />
+                      </Link>
+
+                      <Link to={`${match.url}/${playlist.spotifyID}`}>
+                        <h4>{playlist.name}</h4>
+                      </Link>
                     </div>
                   )
-              })}
-            </div>
+                })}
+              </div>
+            )
+          })}
+        </div>
 
       );
     }

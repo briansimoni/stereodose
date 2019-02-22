@@ -39,3 +39,12 @@ ul.moods, ul.drugs, #moods {
 #playlist-heading > img {
     height: 40vh
 }
+
+.track-play-button {
+    background-color: #008f0c;
+    color: white;
+}
+
+.playlist {
+    margin-top: 25px;
+}

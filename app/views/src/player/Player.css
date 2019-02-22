@@ -17,7 +17,7 @@ body {
 
 #player-message-not-signed-in {
 	text-align: center;
-	color: #007bff;
+	color: #008f0c;
 	cursor: pointer;
 }
 
@@ -43,7 +43,7 @@ body {
 	border-top: 15px solid transparent;
 	border-bottom: 15px solid transparent;
 	
-	border-left: 15px solid #007bff;
+	border-left: 15px solid #008f0c;
 	display: inline-block;
 	/* transition: 100ms all ease; */
 }
@@ -58,7 +58,7 @@ body {
 	border-style: double;
 	border-width: 0px 0 0px 22px;
 
-	border-color: transparent transparent transparent #007bff;
+	border-color: transparent transparent transparent #008f0c;
 	/* transition: 100ms all ease; */
 	cursor: pointer;
 	display: inline-block;
@@ -72,7 +72,7 @@ body {
 	height: 0; 
 	border-top: 10px solid transparent;
 	border-bottom: 10px solid transparent; 
-	border-right:10px solid #007bff; 
+	border-right:10px solid #008f0c;
 	margin-bottom: 5px;
 	cursor: pointer;
 }
@@ -87,7 +87,7 @@ body {
 	border-top: 10px solid transparent;
 	border-bottom: 10px solid transparent;
 	
-	border-left: 10px solid #007bff;
+	border-left: 10px solid #008f0c;
 	margin-bottom: 5px;
 	cursor: pointer;
 }
@@ -134,4 +134,8 @@ body {
 	/* transition: 100ms all ease; */
 	cursor: not-allowed;
 	display: inline-block;
+}
+
+.progress-bar {
+	background-color: #008f0c;
 }

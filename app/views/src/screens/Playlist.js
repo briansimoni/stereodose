@@ -28,7 +28,7 @@ class Playlist extends React.Component {
               <h2>{playlist.name}</h2>
               <img src={playlist.bucketImageURL} alt="playlist-artwork" />
             </div>
-            <ul className="list-group">
+            <ul className="list-group playlist">
               {playlist.tracks.map((track) => {
                 return (
                   <li
@@ -145,8 +145,5 @@ class Playlist extends React.Component {
   }
 
 }
-
-// lets have this component have some function for getting the access token
-// and have the player nested in this component
 
 export default Playlist;
