@@ -2,7 +2,6 @@ import React from "react";
 import Spotify from "spotify-web-api-js";
 import ShareSpotifyPlaylist from "./sharing/ShareSpotifyPlaylist";
 import StereodosePlaylist from "./StereodosePlaylist";
-import Tabs from "./Tabs";
 import "./Profile.css";
 
 class UserProfile extends React.Component {
@@ -19,41 +18,60 @@ class UserProfile extends React.Component {
   }
 
   render() {
-    let { spotifyPlaylists, stereodosePlaylists, categories, loading } = this.state;
+    const { spotifyPlaylists, stereodosePlaylists, categories, loading } = this.state;
+
     if (spotifyPlaylists !== null && stereodosePlaylists !== null && !loading) {
       return (
-        <div>
-          {/* each child of <Tabs> needs to be a <div> with a label attribute*/}
-          <Tabs>
-            <div label="Playlists Shared to Stereodose">
-              <h2 id="tab-content-title">Playlists Shared to Stereodose</h2>
-              <table className="table">
-                <tbody>
-                  <tr>
-                    <th>Playlist Name</th>
-                    <th>Drug</th>
-                    <th>Mood</th>
-                    <th>Delete?</th>
-                  </tr>
-                  {stereodosePlaylists.map((playlist) => {
-                    return <StereodosePlaylist
-                      key={playlist.spotifyID}
-                      playlist={playlist}
+
+        <div className="container">
+
+          <div className="row">
+            <div className="col">
+      
+
+                {this.props.location.pathname === "/profile/shared" &&
+                  <div label="Playlists Shared to Stereodose">
+                    <h2 id="content-title">Playlists Shared to Stereodose</h2>
+                    <table className="table">
+                      <tbody>
+                        <tr>
+                          <th>Playlist Name</th>
+                          <th>Drug</th>
+                          <th>Mood</th>
+                          <th>Delete?</th>
+                        </tr>
+                        {stereodosePlaylists.map((playlist) => {
+                          return <StereodosePlaylist
+                            key={playlist.spotifyID}
+                            playlist={playlist}
+                            onUpdate={() => { this.checkPlaylists() }}
+                          />
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                }
+
+                {this.props.location.pathname === "/profile/available" &&
+                  <div label="Playlists Available">
+                    <ShareSpotifyPlaylist
+                      playlists={spotifyPlaylists}
+                      categories={categories}
                       onUpdate={() => { this.checkPlaylists() }}
                     />
-                  })}
-                </tbody>
-              </table>
-            </div>
+                  </div>
+                }
 
-            <div label="Playlists Available">
-              <ShareSpotifyPlaylist
-                playlists={spotifyPlaylists}
-                categories={categories}
-                onUpdate={() => { this.checkPlaylists() }}
-              />
-            </div>
-          </Tabs>
+                {this.props.location.pathname === "/profile" &&
+                  <div>TODO: add some profile data stuff here</div>
+                }
+
+
+
+              </div>
+     
+          </div>
+
         </div>
       )
     }
@@ -73,7 +91,7 @@ class UserProfile extends React.Component {
     this.checkPlaylists();
   }
 
-  checkPlaylists = async() => {
+  checkPlaylists = async () => {
     let SDK = new Spotify();
     // TODO: catch errors here
     let token = await this.props.getAccessToken();
@@ -86,7 +104,6 @@ class UserProfile extends React.Component {
     let diffedSpotifyPlaylists = [];
     let diffedStereodosePlaylists = [];
 
-    // so old school
     let spotifyPlaylists = userPlaylists.items;
     for (let i = 0; i < spotifyPlaylists.length; i++) {
       let match = false;

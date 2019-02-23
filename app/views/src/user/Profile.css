@@ -11,8 +11,9 @@ nav img {
 	cursor: pointer;
 }
 
-#tab-content-title {
+#content-title {
 	margin-top: 30px;
+	margin-bottom: 30px;
 	text-align: center;
 }
 
@@ -24,6 +25,10 @@ span.nav-link {
 	color: #008f0c;
 	text-align: center;
 	cursor: pointer;
+}
+
+.cancel {
+	margin-top: 25px;
 }
 
 .navbar-toggler {

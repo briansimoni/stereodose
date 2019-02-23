@@ -40,7 +40,7 @@ class ShareSpotifyPlaylist extends React.Component {
       return (
         <Fragment>
           <div>
-            <h2 id="tab-content-title">Upload An Image</h2>
+            <h2 id="content-title">Upload An Image</h2>
           </div>
 
           <div className="text-center">
@@ -60,28 +60,43 @@ class ShareSpotifyPlaylist extends React.Component {
               inFlight={this.state.inFlight} />
           </div>
 
+          <div className="cancel text-center">
+            <button className="btn btn-danger" onClick={this.cancel}>Cancel</button>
+          </div>
+
         </Fragment>
       )
     }
 
     if (selectedPlaylist && selectedDrug) {
       return (
-        <PickMood
-          onSelectMood={this.onSelectMood}
-          categories={categories}
-          playlist={selectedPlaylist}
-          drug={selectedDrug}
-        />
+        <Fragment>
+          <PickMood
+            onSelectMood={this.onSelectMood}
+            categories={categories}
+            playlist={selectedPlaylist}
+            drug={selectedDrug}
+          />
+          <div className="cancel text-center">
+            <button className="btn btn-danger" onClick={this.cancel}>Cancel</button>
+          </div>
+        </Fragment>
       );
     }
 
     if (selectedPlaylist) {
       return (
-        <PickDrug
-          onSelectDrug={this.onSelectDrug}
-          categories={categories}
-          playlist={selectedPlaylist}
-        />
+        <Fragment>
+          <PickDrug
+            onSelectDrug={this.onSelectDrug}
+            categories={categories}
+            playlist={selectedPlaylist}
+          />
+          <div className="cancel text-center">
+            <button className="btn btn-danger" onClick={this.cancel}>Cancel</button>
+          </div>
+        </Fragment>
+
       );
     }
 
@@ -155,6 +170,15 @@ class ShareSpotifyPlaylist extends React.Component {
       inFlight: false
     });
     this.props.onUpdate();
+  }
+
+  cancel = () => {
+    this.setState({
+      selectedPlaylist: null,
+      selectedDrug: null,
+      selectedMood: null,
+      imageBlob: null
+    });
   }
 
 }

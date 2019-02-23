@@ -41,6 +41,12 @@ class UserStatusIndicator extends React.Component {
           <li className="nav-item">
             <Link className="nav-link" to="/profile">Profile</Link>
           </li>
+          <li className="nav-item">
+            <Link className="nav-link" to="/profile/shared">Shared</Link>
+          </li>
+          <li className="nav-item">
+            <Link className="nav-link" to="/profile/available">Playlists Available</Link>
+          </li>
           {/* Logout is a special case. Need to use a plain <a> tag instead of <Link>*/}
           <li className="nav-item">
             <a href="/auth/logout" className="nav-link">logout</a>

@@ -73,6 +73,24 @@ class App extends React.Component {
                 }
               />
 
+              <Route exact path="/profile/shared"
+                render={(props) =>
+                  <UserProfile
+                    {...props}
+                    getAccessToken={() => this.getAccessToken()}
+                  />
+                }
+              />
+
+              <Route exact path="/profile/available"
+                render={(props) =>
+                  <UserProfile
+                    {...props}
+                    getAccessToken={() => this.getAccessToken()}
+                  />
+                }
+              />
+
               <Route exact path="/" component={Drugs} />
               <Route exact path="/:drug" component={Drug} />
               <Route exact path="/:drug/:subcategory" component={Playlists} />

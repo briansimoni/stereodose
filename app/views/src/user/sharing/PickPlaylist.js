@@ -9,7 +9,7 @@ class PickPlaylist extends React.Component {
     }
     return (
       <Fragment>
-        <h2 id="tab-content-title">Playlists Available From Spotify</h2>
+        <h2 id="content-title">Playlists Available From Spotify</h2>
         <div className="list-group">
           {this.props.playlists.map((playlist) =>
             <button onClick={() => { onSelectPlaylist(playlist) }}
