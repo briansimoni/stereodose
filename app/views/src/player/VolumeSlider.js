@@ -1,17 +1,17 @@
 import React from "react";
-import { Fragment } from "react";
-import Slider, { Rail, Handles, Tracks } from 'react-compound-slider'
+import Slider, { Rail, Handles, Tracks } from 'react-compound-slider';
+import Octicon from "react-octicon";
 
-const sliderStyle = {
-  position: 'relative',
-  height: '50px',
-  display: 'inline-block',
-  'marginLeft': '200px',
-  top: '-55px'
+const railStyle = {
+  position: 'absolute',
+  width: '100%',
+  height: 10,
+  marginTop: 35,
+  borderRadius: 5,
+  backgroundColor: '#8B9CB6',
 }
 
-const domain = [0, 100]
-const defaultValues = [0]
+const defaultValues = [100]
 
 class VolumeSlider extends React.Component {
 
@@ -25,168 +25,106 @@ class VolumeSlider extends React.Component {
   }
 
   onChange = values => {
-    const percent = values[0];
+    const percent = Math.round(values[0]);
     this.props.onChangeVolume(percent);
   }
 
   render() {
-    // const { state: { values }} = this
-
-    // const state = this.state;
     const values = this.state.values;
+    const className = this.props.className;
 
     return (
-      <div style={{position: 'absolute', width: '100%' }}>
-        <Slider
-          vertical
-          mode={2}
-          step={5}
-          domain={domain}
-          rootStyle={sliderStyle}
-          onUpdate={this.onUpdate}
-          onChange={this.onChange}
-          values={values}
-          reversed
-          disabled={this.props.disabled}
-        >
-          <Rail>
-            {({ getRailProps }) => <SliderRail getRailProps={getRailProps} />}
-          </Rail>
-          <Handles>
-            {({ handles, getHandleProps }) => (
-              <div className="slider-handles">
-                {handles.map(handle => (
-                  <Handle
-                    key={handle.id}
-                    handle={handle}
-                    domain={domain}
-                    getHandleProps={getHandleProps}
-                  />
-                ))}
-              </div>
-            )}
-          </Handles>
-          <Tracks left={false}>
-            {({ tracks, getTrackProps }) => (
-              <div className="slider-tracks">
-                {tracks.map(({ id, source, target }) => (
-                  <Track
-                    key={id}
-                    source={source}
-                    target={target}
-                    getTrackProps={getTrackProps}
-                  />
-                ))}
-              </div>
-            )}
-          </Tracks>
-          {/* <Ticks count={5}>
-            {({ ticks }) => (
-              <div className="slider-ticks">
-                {ticks.map(tick => (
-                  <Tick key={tick.id} tick={tick} />
-                ))}
-              </div>
-            )}
-          </Ticks> */}
-        </Slider>
-      </div>
+      <Slider
+        className={className}
+        domain={[0, 100]}
+        values={values}
+        onChange={this.onChange}
+        disabled={this.props.disabled}
+      >
+      <Octicon className="unmute" name="unmute" mega/>
+        <Rail>
+          {({ getRailProps }) => (  // adding the rail props sets up events on the rail
+            <div style={railStyle} {...getRailProps()} />
+          )}
+        </Rail>
+        <Handles>
+          {({ handles, getHandleProps }) => (
+            <div className="slider-handles">
+              {handles.map(handle => (
+                <Handle
+                  key={handle.id}
+                  handle={handle}
+                  getHandleProps={getHandleProps}
+                />
+              ))}
+            </div>
+          )}
+        </Handles>
+        <Tracks right={false}>
+          {({ tracks, getTrackProps }) => (
+            <div className="slider-tracks">
+              {tracks.map(({ id, source, target }) => (
+                <Track
+                  key={id}
+                  source={source}
+                  target={target}
+                  getTrackProps={getTrackProps}
+                />
+              ))}
+            </div>
+          )}
+        </Tracks>
+      </Slider>
+
     )
   }
 
 }
 
 
-const railOuterStyle = {
-  position: 'absolute',
-  height: '100%',
-  width: 21,
-  transform: 'translate(-50%, 0%)',
-  borderRadius: 7,
-  cursor: 'pointer',
-  // border: '1px solid white',
-}
-
-const railInnerStyle = {
-  position: 'absolute',
-  height: '100%',
-  width: 7,
-  transform: 'translate(-50%, 0%)',
-  borderRadius: 7,
-  pointerEvents: 'none',
-  backgroundColor: 'rgb(155,155,155)',
-}
-
-function SliderRail({ getRailProps }) {
-  return (
-    <Fragment>
-      <div style={railOuterStyle} {...getRailProps()} />
-      <div style={railInnerStyle} />
-    </Fragment>
-  )
-}
-
-
-
-function Handle({
-  domain: [min, max],
+function Handle({ // your handle component
   handle: { id, value, percent },
-  getHandleProps,
+  getHandleProps
 }) {
   return (
-    <Fragment>
-      <div
-        style={{
-          top: `${percent}%`,
-          position: 'absolute',
-          transform: 'translate(-50%, -50%)',
-          WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-          zIndex: 5,
-          width: 21,
-          height: 14,
-          cursor: 'pointer',
-          // border: '1px solid white',
-          backgroundColor: 'none',
-        }}
-        {...getHandleProps(id)}
-      />
-      <div
-        role="slider"
-        aria-valuemin={min}
-        aria-valuemax={max}
-        aria-valuenow={value}
-        style={{
-          top: `${percent}%`,
-          position: 'absolute',
-          transform: 'translate(-50%, -50%)',
-          zIndex: 2,
-          width: 12,
-          height: 12,
-          borderRadius: '50%',
-          boxShadow: '1px 1px 1px 1px rgba(0, 0, 0, 0.3)',
-          backgroundColor: 'green',
-        }}
-      />
-    </Fragment>
+    <div
+      style={{
+        left: `${percent}%`,
+        position: 'absolute',
+        marginLeft: -5.5,
+        marginTop: 33,
+        zIndex: 2,
+        width: 15,
+        height: 15,
+        border: 0,
+        textAlign: 'center',
+        cursor: 'pointer',
+        borderRadius: '50%',
+        backgroundColor: 'green',
+        color: '#333',
+      }}
+      {...getHandleProps(id)}
+    >
+    </div>
   )
 }
 
 
-function Track({ source, target, getTrackProps }) {
+function Track({ source, target, getTrackProps }) { // your own track component
   return (
     <div
       style={{
         position: 'absolute',
+        height: 10,
         zIndex: 1,
-        backgroundColor: 'green',
-        borderRadius: 7,
+        marginTop: 35,
+        backgroundColor: '#145814',
+        borderRadius: 5,
         cursor: 'pointer',
-        width: 7,
-        transform: 'translate(-50%, 0%)',
-        top: `${source.percent}%`,
-        height: `${target.percent - source.percent}%`,
+        left: `${source.percent}%`,
+        width: `${target.percent - source.percent}%`,
       }}
-      {...getTrackProps()}
+      {...getTrackProps()} // this will set up events if you want it to be clickeable (optional)
     />
   )
 }

@@ -42,7 +42,7 @@ export default class NowPlaying extends Component {
               <div onClick={this.props.onPreviousSong} className="arrow-left"></div>
               <div onClick={this.props.onPlayPause} id="play-pause" className={playerState.paused ? "button play": "button pause"} alt="play-pause-button"></div>
               <div onClick={this.props.onNextSong} className="arrow-right"></div>
-              <VolumeSlider onChangeVolume={this.props.onChangeVolume}/>
+              <VolumeSlider className="volume-slider" onChangeVolume={this.props.onChangeVolume}/>
             </div>
             <ProgressBar position={position_ms} duration={duration_ms}/>
           </div>

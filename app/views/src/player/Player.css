@@ -139,3 +139,25 @@ body {
 .progress-bar {
 	background-color: #008f0c;
 }
+
+.unmute {
+	color: green;
+	position: absolute;
+	right: -45px;
+	top: 24px;
+}
+
+.volume-slider {
+	display: none;
+	position: absolute;
+	width: 100px;
+	top: 0px;
+	margin-left: 75px;
+
+}
+
+@media only screen and (min-width: 768px) {
+	.volume-slider {
+		display: inline-block;
+	}
+}

@@ -19,7 +19,7 @@ export default function DisabledPlayer(props) {
           <div className="arrow-left disabled"></div>
           <div id="play-pause" className="button play disabled" alt="play-pause-button"></div>
           <div className="arrow-right disabled"></div>
-          <VolumeSlider disabled={true}/>
+          <VolumeSlider className="volume-slider disabled" disabled={true}/>
         </div>
         <ProgressBar position={0} duration={100} />
       </div>
