@@ -48,15 +48,21 @@ export default class Player extends Component {
   }
 
   nextSong = async() => {
-    let options = {device_id: this.state.userDeviceId};
-    let SDK = await this.getSDK();
+    const options = {device_id: this.state.userDeviceId};
+    const SDK = await this.getSDK();
     SDK.skipToNext(options);
   }
 
   previousSong = async() => {
-    let options = {device_id: this.state.userDeviceId};
-    let SDK = await this.getSDK();
+    const options = {device_id: this.state.userDeviceId};
+    const SDK = await this.getSDK();
     SDK.skipToPrevious(options);
+  }
+
+  changeVolume = async(volume) => {
+    const options = {device_id: this.state.userDeviceId};
+    const SDK = await this.getSDK();
+    SDK.setVolume(volume, options);
   }
 
   getSDK = async() => {
@@ -140,6 +146,7 @@ export default class Player extends Component {
                       onPlayPause={this.onPlayPause}
                       onNextSong={this.nextSong}
                       onPreviousSong={this.previousSong}
+                      onChangeVolume={this.changeVolume}
                     />
                   </Fragment>
                 </div>

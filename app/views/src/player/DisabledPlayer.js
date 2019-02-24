@@ -1,5 +1,6 @@
 import React from "react";
 import ProgressBar from "./ProgressBar";
+import VolumeSlider from "./VolumeSlider";
 
 export default function DisabledPlayer(props) {
   return (
@@ -18,8 +19,9 @@ export default function DisabledPlayer(props) {
           <div className="arrow-left disabled"></div>
           <div id="play-pause" className="button play disabled" alt="play-pause-button"></div>
           <div className="arrow-right disabled"></div>
+          <VolumeSlider disabled={true}/>
         </div>
-        <ProgressBar position={0} duration={100}/>
+        <ProgressBar position={0} duration={100} />
       </div>
     </div>
   );
