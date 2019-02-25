@@ -41,7 +41,7 @@ class VolumeSlider extends React.Component {
         onChange={this.onChange}
         disabled={this.props.disabled}
       >
-      <Octicon className="unmute" name="unmute" mega/>
+      <Octicon className="unmute" name="unmute"/>
         <Rail>
           {({ getRailProps }) => (  // adding the rail props sets up events on the rail
             <div style={railStyle} {...getRailProps()} />

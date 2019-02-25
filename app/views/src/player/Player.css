@@ -1,14 +1,14 @@
 
 body {
 	/* Margin bottom by footer height plus the margin between other stuff*/
-	margin-bottom: 200px;
+	margin-bottom: 175px;
 }
 
 .footer {
 	bottom: 0;
 	width: 100%;
 	/* Set the fixed height of the footer here */
-	height: 150px;
+	height: 125px;
 	/* Vertically center the text there */
 	/* line-height: 60px; */
 	background-color: black;
@@ -34,6 +34,8 @@ body {
 
 .controls {
 	padding-bottom: 10px;
+	display: flex;
+	justify-content: center;
 }
 
 .button.play {
@@ -66,57 +68,36 @@ body {
 
 .arrow-left {
 	display: inline-block;
-	text-align: center;
 	margin-right: 40px;
+	margin-top: 5px;
 	width: 0; 
 	height: 0; 
 	border-top: 10px solid transparent;
 	border-bottom: 10px solid transparent; 
 	border-right:10px solid #008f0c;
-	margin-bottom: 5px;
 	cursor: pointer;
+}
+
+.arrow-left.disabled {
+	border-right:10px solid #3f4041;
+	cursor: not-allowed;
 }
 
 .arrow-right {
 	display: inline-block;
-	text-align: center;
 	margin-left: 40px;
-
+	margin-top: 5px;
 	width: 0; 
 	height: 0; 
 	border-top: 10px solid transparent;
 	border-bottom: 10px solid transparent;
 	
 	border-left: 10px solid #008f0c;
-	margin-bottom: 5px;
 	cursor: pointer;
 }
 
 .arrow-right.disabled {
-	display: inline-block;
-	text-align: center;
-	margin-left: 40px;
-
-	width: 0; 
-	height: 0; 
-	border-top: 10px solid transparent;
-	border-bottom: 10px solid transparent;
-	
 	border-left: 10px solid #3f4041;
-	margin-bottom: 5px;
-	cursor: not-allowed;
-}
-
-.arrow-left.disabled {
-	display: inline-block;
-	text-align: center;
-	margin-right: 40px;
-	width: 0; 
-	height: 0; 
-	border-top: 10px solid transparent;
-	border-bottom: 10px solid transparent; 
-	border-right:10px solid #3f4041;
-	margin-bottom: 5px;
 	cursor: not-allowed;
 }
 
@@ -140,11 +121,12 @@ body {
 	background-color: #008f0c;
 }
 
-.unmute {
+.octicon.unmute {
 	color: green;
 	position: absolute;
 	right: -45px;
-	top: 24px;
+	top: 30px;
+	font-size: 20px;
 }
 
 .volume-slider {
@@ -152,12 +134,55 @@ body {
 	position: absolute;
 	width: 100px;
 	top: 0px;
-	margin-left: 75px;
+	margin-left: 200px;
+}
 
+.slider-handles > div#volume-slider-handle {
+	position: 'absolute';
+	margin-left: -5.5;
+	margin-top: 33;
+	z-index: 2;
+	width: 15;
+	height: 15;
+	border: 0;
+	text-align: 'center';
+	cursor: 'pointer';
+	border-radius: '50%';
+	background-color: 'green';
+	color: '#333';
 }
 
 @media only screen and (min-width: 768px) {
 	.volume-slider {
 		display: inline-block;
 	}
+}
+
+.octicon.repeat {
+	cursor: pointer;
+	margin-right: 75px;
+	margin-left: -75px;
+	margin-top: 5px;
+	font-size: 20px;
+}
+
+.octicon.repeat.context {
+	color: green;
+}
+
+.octicon.repeat.track {
+	color: green;
+}
+
+.octicon.repeat.disabled {
+	color: #3f4041;
+	cursor: not-allowed;
+}
+
+.octicon.repeat.track::after {
+	position: absolute;
+	content: "1";
+	color: green;
+	font-size: 12px;
+	font-weight: 700;
 }

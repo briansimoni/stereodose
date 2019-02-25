@@ -1,6 +1,7 @@
 import React from "react";
 import ProgressBar from "./ProgressBar";
 import VolumeSlider from "./VolumeSlider";
+import RepeatButton from "./RepeatButton";
 
 export default function DisabledPlayer(props) {
   return (
@@ -16,6 +17,7 @@ export default function DisabledPlayer(props) {
       <div className="col-md-8 text-center">
         <br />
         <div className="controls">
+          <RepeatButton/>
           <div className="arrow-left disabled"></div>
           <div id="play-pause" className="button play disabled" alt="play-pause-button"></div>
           <div className="arrow-right disabled"></div>

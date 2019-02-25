@@ -38,7 +38,7 @@ export default class Player extends Component {
 
   onPlayPause = async () => {
     let SDK = await this.getSDK();
-    let options = {device_id: this.state.userDeviceId};
+    let options = { device_id: this.state.userDeviceId };
     let paused = this.state.playerState.paused;
     if (paused) {
       SDK.play(options);
@@ -47,25 +47,43 @@ export default class Player extends Component {
     }
   }
 
-  nextSong = async() => {
-    const options = {device_id: this.state.userDeviceId};
+  nextSong = async () => {
+    const options = { device_id: this.state.userDeviceId };
     const SDK = await this.getSDK();
     SDK.skipToNext(options);
   }
 
-  previousSong = async() => {
-    const options = {device_id: this.state.userDeviceId};
+  previousSong = async () => {
+    const options = { device_id: this.state.userDeviceId };
     const SDK = await this.getSDK();
     SDK.skipToPrevious(options);
   }
 
-  changeVolume = async(volume) => {
-    const options = {device_id: this.state.userDeviceId};
+  changeVolume = async (volume) => {
+    const options = { device_id: this.state.userDeviceId };
     const SDK = await this.getSDK();
     SDK.setVolume(volume, options);
   }
 
-  getSDK = async() => {
+  changeRepeatMode = async () => {
+    const repeatMode = this.state.playerState.repeat_mode;
+    const options = { device_id: this.state.userDeviceId };
+    const SDK = await this.getSDK();
+    console.log(repeatMode);
+
+    switch (repeatMode) {
+      case 0: // off
+        SDK.setRepeat('context', options);
+        break;
+      case 1: // context
+        SDK.setRepeat('track', options);
+        break;
+      default: // 3 is track
+        SDK.setRepeat('off', options);
+    }
+  }
+
+  getSDK = async () => {
     let SDK = new Spotify();
     let token;
     try {
@@ -110,7 +128,7 @@ export default class Player extends Component {
 
           <footer className="footer fixed-bottom">
             <div className="container-fluid">
-              <h2 onClick={ () => {window.location = "/auth/login"} } id="player-message-not-signed-in">{authError.message}</h2>
+              <h2 onClick={() => { window.location = "/auth/login" }} id="player-message-not-signed-in">{authError.message}</h2>
             </div>
           </footer>
         }
@@ -124,7 +142,7 @@ export default class Player extends Component {
             {!playerSelected &&
               <footer className="footer fixed-bottom">
                 <div className="container-fluid">
-                  <DisabledPlayer/>
+                  <DisabledPlayer />
                 </div>
               </footer>
             }
@@ -132,7 +150,7 @@ export default class Player extends Component {
             {playerLoaded && playerSelected && !playerState &&
               <footer className="footer fixed-bottom">
                 <div className="container-fluid">
-                  <DisabledPlayer/>
+                  <DisabledPlayer />
                 </div>
               </footer>
             }
@@ -141,12 +159,13 @@ export default class Player extends Component {
               <footer className="footer fixed-bottom">
                 <div className="container-fluid">
                   <Fragment>
-                    <NowPlayingScreen 
+                    <NowPlayingScreen
                       playerState={playerState}
                       onPlayPause={this.onPlayPause}
                       onNextSong={this.nextSong}
                       onPreviousSong={this.previousSong}
                       onChangeVolume={this.changeVolume}
+                      onChangeRepeat={this.changeRepeatMode}
                     />
                   </Fragment>
                 </div>
