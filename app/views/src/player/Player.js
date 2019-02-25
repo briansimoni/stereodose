@@ -69,16 +69,15 @@ export default class Player extends Component {
     const repeatMode = this.state.playerState.repeat_mode;
     const options = { device_id: this.state.userDeviceId };
     const SDK = await this.getSDK();
-    console.log(repeatMode);
 
     switch (repeatMode) {
-      case 0: // off
+      case 0: // 0 is off
         SDK.setRepeat('context', options);
         break;
-      case 1: // context
+      case 1: // 1 is context
         SDK.setRepeat('track', options);
         break;
-      default: // 3 is track
+      default: // 2 is track
         SDK.setRepeat('off', options);
     }
   }
