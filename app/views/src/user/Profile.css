@@ -38,3 +38,7 @@ span.nav-link {
 .navbar-dark .navbar-nav .nav-link {
     color: #008f0c;
 }
+
+.ReactCrop {
+	width: 100%;
+}

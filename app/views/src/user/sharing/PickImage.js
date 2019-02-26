@@ -12,10 +12,7 @@ export default class PickImage extends React.Component {
     fileInputRef: React.createRef(),
     src: null,
     crop: {
-      aspect: 1,
-      width: 50,
-      x: 0,
-      y: 0,
+      aspect: 1
     },
   }
 
