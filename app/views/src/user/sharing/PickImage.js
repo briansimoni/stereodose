@@ -4,7 +4,7 @@ import 'react-image-crop/dist/ReactCrop.css';
 
 // PickImage presents a way to upload and crop an image to predetermined aspect ratio
 // When the user crops the image, it sets a blob value in the parent component
-// Using a lot of code from the example referenced https://github.com/DominicTobias/react-image-crop
+// Using a lot of code from the example referenced on https://github.com/DominicTobias/react-image-crop
 // https://codesandbox.io/s/72py4jlll6
 export default class PickImage extends React.Component {
 

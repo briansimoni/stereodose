@@ -136,7 +136,7 @@ class ShareSpotifyPlaylist extends React.Component {
       throw new Error(`Problem uploading image, ${errorMessage} ${response.status}: ${response.statusText}`);
     }
     const json = await response.json();
-    return json.imageURL;
+    return json;
   }
 
   shareToStereodose = async () => {
@@ -145,7 +145,7 @@ class ShareSpotifyPlaylist extends React.Component {
       return;
     }
     this.setState({ inFlight: true });
-    const imageURL = await this.uploadImage(this.state.imageBlob);
+    const { imageURL, thumbnailURL } = await this.uploadImage(this.state.imageBlob);
 
     const { selectedPlaylist, selectedMood, selectedDrug } = this.state;
     let resp = await fetch(`/api/playlists/`, {
@@ -155,7 +155,8 @@ class ShareSpotifyPlaylist extends React.Component {
         SpotifyID: selectedPlaylist.id,
         Category: selectedDrug,
         Subcategory: selectedMood,
-        ImageURL: imageURL
+        ImageURL: imageURL,
+        ThumbnailURL: thumbnailURL
       })
     });
     if (resp.status !== 201) {

@@ -19,7 +19,7 @@ type PlaylistService interface {
 	GetByID(ID string) (*Playlist, error)
 	GetMyPlaylists(user User) ([]Playlist, error)
 	// TODO: reafactor this to take a Playlist struct instead of a ton of strings
-	CreatePlaylistBySpotifyID(user User, playlistID, category, subCategory, image string) (*Playlist, error)
+	CreatePlaylistBySpotifyID(user User, playlistID, category, subCategory, image, thumbnail string) (*Playlist, error)
 	DeletePlaylist(spotifyID string) error
 }
 
@@ -98,7 +98,7 @@ func (s *StereodosePlaylistService) GetMyPlaylists(user User) ([]Playlist, error
 
 // CreatePlaylistBySpotifyID is given a user and playlistID
 // It uses the information to call the Spotify API and save the information to the local db
-func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlistID, category, subCategory, image string) (*Playlist, error) {
+func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlistID, category, subCategory, image, thumbnail string) (*Playlist, error) {
 	// 1. get the tracks for the playlist
 	// 2. create playlist, add tracks
 	// 3. add to db
@@ -118,17 +118,18 @@ func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlis
 		return nil, err
 	}
 	playlist := &Playlist{
-		SpotifyID:      string(list.ID),
-		Collaborative:  list.Collaborative,
-		Endpoint:       list.Endpoint,
-		Name:           list.Name,
-		IsPublic:       list.IsPublic,
-		SnapshotID:     list.SnapshotID,
-		URI:            string(list.URI),
-		UserID:         user.ID,
-		Category:       category,
-		SubCategory:    subCategory,
-		BucketImageURL: image,
+		SpotifyID:          string(list.ID),
+		Collaborative:      list.Collaborative,
+		Endpoint:           list.Endpoint,
+		Name:               list.Name,
+		IsPublic:           list.IsPublic,
+		SnapshotID:         list.SnapshotID,
+		URI:                string(list.URI),
+		UserID:             user.ID,
+		Category:           category,
+		SubCategory:        subCategory,
+		BucketImageURL:     image,
+		BucketThumbnailURL: thumbnail,
 	}
 	for _, image := range list.Images {
 		playlist.Images = append(playlist.Images, PlaylistImage{Image: image})

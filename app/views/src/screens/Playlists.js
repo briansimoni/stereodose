@@ -48,11 +48,11 @@ class Playlists extends React.Component {
             return (
               <div className="row" key={index}>
                 {row.map((playlist) => {
-                  const bucketImageURL = playlist.bucketImageURL ? playlist.bucketImageURL : "https://via.placeholder.com/250x200";
+                  const thumbnailImageURL = playlist.bucketThumbnailURL ? playlist.bucketThumbnailURL : "https://via.placeholder.com/250x200";
                   return (
                     <div className="col-md-4" key={playlist.spotifyID}>
                       <Link to={`${match.url}/${playlist.spotifyID}`}>
-                        <img src={bucketImageURL} alt="playlist-artwork" />
+                        <img src={thumbnailImageURL} alt="playlist-artwork" />
                       </Link>
 
                       <Link to={`${match.url}/${playlist.spotifyID}`}>

@@ -1,15 +1,21 @@
 package controllers
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"image"
+	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
 
 	// register jpeg type
+	"image/jpeg"
 	_ "image/jpeg"
+
 	// register png type
 	_ "image/png"
 	// register gif type
@@ -19,6 +25,7 @@ import (
 
 	"github.com/briansimoni/stereodose/app/models"
 	"github.com/briansimoni/stereodose/app/util"
+	"github.com/disintegration/imaging"
 	"github.com/google/go-cloud/blob"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -99,10 +106,11 @@ func (p *PlaylistsController) GetMyPlaylists(w http.ResponseWriter, r *http.Requ
 // TODO: return 409 conflict instead of 500 error if playlist already exists
 func (p *PlaylistsController) CreatePlaylist(w http.ResponseWriter, r *http.Request) error {
 	type jsonBody struct {
-		SpotifyID   string `json:"SpotifyID"`
-		Category    string `json:"Category"`
-		SubCategory string `json:"SubCategory"`
-		ImageURL    string `json:"ImageURL"`
+		SpotifyID    string `json:"SpotifyID"`
+		Category     string `json:"Category"`
+		SubCategory  string `json:"SubCategory"`
+		ImageURL     string `json:"ImageURL"`
+		ThumbnailURL string `json:"ThumbnailURL"`
 	}
 	var data jsonBody
 	defer r.Body.Close()
@@ -125,7 +133,7 @@ func (p *PlaylistsController) CreatePlaylist(w http.ResponseWriter, r *http.Requ
 		return errors.New("Unable to obtain user from session")
 	}
 
-	_, err = p.DB.Playlists.CreatePlaylistBySpotifyID(user, data.SpotifyID, data.Category, data.SubCategory, data.ImageURL)
+	_, err = p.DB.Playlists.CreatePlaylistBySpotifyID(user, data.SpotifyID, data.Category, data.SubCategory, data.ImageURL, data.ThumbnailURL)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -179,9 +187,10 @@ func (p *PlaylistsController) DeletePlaylist(w http.ResponseWriter, r *http.Requ
 // UploadImage saves an image the corresponds to a playlist
 // The actual data is saved to cloud bucket storage
 // A permalink to the object is stored in the database and returned to the client
-// TODO: resize to optimal dimensions
+// TODO: refactor this so it's not butt ugly
+// TODO: upload/resize images in parallel
 func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request) error {
-	data, header, err := r.FormFile("playlist-image")
+	multipartFile, header, err := r.FormFile("playlist-image")
 	if err != nil {
 		return err
 	}
@@ -194,14 +203,28 @@ func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request
 		}
 	}
 
-	opts := &blob.WriterOptions{}
-	image, err := ioutil.ReadAll(data)
+	// here we create a space in memory to copy the image
+	buffer := new(bytes.Buffer)
+	// we use tee reader so I can ioutil.ReadAll, and then read again from buffer later
+	reader := io.TeeReader(multipartFile, buffer)
+	imageCopy, err := jpeg.Decode(reader)
 	if err != nil {
+		return err
+	}
+	resizedImage := imaging.Resize(imageCopy, 250, 200, imaging.Lanczos)
+	imageDataCopy := new(bytes.Buffer)
+	err = jpeg.Encode(imageDataCopy, resizedImage, nil)
+	if err != nil {
+		return err
+	}
+	imageData, err := ioutil.ReadAll(buffer)
+	if err != nil {
+		log.Println(err.Error())
 		return err
 	}
 
 	// Only allow web-safe image files
-	actualContentType := http.DetectContentType(image)
+	actualContentType := http.DetectContentType(imageData)
 	validContentTypes := []string{
 		"image/jpeg",
 		"image/jpg",
@@ -230,8 +253,10 @@ func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request
 
 	// the images/ prefix is the target folder inside of the bucket
 	imageName := fmt.Sprintf("images/%s-%s.%s", id, playlistID, suffix)
+	thumbNailName := fmt.Sprintf("images/%s-%s-thumbnail.%s", id, playlistID, suffix)
+	opts := &blob.WriterOptions{}
 	ctx := context.Background()
-	err = p.Bucket.WriteAll(ctx, imageName, image, opts)
+	err = p.Bucket.WriteAll(ctx, imageName, imageData, opts)
 	if err != nil {
 		return &statusError{
 			Message: fmt.Sprintf("Error uploading to S3 bucket: %s", err.Error()),
@@ -239,14 +264,21 @@ func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request
 		}
 	}
 
+	err = p.uploadImage(imageDataCopy.Bytes(), thumbNailName)
+	if err != nil {
+		return err
+	}
+
 	// write some useful JSON back
 	imageCreatedResponse := struct {
-		Status   int    `json:"status"`
-		ImageURL string `json:"imageURL"`
+		Status       int    `json:"status"`
+		ImageURL     string `json:"imageURL"`
+		ThumbNailURL string `json:"thumbnailURL"`
 	}{
 		Status: http.StatusCreated,
 		// TODO: somehow not hardcode this
-		ImageURL: "https://s3.amazonaws.com/stereodose/" + imageName,
+		ImageURL:     "https://s3.amazonaws.com/stereodose/" + imageName,
+		ThumbNailURL: "https://s3.amazonaws.com/stereodose/" + thumbNailName,
 	}
 
 	w.WriteHeader(http.StatusCreated)
@@ -266,4 +298,8 @@ func (p *PlaylistsController) uploadImage(img []byte, imageName string) error {
 		}
 	}
 	return nil
+}
+
+func convert(image image.Image) *image.NRGBA {
+	return imaging.Resize(image, 100, 100, imaging.Lanczos)
 }
