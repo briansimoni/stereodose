@@ -46,6 +46,14 @@
   version = "v1.15.67"
 
 [[projects]]
+  digest = "1:47cebe27e59e4e0c239d0bf2419d6a46f0364a56efc43be702c32b82710b6ecf"
+  name = "github.com/disintegration/imaging"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "5362c131d56305ce787e79a5b94ffc956df00d62"
+  version = "v1.6.0"
+
+[[projects]]
   digest = "1:97df918963298c287643883209a2c3f642e6593379f97ab400c2a2e219ab647d"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
@@ -177,13 +185,12 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:e07483c90d27239c7121fb733d0a6c42ab229f67ecf0c2edcceb13ef1599d8a5"
+  digest = "1:acadbbf02e5c744709c60ac929e63258a69a3404ab36ed0c1a245cc28f056220"
   name = "golang.org/x/image"
   packages = [
-    "riff",
-    "vp8",
-    "vp8l",
-    "webp",
+    "bmp",
+    "tiff",
+    "tiff/lzw",
   ]
   pruneopts = "UT"
   revision = "cd38e8056d9b27bb2f265effa37fb0ea6b8a7f0f"
@@ -234,6 +241,7 @@
     "github.com/aws/aws-sdk-go/aws",
     "github.com/aws/aws-sdk-go/aws/credentials",
     "github.com/aws/aws-sdk-go/aws/session",
+    "github.com/disintegration/imaging",
     "github.com/google/go-cloud/blob",
     "github.com/google/go-cloud/blob/s3blob",
     "github.com/google/uuid",
@@ -245,7 +253,6 @@
     "github.com/jinzhu/gorm/dialects/postgres",
     "github.com/pkg/errors",
     "github.com/zmb3/spotify",
-    "golang.org/x/image/webp",
     "golang.org/x/oauth2",
     "golang.org/x/oauth2/spotify",
   ]

@@ -14,14 +14,6 @@ import (
 
 	// register jpeg type
 	"image/jpeg"
-	_ "image/jpeg"
-
-	// register png type
-	_ "image/png"
-	// register gif type
-	_ "image/gif"
-	// register webp type
-	_ "golang.org/x/image/webp"
 
 	"github.com/briansimoni/stereodose/app/models"
 	"github.com/briansimoni/stereodose/app/util"
