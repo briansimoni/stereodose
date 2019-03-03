@@ -3,8 +3,13 @@ package controllers
 import (
 	"bytes"
 	"context"
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
+	"image"
+	"image/color"
+	"image/jpeg"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -12,9 +17,44 @@ import (
 
 	"github.com/briansimoni/stereodose/app/models"
 	"github.com/briansimoni/stereodose/app/util"
+	"github.com/google/go-cloud/blob"
+	"github.com/google/go-cloud/blob/driver"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 )
+
+type fakeWriteCloser struct {
+}
+
+func (w fakeWriteCloser) Write(p []byte) (n int, err error) {
+	if len(p) == 0 {
+		return 0, errors.New("unable to write to blob storage")
+	}
+	return len(p), nil
+}
+func (w fakeWriteCloser) Close() error {
+	return nil
+}
+
+// fakeBucket is used to compose the fake controller
+type fakeBucket struct{}
+
+func (f fakeBucket) Attributes(ctx context.Context, key string) (driver.Attributes, error) {
+	return driver.Attributes{}, errors.New("Attributes not implemented")
+}
+func (f fakeBucket) NewRangeReader(ctx context.Context, key string, offset, length int64) (driver.Reader, error) {
+	return nil, errors.New("NewRangeReader not implemented")
+}
+func (f fakeBucket) NewTypedWriter(ctx context.Context, key string, contentType string, opt *driver.WriterOptions) (driver.Writer, error) {
+	fakeWriter := &fakeWriteCloser{}
+	return fakeWriter, nil
+}
+func (f fakeBucket) Delete(ctx context.Context, key string) error {
+	return nil
+}
+func (f fakeBucket) WriteAll(ctx context.Context, key string, data []byte, options *blob.WriterOptions) error {
+	return errors.New("WriteAll not implemented")
+}
 
 // fake playlist service
 type fakePlaylistService struct {
@@ -44,7 +84,7 @@ func (f *fakePlaylistService) GetByID(ID string) (*models.Playlist, error) {
 	return playlist, nil
 }
 
-func (f *fakePlaylistService) CreatePlaylistBySpotifyID(user models.User, spotifyID, category, subcategory, image string) (*models.Playlist, error) {
+func (f *fakePlaylistService) CreatePlaylistBySpotifyID(user models.User, spotifyID, category, subcategory, image, thumbnailImage string) (*models.Playlist, error) {
 	if spotifyID == "alreadyExists" {
 		return nil, errors.New("Playlist with this id already exists")
 	}
@@ -76,6 +116,7 @@ var controller = &PlaylistsController{
 	DB: &models.StereoDoseDB{
 		Playlists: &fakePlaylistService{},
 	},
+	Bucket: blob.NewBucket(fakeBucket{}),
 }
 
 func TestPlaylistsController_GetPlaylistByID(t *testing.T) {
@@ -276,4 +317,87 @@ func TestPlaylistsController_DeletePlaylist(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestPlaylistsController_uploadImage(t *testing.T) {
+	var fakeImageData = make([]byte, 100)
+	_, err := rand.Read(fakeImageData)
+	if err != nil {
+		t.Fatal("Failed to create random fake image ", err.Error())
+	}
+
+	type args struct {
+		img       []byte
+		imageName string
+	}
+	tests := []struct {
+		name    string
+		p       *PlaylistsController
+		args    args
+		wantErr bool
+	}{
+		{name: "Normal Image", p: controller, args: args{img: fakeImageData, imageName: "playlist-image.jpeg"}, wantErr: false},
+		{name: "No image data", p: controller, args: args{img: []byte{}, imageName: ""}, wantErr: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.p.uploadImage(tt.args.img, tt.args.imageName); (err != nil) != tt.wantErr {
+				t.Errorf("PlaylistsController.uploadImage() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestPlaylistsController_UploadImage(t *testing.T) {
+	// var testRouter = &util.AppRouter{mux.NewRouter()}
+	type args struct {
+		w http.ResponseWriter
+		r *http.Request
+	}
+
+	req, err := newMultiPartUploadRequest()
+	if err != nil {
+		t.Fatal("Error creating multi-part upload request", err.Error())
+	}
+
+	tests := []struct {
+		name    string
+		p       *PlaylistsController
+		args    args
+		wantErr bool
+	}{
+		{name: "normal run", p: controller, args: args{w: httptest.NewRecorder(), r: req}, wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.p.UploadImage(tt.args.w, tt.args.r); (err != nil) != tt.wantErr {
+				t.Errorf("PlaylistsController.UploadImage() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func newMultiPartUploadRequest() (*http.Request, error) {
+	// Create an 100 x 50 image
+	img := image.NewRGBA(image.Rect(0, 0, 100, 50))
+	xMax := img.Bounds().Dx()
+	yMax := img.Bounds().Dy()
+	for x := 0; x < xMax; x++ {
+		for y := 0; y < yMax; y++ {
+			img.Set(x, y, color.RGBA{255, 0, 0, 255})
+		}
+	}
+
+	body := new(bytes.Buffer)
+	writer := multipart.NewWriter(body)
+	defer writer.Close()
+	formFile, err := writer.CreateFormFile("playlist-image", "image.jpeg")
+	jpeg.Encode(formFile, img, nil)
+
+	req, err := http.NewRequest(http.MethodPost, "/api/playlists/1/image", body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	return req, nil
 }

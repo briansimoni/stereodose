@@ -5,12 +5,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"image"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
+	"sync"
 
 	// register jpeg type
 	"image/jpeg"
@@ -178,9 +178,8 @@ func (p *PlaylistsController) DeletePlaylist(w http.ResponseWriter, r *http.Requ
 
 // UploadImage saves an image the corresponds to a playlist
 // The actual data is saved to cloud bucket storage
-// A permalink to the object is stored in the database and returned to the client
-// TODO: refactor this so it's not butt ugly
-// TODO: upload/resize images in parallel
+// Permalinks are returned to the client. The following request (CreatePlaylist) saves the playlist
+// along with the permalinks to the database.
 func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request) error {
 	multipartFile, header, err := r.FormFile("playlist-image")
 	if err != nil {
@@ -246,17 +245,19 @@ func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request
 	// the images/ prefix is the target folder inside of the bucket
 	imageName := fmt.Sprintf("images/%s-%s.%s", id, playlistID, suffix)
 	thumbNailName := fmt.Sprintf("images/%s-%s-thumbnail.%s", id, playlistID, suffix)
-	opts := &blob.WriterOptions{}
-	ctx := context.Background()
-	err = p.Bucket.WriteAll(ctx, imageName, imageData, opts)
-	if err != nil {
-		return &statusError{
-			Message: fmt.Sprintf("Error uploading to S3 bucket: %s", err.Error()),
-			Code:    http.StatusInternalServerError,
-		}
-	}
 
-	err = p.uploadImage(imageDataCopy.Bytes(), thumbNailName)
+	// upload the images in parallel for a small performance boost
+	wg := sync.WaitGroup{}
+	wg.Add(2)
+	go func() {
+		err = p.uploadImage(imageData, imageName)
+		wg.Done()
+	}()
+	go func() {
+		err = p.uploadImage(imageDataCopy.Bytes(), thumbNailName)
+		wg.Done()
+	}()
+	wg.Wait()
 	if err != nil {
 		return err
 	}
@@ -290,8 +291,4 @@ func (p *PlaylistsController) uploadImage(img []byte, imageName string) error {
 		}
 	}
 	return nil
-}
-
-func convert(image image.Image) *image.NRGBA {
-	return imaging.Resize(image, 100, 100, imaging.Lanczos)
 }
