@@ -26,9 +26,10 @@ RUN rm -rf node_modules
 
 # Finally, take both artifacts and copy to a small, production ready image
 FROM alpine:latest  
-RUN apk --no-cache add ca-certificates
+RUN apk --no-cache add ca-certificates && apk --no-cache add curl
 WORKDIR /stereodose/
 COPY --from=node /stereodose/ .
+HEALTHCHECK CMD curl --fail localhost:${PORT}/api/health/ || exit 1
 CMD ["./stereodose"]
 
 

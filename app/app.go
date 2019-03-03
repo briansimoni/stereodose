@@ -59,31 +59,22 @@ func createRouter(c *config.Config) *util.AppRouter {
 		return handlers.LoggingHandler(os.Stdout, next)
 	})
 
-	// TODO: just move all the files that have to be served from "/" to their own handler funcs
-	// // For a progressive web app to work with a service worker not served from
-	// // the "/" directory we have to do this.
-	// // See https://www.w3.org/TR/service-workers-1/#extended-http-headers
-	// app.Use(func(next http.Handler) http.Handler {
-	// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	// 		if r.URL.Path == "/public/service-worker.js" {
-	// 			w.Header().Add("Service-Worker-Allowed", "/")
-	// 		}
-	// 		next.ServeHTTP(w, r)
-	// 	})
-	// })
-
 	categories := controllers.NewCategoriesController()
 	users := controllers.NewUsersController(stereoDoseDB)
 	playlists := controllers.NewPlaylistsController(stereoDoseDB, cloudBucket)
 	auth := controllers.NewAuthController(stereoDoseDB, store, c)
+	health := controllers.NewHealthController()
 
 	// Serve all of the static files
 	fs := http.StripPrefix("/public/", http.FileServer(http.Dir("app/views/build/")))
 	app.PathPrefix("/public/").Handler(fs)
 
-	app.HandleFunc("/robots.txt", serveRobotsTxt)
-	app.HandleFunc("/manifest.json", serveManifest)
-	app.HandleFunc("/sw.js", serveServiceWorker)
+	app.HandleFunc("/robots.txt", serveFile(robotsTXT, nil))
+	app.HandleFunc("/manifest.json", serveFile(manifest, nil))
+	app.HandleFunc("/sw.js", serveFile(manifest, map[string]string{"Content-Type": "application/javascript"}))
+
+	healthRouter := util.AppRouter{app.PathPrefix("/api/health").Subrouter()}
+	healthRouter.AppHandler("/", health.CheckHealth).Methods(http.MethodGet)
 
 	authRouter := util.AppRouter{app.PathPrefix("/auth").Subrouter()}
 	authRouter.AppHandler("/login", auth.Login).Methods(http.MethodGet)
@@ -120,12 +111,12 @@ func createRouter(c *config.Config) *util.AppRouter {
 	categoriesRouter := util.AppRouter{app.PathPrefix("/api/categories").Subrouter()}
 	categoriesRouter.AppHandler("/", categories.GetAvailableCategories).Methods(http.MethodGet)
 
-	app.HandleFunc("/", serveReactApp)
+	app.HandleFunc("/", serveFile(indexHTML, nil))
 	// Serving the React app on 404's enables the use of arbitrary routes with react browser-router
 	// Otherwise a requet to /some/arbitrary/path from a different origin would simply 404
 	// Could use the hash router for a looser coupling but /#/some/path is ugly
-	app.HandleFunc("/{page1}", serveReactApp)
-	app.HandleFunc("/{page1}/{page2}", serveReactApp)
+	app.HandleFunc("/{page1}", serveFile(indexHTML, nil))
+	app.HandleFunc("/{page1}/{page2}", serveFile(indexHTML, nil))
 	app.NotFoundHandler = http.HandlerFunc(serveReactApp404)
 
 	return app
@@ -136,21 +127,14 @@ func serveReactApp404(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(indexHTML))
 }
 
-func serveReactApp(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, string(indexHTML))
-}
-
-func serveRobotsTxt(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, string(robotsTXT))
-}
-
-func serveManifest(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, string(manifest))
-}
-
-func serveServiceWorker(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/javascript")
-	fmt.Fprint(w, string(serviceWorker))
+// serve file takes file data and optionally headers and returns an http.Handler function
+func serveFile(data []byte, headers map[string]string) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		for key, value := range headers {
+			w.Header().Set(key, value)
+		}
+		fmt.Fprint(w, string(data))
+	}
 }
 
 // load the contents of index.html and robots.txt into memory only when the app starts up
@@ -197,12 +181,3 @@ func init() {
 		log.Fatalf("Unable to read contents of serviceworker.json %s", err.Error())
 	}
 }
-
-// could do this on a subrouter to handle auth for all routes
-// app.Use(func(next http.Handler) http.Handler {
-// 	return auth.Middleware(next.ServeHTTP)
-// })
-
-// app.Use(func(next http.Handler) http.Handler {
-// 	return auth.Middleware(next)
-// })
