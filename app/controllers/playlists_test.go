@@ -23,6 +23,13 @@ import (
 	"github.com/pkg/errors"
 )
 
+// io.Reader that always errors
+type errReader int
+
+func (errReader) Read(p []byte) (n int, err error) {
+	return 0, errors.New("test error")
+}
+
 type fakeWriteCloser struct {
 }
 
@@ -110,6 +117,13 @@ func (f *fakePlaylistService) GetMyPlaylists(user models.User) ([]models.Playlis
 }
 func (f *fakePlaylistService) DeletePlaylist(id string) error {
 	return nil
+}
+
+func (f *fakePlaylistService) Comment(playlistID, text string, user models.User) (*models.Comment, error) {
+	if text == "leet hacks" {
+		return nil, errors.New("wow something broke")
+	}
+	return nil, nil
 }
 
 var controller = &PlaylistsController{
@@ -349,7 +363,6 @@ func TestPlaylistsController_uploadImage(t *testing.T) {
 }
 
 func TestPlaylistsController_UploadImage(t *testing.T) {
-	// var testRouter = &util.AppRouter{mux.NewRouter()}
 	type args struct {
 		w http.ResponseWriter
 		r *http.Request
@@ -400,4 +413,81 @@ func newMultiPartUploadRequest() (*http.Request, error) {
 	}
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	return req, nil
+}
+
+func TestPlaylistsController_Comment(t *testing.T) {
+
+	testUser := models.User{}
+	testUser.ID = 1
+	testBody1 := bytes.NewReader([]byte(`{"text": "cool playlist bro"}`))
+	request1, err := http.NewRequest(http.MethodPost, "/api/playlists/1234/comment", testBody1)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	ctx1 := context.WithValue(request1.Context(), "User", testUser)
+	request1 = request1.WithContext(ctx1)
+
+	request2, err := http.NewRequest(http.MethodPost, "/api/playlists/1234/comment", testBody1)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	request3, err := http.NewRequest(http.MethodPost, "/api/playlists/1234/comment", errReader(0))
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	ctx3 := context.WithValue(request3.Context(), "User", testUser)
+	request3 = request3.WithContext(ctx3)
+
+	testBody4 := bytes.NewReader([]byte(`not valid json{} [] paisdjfpoj ""`))
+	request4, err := http.NewRequest(http.MethodPost, "/api/playlists/1234/comment", testBody4)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	ctx4 := context.WithValue(request4.Context(), "User", testUser)
+	request4 = request4.WithContext(ctx4)
+
+	testBody5 := bytes.NewReader([]byte(`{"text": ""}`))
+	request5, err := http.NewRequest(http.MethodPost, "/api/playlists/1234/comment", testBody5)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	ctx5 := context.WithValue(request5.Context(), "User", testUser)
+	request5 = request5.WithContext(ctx5)
+
+	testBody6 := bytes.NewReader([]byte(`{"text": "leet hacks"}`))
+	request6, err := http.NewRequest(http.MethodPost, "/api/playlists/1234/comment", testBody6)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	ctx6 := context.WithValue(request6.Context(), "User", testUser)
+	request6 = request6.WithContext(ctx6)
+
+	mux.SetURLVars(request1, map[string]string{"id": "1234"})
+
+	type args struct {
+		w http.ResponseWriter
+		r *http.Request
+	}
+
+	tests := []struct {
+		name    string
+		p       *PlaylistsController
+		args    args
+		wantErr bool
+	}{
+		{name: "normal test", p: controller, args: args{w: httptest.NewRecorder(), r: request1}, wantErr: false},
+		{name: "no authenticated user", p: controller, args: args{w: httptest.NewRecorder(), r: request2}, wantErr: true},
+		{name: "something wrong with the body", p: controller, args: args{w: httptest.NewRecorder(), r: request3}, wantErr: true},
+		{name: "invalid json", p: controller, args: args{w: httptest.NewRecorder(), r: request4}, wantErr: true},
+		{name: "empty comment", p: controller, args: args{w: httptest.NewRecorder(), r: request5}, wantErr: true},
+		{name: "database error", p: controller, args: args{w: httptest.NewRecorder(), r: request6}, wantErr: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.p.Comment(tt.args.w, tt.args.r); (err != nil) != tt.wantErr {
+				t.Errorf("PlaylistsController.Comment() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
 }

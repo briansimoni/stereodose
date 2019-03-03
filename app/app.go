@@ -107,6 +107,7 @@ func createRouter(c *config.Config) *util.AppRouter {
 	authPlaylistsRouter.AppHandler("/", playlists.CreatePlaylist).Methods(http.MethodPost)
 	authPlaylistsRouter.AppHandler("/{id}/image", playlists.UploadImage).Methods(http.MethodPost)
 	authPlaylistsRouter.AppHandler("/{id}", playlists.DeletePlaylist).Methods(http.MethodDelete)
+	authPlaylistsRouter.AppHandler("/{id}/comment", playlists.Comment).Methods(http.MethodPost)
 
 	categoriesRouter := util.AppRouter{app.PathPrefix("/api/categories").Subrouter()}
 	categoriesRouter.AppHandler("/", categories.GetAvailableCategories).Methods(http.MethodGet)

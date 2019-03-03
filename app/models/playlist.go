@@ -21,25 +21,26 @@ type PlaylistService interface {
 	// TODO: reafactor this to take a Playlist struct instead of a ton of strings
 	CreatePlaylistBySpotifyID(user User, playlistID, category, subCategory, image, thumbnail string) (*Playlist, error)
 	DeletePlaylist(spotifyID string) error
+	Comment(playlistID, text string, user User) (*Comment, error)
 }
 
 // Playlist is the data structure that contains playlist metadata from Spotify
 // It additionally has relations to users and tracks on Stereodose
 type Playlist struct {
 	//gorm.Model
-	SpotifyID     string    `json:"spotifyID" gorm:"primary_key:true"`
-	CreatedAt     time.Time `json:"createdAt"`
-	UpdatedAt     time.Time `json:"updatedAt"`
-	Category      string    `json:"category"`
-	SubCategory   string    `json:"subCategory"`
-	Collaborative bool      `json:"collaborative"`
-	//ExternalURLs  map[string]string `json:"external_urls"`
+	SpotifyID          string          `json:"spotifyID" gorm:"primary_key:true"`
+	CreatedAt          time.Time       `json:"createdAt"`
+	UpdatedAt          time.Time       `json:"updatedAt"`
+	Category           string          `json:"category"`
+	SubCategory        string          `json:"subCategory"`
+	Collaborative      bool            `json:"collaborative"`
 	Endpoint           string          `json:"href"`
 	Images             []PlaylistImage `json:"images"`
 	Name               string          `json:"name"`
 	IsPublic           bool            `json:"public"`
 	SnapshotID         string          `json:"snapshot_id"`
 	Tracks             []Track         `json:"tracks" gorm:"many2many:playlist_tracks"`
+	Comments           []Comment       `json:"comments" gorm:"ForeignKey:PlaylistID;AssociationForeignKey:spotify_id"`
 	URI                string          `json:"URI"`
 	UserID             uint            `json:"userID"`
 	BucketImageURL     string          `json:"bucketImageURL"`
@@ -79,7 +80,7 @@ func (s *StereodosePlaylistService) GetPlaylists(offset, limit, category, subcat
 // GetByID returns a playlist populated with all of its tracks
 func (s *StereodosePlaylistService) GetByID(ID string) (*Playlist, error) {
 	playlist := &Playlist{}
-	err := s.db.Preload("Tracks").Find(playlist, "spotify_id = ?", ID).Error
+	err := s.db.Debug().Preload("Tracks").Preload("Comments").Find(playlist, "spotify_id = ?", ID).Error
 	if err != nil {
 		return nil, err
 	}
@@ -219,4 +220,24 @@ func (s *StereodosePlaylistService) DeletePlaylist(spotifyID string) error {
 		return errors.New("Delete failed. Playlist Did not exist")
 	}
 	return nil
+}
+
+// Comment will save a comment to the specified playlist
+func (s *StereodosePlaylistService) Comment(playlistID, text string, user User) (*Comment, error) {
+	if playlistID == "" {
+		return nil, errors.New("spotifyID was empty string")
+	}
+
+	comment := &Comment{
+		Content:     text,
+		UserID:      user.ID,
+		PlaylistID:  playlistID,
+		DisplayName: user.DisplayName,
+	}
+
+	err := s.db.Save(comment).Error
+	if err != nil {
+		return nil, err
+	}
+	return comment, nil
 }

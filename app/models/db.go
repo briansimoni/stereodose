@@ -19,7 +19,7 @@ type StereoDoseDB struct {
 func NewStereodoseDB(db *gorm.DB, s *sessions.CookieStore) *StereoDoseDB {
 	// db = db.Debug()
 	// db.Debug().DropTable(User{}, Playlist{}, UserImage{}, PlaylistImage{}, Track{})
-	err := db.AutoMigrate(User{}, Playlist{}, UserImage{}, PlaylistImage{}, Track{}).Error
+	err := db.AutoMigrate(User{}, Playlist{}, UserImage{}, PlaylistImage{}, Track{}, Comment{}).Error
 	if err != nil {
 		log.Fatal(err.Error())
 	}

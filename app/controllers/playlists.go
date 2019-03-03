@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"html"
 	"io"
 	"io/ioutil"
 	"log"
@@ -291,4 +292,54 @@ func (p *PlaylistsController) uploadImage(img []byte, imageName string) error {
 		}
 	}
 	return nil
+}
+
+// Comment parses the JSON body and saves a user comment to the database
+// the JSON body looks like this: { "text": "wow this playlist is cool" }
+func (p *PlaylistsController) Comment(w http.ResponseWriter, r *http.Request) error {
+	user, ok := r.Context().Value("User").(models.User)
+	if !ok {
+		return errors.New("Unable to obtain user from session")
+	}
+	vars := mux.Vars(r)
+	playlistID := vars["id"]
+
+	defer r.Body.Close()
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return &statusError{
+			Message: fmt.Sprintf("Error parsing body %s", err.Error()),
+			Code:    http.StatusInternalServerError,
+		}
+	}
+
+	type model struct {
+		Text string
+	}
+	var m = new(model)
+	err = json.Unmarshal(data, m)
+	if err != nil {
+		return &statusError{
+			Message: fmt.Sprintf("Error parsing body %s", err.Error()),
+			Code:    http.StatusInternalServerError,
+		}
+	}
+
+	if m.Text == "" {
+		return &statusError{
+			Message: "Cannot upload empty comment",
+			Code:    http.StatusBadRequest,
+		}
+	}
+
+	// escape user data to avoid XSS attacks
+	escapedText := html.EscapeString(m.Text)
+
+	comment, err := p.DB.Playlists.Comment(playlistID, escapedText, user)
+	if err != nil {
+		return err
+	}
+	w.WriteHeader(http.StatusCreated)
+	err = util.JSON(w, comment)
+	return err
 }
