@@ -107,18 +107,21 @@ func createRouter(c *config.Config) *util.AppRouter {
 	authPlaylistsRouter.AppHandler("/", playlists.CreatePlaylist).Methods(http.MethodPost)
 	authPlaylistsRouter.AppHandler("/{id}/image", playlists.UploadImage).Methods(http.MethodPost)
 	authPlaylistsRouter.AppHandler("/{id}", playlists.DeletePlaylist).Methods(http.MethodDelete)
-	authPlaylistsRouter.AppHandler("/{id}/comment", playlists.Comment).Methods(http.MethodPost)
+	authPlaylistsRouter.AppHandler("/{id}/comments", playlists.Comment).Methods(http.MethodPost)
+	authPlaylistsRouter.AppHandler("/{playlistID}/comments/{commentID}", playlists.DeleteComment).Methods(http.MethodDelete)
+	authPlaylistsRouter.AppHandler("/{id}/likes", playlists.Like).Methods(http.MethodPost)
+	authPlaylistsRouter.AppHandler("/{playlistID}/likes/{likeID}", playlists.Unlike).Methods(http.MethodDelete)
 
 	categoriesRouter := util.AppRouter{app.PathPrefix("/api/categories").Subrouter()}
 	categoriesRouter.AppHandler("/", categories.GetAvailableCategories).Methods(http.MethodGet)
 
 	app.HandleFunc("/", serveFile(indexHTML, nil))
 	// Serving the React app on 404's enables the use of arbitrary routes with react browser-router
-	// Otherwise a requet to /some/arbitrary/path from a different origin would simply 404
+	// Otherwise a request to /some/arbitrary/path from a different origin would simply 404
 	// Could use the hash router for a looser coupling but /#/some/path is ugly
 	app.HandleFunc("/{page1}", serveFile(indexHTML, nil))
 	app.HandleFunc("/{page1}/{page2}", serveFile(indexHTML, nil))
-	app.NotFoundHandler = http.HandlerFunc(serveReactApp404)
+	app.NotFoundHandler = handlers.LoggingHandler(os.Stdout, http.HandlerFunc(serveReactApp404))
 
 	return app
 }
@@ -149,7 +152,7 @@ func init() {
 
 	indexHTML, err = ioutil.ReadAll(file)
 	if err != nil {
-		log.Fatalf("Unable to read the contets of index.html, %s", err.Error())
+		log.Fatalf("Unable to read the contents of index.html, %s", err.Error())
 	}
 
 	robotsFile, err := os.Open("./app/views/public/robots.txt")
@@ -172,12 +175,12 @@ func init() {
 		log.Fatalf("Unable to read contents of manifest.json %s", err.Error())
 	}
 
-	serviceWorkerFlie, err := os.Open("./app/views/build/sw.js")
+	serviceWorkerFile, err := os.Open("./app/views/build/sw.js")
 	if err != nil {
 		log.Fatalf("Unable to open manifest.json")
 	}
-	defer serviceWorkerFlie.Close()
-	serviceWorker, err = ioutil.ReadAll(serviceWorkerFlie)
+	defer serviceWorkerFile.Close()
+	serviceWorker, err = ioutil.ReadAll(serviceWorkerFile)
 	if err != nil {
 		log.Fatalf("Unable to read contents of serviceworker.json %s", err.Error())
 	}

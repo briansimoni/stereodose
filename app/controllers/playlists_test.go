@@ -9,6 +9,7 @@ import (
 	"image"
 	"image/color"
 	"image/jpeg"
+	"io"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -126,9 +127,44 @@ func (f *fakePlaylistService) Comment(playlistID, text string, user models.User)
 	return nil, nil
 }
 
+func (f *fakePlaylistService) DeleteComment(commentID uint) error {
+	if commentID == 2 {
+		return errors.New("Unable to delete this comment for some reason")
+	}
+	return nil
+}
+
+func (f *fakePlaylistService) Like(playlistID string, user models.User) (*models.Like, error) {
+	if playlistID == "3" {
+		return nil, errors.New("Unable to like this playlist for some reason")
+	}
+	return nil, nil
+}
+
+func (f *fakePlaylistService) Unlike(playlistID string, likeID uint) error {
+	if likeID == 9000 {
+		return errors.New("Unable to delete this like")
+	}
+	return nil
+}
+
+type fakeCommentService struct{}
+
+func (f *fakeCommentService) ByID(id uint) (*models.Comment, error) {
+	if id == 9000 {
+		return nil, errors.New("Comment does not exist")
+	}
+	comment := new(models.Comment)
+	comment.ID = 1
+	comment.UserID = 1
+	return comment, nil
+}
+
 var controller = &PlaylistsController{
 	DB: &models.StereoDoseDB{
 		Playlists: &fakePlaylistService{},
+		Comments:  &fakeCommentService{},
+		Users:     &fakeUserService{},
 	},
 	Bucket: blob.NewBucket(fakeBucket{}),
 }
@@ -391,7 +427,7 @@ func TestPlaylistsController_UploadImage(t *testing.T) {
 }
 
 func newMultiPartUploadRequest() (*http.Request, error) {
-	// Create an 100 x 50 image
+	// Create a 100 x 50 image
 	img := image.NewRGBA(image.Rect(0, 0, 100, 50))
 	xMax := img.Bounds().Dx()
 	yMax := img.Bounds().Dy()
@@ -490,4 +526,143 @@ func TestPlaylistsController_Comment(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestPlaylistsController_DeleteComment(t *testing.T) {
+
+	testUser := models.User{}
+	testUser.ID = 1
+
+	testUser2 := models.User{}
+	testUser2.ID = 2
+
+	testRouter := util.AppRouter{mux.NewRouter()}
+	testRouter.AppHandler("/api/playlists/{playlistID}/comments/{commentID}", controller.DeleteComment).Methods(http.MethodDelete)
+
+	request1 := createContextRequest(http.MethodDelete, "/api/playlists/1/comments/1", nil, &testUser)
+	request2 := createContextRequest(http.MethodDelete, "/api/playlists/1/comments/fart", nil, &testUser)
+	request3 := createContextRequest(http.MethodDelete, "/api/playlists/1/comments/1", nil, nil)
+	request4 := createContextRequest(http.MethodDelete, "/api/playlists/1/comments/9000", nil, &testUser)
+	request5 := createContextRequest(http.MethodDelete, "/api/playlists/1/comments/1", nil, &testUser2)
+	request6 := createContextRequest(http.MethodDelete, "/api/playlists/1/comments/2", nil, &testUser)
+
+	tests := []struct {
+		name               string
+		expectedStatusCode int
+		w                  http.ResponseWriter
+		r                  *http.Request
+	}{
+		{name: "Normal Test", w: httptest.NewRecorder(), r: request1, expectedStatusCode: 200},
+		{name: "Invalid comment ID", w: httptest.NewRecorder(), r: request2, expectedStatusCode: 400},
+		{name: "No User Cookie", w: httptest.NewRecorder(), r: request3, expectedStatusCode: 401},
+		{name: "Comment does not exist", w: httptest.NewRecorder(), r: request4, expectedStatusCode: 500},
+		{name: "Unauthorized delete", w: httptest.NewRecorder(), r: request5, expectedStatusCode: 403},
+		{name: "Database failure", w: httptest.NewRecorder(), r: request6, expectedStatusCode: 500},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			testRouter.ServeHTTP(tt.w, tt.r)
+			response := tt.w.(*httptest.ResponseRecorder)
+			result := response.Result()
+			if result.StatusCode != tt.expectedStatusCode {
+				t.Errorf("Expected status to be %d. Got: %d", tt.expectedStatusCode, result.StatusCode)
+			}
+		})
+	}
+}
+
+func TestPlaylistsController_Like(t *testing.T) {
+	testUser := models.User{}
+	testUser.ID = 1
+
+	testUser2 := models.User{}
+	testUser2.ID = 9999
+
+	testRouter := util.AppRouter{mux.NewRouter()}
+	testRouter.AppHandler("/api/playlists/{id}/likes", controller.Like).Methods(http.MethodPost)
+
+	request1 := createContextRequest(http.MethodPost, "/api/playlists/1/likes", nil, &testUser)
+	request2 := createContextRequest(http.MethodPost, "/api/playlists/1/likes", nil, nil)
+	request3 := createContextRequest(http.MethodPost, "/api/playlists/1/likes", nil, &testUser2)
+	request4 := createContextRequest(http.MethodPost, "/api/playlists/2/likes", nil, &testUser)
+	request5 := createContextRequest(http.MethodPost, "/api/playlists/3/likes", nil, &testUser)
+
+	tests := []struct {
+		name               string
+		expectedStatusCode int
+		w                  http.ResponseWriter
+		r                  *http.Request
+	}{
+		{name: "Normal Test", w: httptest.NewRecorder(), r: request1, expectedStatusCode: 201},
+		{name: "No User Cookie", w: httptest.NewRecorder(), r: request2, expectedStatusCode: 401},
+		{name: "Unable to read user from DB", w: httptest.NewRecorder(), r: request3, expectedStatusCode: 500},
+		{name: "Already liked playlist", w: httptest.NewRecorder(), r: request4, expectedStatusCode: 409},
+		{name: "Database Failure", w: httptest.NewRecorder(), r: request5, expectedStatusCode: 500},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			testRouter.ServeHTTP(tt.w, tt.r)
+			response := tt.w.(*httptest.ResponseRecorder)
+			result := response.Result()
+			if result.StatusCode != tt.expectedStatusCode {
+				t.Errorf("Expected status to be %d. Got: %d", tt.expectedStatusCode, result.StatusCode)
+			}
+		})
+	}
+}
+
+func TestPlaylistsController_Unlike(t *testing.T) {
+	testUser := models.User{}
+	testUser.ID = 1
+
+	testUser2 := models.User{}
+	testUser2.ID = 9999
+
+	testRouter := util.AppRouter{mux.NewRouter()}
+	testRouter.AppHandler("/api/playlists/{playlistID}/likes/{likeID}", controller.Unlike).Methods(http.MethodDelete)
+
+	request1 := createContextRequest(http.MethodDelete, "/api/playlists/1/likes/0", nil, &testUser)
+	request2 := createContextRequest(http.MethodDelete, "/api/playlists/1/likes/poop", nil, &testUser)
+	request3 := createContextRequest(http.MethodDelete, "/api/playlists/1/likes/0", nil, nil)
+	request4 := createContextRequest(http.MethodDelete, "/api/playlists/1/likes/0", nil, &testUser2)
+	request5 := createContextRequest(http.MethodDelete, "/api/playlists/1/likes/2", nil, &testUser)
+	request6 := createContextRequest(http.MethodDelete, "/api/playlists/1/likes/9000", nil, &testUser)
+
+	tests := []struct {
+		name               string
+		expectedStatusCode int
+		w                  http.ResponseWriter
+		r                  *http.Request
+	}{
+		{name: "Normal Test", w: httptest.NewRecorder(), r: request1, expectedStatusCode: 200},
+		{name: "Invalid Like ID", w: httptest.NewRecorder(), r: request2, expectedStatusCode: 400},
+		{name: "Unauthorized request", w: httptest.NewRecorder(), r: request3, expectedStatusCode: 401},
+		{name: "Unable to read user from db", w: httptest.NewRecorder(), r: request4, expectedStatusCode: 500},
+		{name: "Unauthorized Delete", w: httptest.NewRecorder(), r: request5, expectedStatusCode: 403},
+		{name: "Unable to delete like from db", w: httptest.NewRecorder(), r: request6, expectedStatusCode: 500},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			testRouter.ServeHTTP(tt.w, tt.r)
+			response := tt.w.(*httptest.ResponseRecorder)
+			result := response.Result()
+			if result.StatusCode != tt.expectedStatusCode {
+				t.Errorf("Expected status to be %d. Got: %d", tt.expectedStatusCode, result.StatusCode)
+			}
+		})
+	}
+}
+
+// helper function to make request creation with users easier
+func createContextRequest(method string, path string, body io.Reader, user *models.User) *http.Request {
+	if user == nil {
+		return httptest.NewRequest(method, path, body)
+	}
+	req := httptest.NewRequest(method, path, body)
+	ctx := context.WithValue(req.Context(), "User", *user)
+	req = req.WithContext(ctx)
+	return req
 }

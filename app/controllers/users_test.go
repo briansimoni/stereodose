@@ -21,9 +21,18 @@ import (
 type fakeUserService struct{}
 
 func (f *fakeUserService) ByID(ID uint) (*models.User, error) {
+
+	like1 := models.Like{UserID: 1, PlaylistID: "2"}
+	like2 := models.Like{UserID: 1, PlaylistID: "2"}
+	like2.ID = 9000
+
 	if ID == 1 {
 		user := &models.User{
 			DisplayName: "Test User",
+			Likes: []models.Like{
+				like1,
+				like2,
+			},
 		}
 		user.ID = 1
 		return user, nil

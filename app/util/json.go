@@ -2,6 +2,7 @@ package util
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -15,9 +16,10 @@ func JSON(w io.Writer, data interface{}) error {
 		return err
 	}
 	writer, ok := w.(http.ResponseWriter)
-	if ok {
-		writer.Header().Add("Content-Type", "application/json")
+	if !ok {
+		return errors.New("JSON write failed: writer was not an http.ResponseWriter")
 	}
+	writer.Header().Add("Content-Type", "application/json")
 	fmt.Fprint(w, string(j))
 	return nil
 }

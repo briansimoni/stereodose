@@ -1,7 +1,8 @@
 package util
 
 import (
-	"bytes"
+	"io/ioutil"
+	"net/http/httptest"
 	"strings"
 	"testing"
 )
@@ -38,13 +39,19 @@ func TestJSON(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			w := &bytes.Buffer{}
+			w := httptest.NewRecorder()
 			if err := JSON(w, tt.args.data); (err != nil) != tt.wantErr {
 				t.Errorf("JSON() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
+			result := w.Result()
+			defer result.Body.Close()
+			data, err := ioutil.ReadAll(result.Body)
+			if err != nil {
+				t.Error("Reading JSON result failed")
+			}
 
-			gotW := w.String()
+			gotW := string(data)
 			// I was having trouble getting the test case to actually have the right indentation
 			gotWnoWhiteSpace := strings.Replace(gotW, "\n", "", -1)
 			gotWnoWhiteSpace = strings.Replace(gotW, "	", "", -1)

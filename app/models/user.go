@@ -30,6 +30,7 @@ type User struct {
 	Images       []spotify.Image `json:"images"`
 	Playlists    []Playlist      `json:"playlists"`
 	Comments     []Comment       `json:"comments"`
+	Likes        []Like          `json:"likes"`
 	// Product is the user's subscription level: "premium, free etc..."
 	Product string `json:"product"`
 }
@@ -52,7 +53,7 @@ type StereodoseUserService struct {
 // if it doesn't it creates one, otherwise it returns a pointer to user
 func (u *StereodoseUserService) ByID(ID uint) (*User, error) {
 	user := &User{}
-	err := u.db.Preload("Playlists").Preload("Comments").Find(user, "id = ?", ID).Error
+	err := u.db.Preload("Playlists").Preload("Comments").Preload("Likes").Find(user, "id = ?", ID).Error
 	if err != nil {
 		return nil, err
 	}

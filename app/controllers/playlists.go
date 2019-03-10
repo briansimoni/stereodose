@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -342,4 +343,150 @@ func (p *PlaylistsController) Comment(w http.ResponseWriter, r *http.Request) er
 	w.WriteHeader(http.StatusCreated)
 	err = util.JSON(w, comment)
 	return err
+}
+
+// DeleteComment removes a comment from a playlist and soft deletes in the database
+func (p *PlaylistsController) DeleteComment(w http.ResponseWriter, r *http.Request) error {
+	vars := mux.Vars(r)
+	commentID, err := strconv.Atoi(vars["commentID"])
+	if err != nil {
+		return &statusError{
+			Message: "Unable to parse comment ID: " + err.Error(),
+			Code:    http.StatusBadRequest,
+		}
+	}
+
+	user, ok := r.Context().Value("User").(models.User)
+	if !ok {
+		return &statusError{
+			Message: "Unable to obtain user from session",
+			Code:    http.StatusUnauthorized,
+		}
+	}
+
+	comment, err := p.DB.Comments.ByID(uint(commentID))
+	if err != nil {
+		return &statusError{
+			Message: "Unable to read comment from database: " + err.Error(),
+			Code:    http.StatusInternalServerError,
+		}
+	}
+
+	if comment.UserID != user.ID {
+		return &statusError{
+			Message: "Not authorized - unable to delete other users' playlists",
+			Code:    http.StatusForbidden,
+		}
+	}
+
+	err = p.DB.Playlists.DeleteComment(uint(commentID))
+	if err != nil {
+		return &statusError{
+			Message: "Error deleting comment from database: " + err.Error(),
+			Code:    http.StatusInternalServerError,
+		}
+	}
+	return nil
+}
+
+// Like will add a like to the playlist in the database
+// Like checks to see if the user had already liked the playlist
+func (p *PlaylistsController) Like(w http.ResponseWriter, r *http.Request) error {
+	vars := mux.Vars(r)
+	playlistID := vars["id"]
+
+	u, ok := r.Context().Value("User").(models.User)
+	if !ok {
+		return &statusError{
+			Message: "Unable to obtain user from session",
+			Code:    http.StatusUnauthorized,
+		}
+	}
+
+	// lets make sure that we have the full and updated data set for the user
+	user, err := p.DB.Users.ByID(u.ID)
+	if err != nil {
+		return err
+	}
+
+	for _, userLike := range user.Likes {
+		if userLike.PlaylistID == playlistID {
+			return &statusError{
+				Message: "The user has already liked this playlist",
+				Code:    http.StatusConflict,
+			}
+		}
+	}
+
+	like, err := p.DB.Playlists.Like(playlistID, *user)
+	if err != nil {
+		return &statusError{
+			Message: "Error writing to database: " + err.Error(),
+			Code:    http.StatusInternalServerError,
+		}
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	err = util.JSON(w, like)
+	if err != nil {
+		return &statusError{
+			Message: "Failed to write JSON " + err.Error(),
+			Code:    http.StatusInternalServerError,
+		}
+	}
+	return nil
+
+}
+
+// Unlike removes a like from a playlist
+// TODO: could improve the performance of this by looking up the Like by ID instead of
+// searching through all of the user's likes
+func (p *PlaylistsController) Unlike(w http.ResponseWriter, r *http.Request) error {
+	vars := mux.Vars(r)
+	playlistID := vars["playlistID"]
+	likeID, err := strconv.Atoi(vars["likeID"])
+	if err != nil {
+		return &statusError{
+			Message: "Playlist ID is not an integer. Error: " + err.Error(),
+			Code:    http.StatusBadRequest,
+		}
+	}
+
+	u, ok := r.Context().Value("User").(models.User)
+	if !ok {
+		return &statusError{
+			Message: "Unable to obtain user from session",
+			Code:    http.StatusUnauthorized,
+		}
+	}
+
+	// make sure we have the full and updated user data
+	user, err := p.DB.Users.ByID(u.ID)
+	if err != nil {
+		return err
+	}
+
+	authorized := false
+	for _, like := range user.Likes {
+		if like.ID == uint(likeID) {
+			authorized = true
+			break
+		}
+	}
+
+	if !authorized {
+		return &statusError{
+			Message: "The user does not own this like",
+			Code:    http.StatusForbidden,
+		}
+	}
+
+	err = p.DB.Playlists.Unlike(playlistID, uint(likeID))
+	if err != nil {
+		return &statusError{
+			Message: "Database Error " + err.Error(),
+			Code:    http.StatusInternalServerError,
+		}
+	}
+	return nil
 }
