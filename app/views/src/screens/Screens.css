@@ -48,3 +48,29 @@ ul.moods, ul.drugs, #moods {
 .playlist {
     margin-top: 25px;
 }
+
+.comments {
+    margin-top: 25px;
+}
+
+#comment-textarea {
+    margin-bottom: 10px;
+}
+
+.comments .delete-button {
+    float: right;
+}
+
+.octicon.octicon-heart {
+    color: #b00606;
+    font-size: 36px;
+}
+
+.octicon.octicon-heart:hover {
+    color: #ff0000;
+    font-size: 36px;
+}
+
+.comment-toggle {
+    float: right;
+}

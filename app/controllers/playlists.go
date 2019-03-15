@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"html"
 	"io"
 	"io/ioutil"
 	"log"
@@ -334,9 +333,10 @@ func (p *PlaylistsController) Comment(w http.ResponseWriter, r *http.Request) er
 	}
 
 	// escape user data to avoid XSS attacks
-	escapedText := html.EscapeString(m.Text)
+	// ...or maybe react is handling this
+	// escapedText := html.EscapeString(m.Text)
 
-	comment, err := p.DB.Playlists.Comment(playlistID, escapedText, user)
+	comment, err := p.DB.Playlists.Comment(playlistID, m.Text, user)
 	if err != nil {
 		return err
 	}

@@ -1,24 +1,60 @@
 import React from "react";
 import Track from "./Track";
+import Comments from "./Comments";
+import Likes from "./Likes"
+import { Fragment } from "react";
 
+// Playlist is the parent component that controls the entire display for a particular playlist.
+// It is a composite of likes, comments, tracks, and playlist image.
+// For likes and comments to work, it also keeps track of user state without parent or peer
+// component dependencies. In other words, it makes API calls to /api/users/me
 class Playlist extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
       loading: true,
+      showComments: false,
       playlist: null,
+      user: null,
       error: null
     };
   }
 
   render() {
-    let { loading, playlist, error } = this.state;
+    let { loading, showComments, playlist, error } = this.state;
     if (loading) {
       return <div></div>
     }
     if (error) {
       return <h3>{error.message}</h3>
+    }
+    if (playlist && showComments) {
+      return (
+        <Fragment>
+          <div className="row">
+            <div className="col">
+              <div id="playlist-heading">
+                <h2>{playlist.name}</h2>
+                <img src={playlist.bucketImageURL} alt="playlist-artwork" />
+              </div>
+              <button className="btn btn-warning comment-toggle" onClick={this.toggleComments}>Show Songs</button>
+              <Likes numberOfLikes={playlist.likes} />
+
+            </div>
+          </div>
+          <div className="row">
+            <div className="col">
+              <Comments
+                comments={playlist.comments}
+                onSubmitComment={this.submitComment}
+                onDeleteComment={this.deleteComment}
+                user={this.state.user}
+              />
+            </div>
+          </div>
+        </Fragment>
+      )
     }
     if (playlist) {
       return (
@@ -28,6 +64,8 @@ class Playlist extends React.Component {
               <h2>{playlist.name}</h2>
               <img src={playlist.bucketImageURL} alt="playlist-artwork" />
             </div>
+            <button className="btn btn-warning comment-toggle" onClick={this.toggleComments}>Show Comments ({playlist.comments.length})</button>
+            <Likes onLike={this.like} numberOfLikes={playlist.likes} />
             <ul className="list-group playlist">
               {playlist.tracks.map((track) => {
                 return (
@@ -118,24 +156,169 @@ class Playlist extends React.Component {
     }
   }
 
-  // grab the data for the particular playlist that the user requested
-  // it can be used later to render a page populated with tracks
-  async componentDidMount() {
+  toggleComments = () => {
+    this.setState({ showComments: !this.state.showComments });
+  }
+
+  submitComment = async (text) => {
+    const options = {
+      method: "POST",
+      body: JSON.stringify({
+        text: text
+      }),
+      credentials: "same-origin"
+    }
+    const response = await fetch(`/api/playlists/${this.state.playlist.spotifyID}/comments`, options);
+    if (response.status !== 201) {
+      const errorMessage = await response.text();
+      throw new Error(`${errorMessage}, ${response.status}, ${response.statusText}`);
+    }
+
     try {
-      let playlistID = this.props.match.params.playlist
+      const comment = await response.json();
+      const playlist = this.state.playlist;
+      playlist.comments.push(comment);
+      this.setState({ playlist: playlist });
+    } catch (err) {
+      alert(err);
+    }
+  }
 
-      const response = await fetch(`/api/playlists/${playlistID}`, { credentials: "same-origin" });
-      if (response.status !== 200) {
-        const errorMessage = await response.text();
-        throw new Error(`${errorMessage}, ${response.status}, ${response.statusText}`)
-      }
+  deleteComment = async (commentID) => {
+    const options = {
+      method: "DELETE",
+      credentials: "same-origin"
+    }
 
-      const json = await response.json();
+    const playlist = this.state.playlist;
 
+    const response = await fetch(`/api/playlists/${playlist.spotifyID}/comments/${commentID}`, options);
+    if (response.status !== 200) {
+      const errorMessage = await response.text();
+      throw new Error(`${errorMessage}, ${response.status}, ${response.statusText}`);
+    }
+
+    // Instead of calling this.updatePlaylistState, simply remove the comment from state immediately
+    // We know it was deleted from the database because the response was 200
+    // This removes a network call and makes the app more responsive
+    playlist.comments = playlist.comments.filter(comment => comment.ID !== commentID);
+    this.setState({
+      playlist: playlist
+    });
+  }
+
+  like = async () => {
+    const { playlist, user} = this.state
+    if (user === null) {
+      return;
+    }
+    // The user already liked this playlist. Unlike.
+    const like = user.likes.find( (like) => like.playlistID)
+    if (like) {
+      await this.unlike(like.ID);
+      user.likes = user.likes.filter(l => l.ID !== like.ID);
       this.setState({
-        loading: false,
-        playlist: json
+        user: user
       });
+      return;
+    }
+
+    const options = {
+      method: "POST",
+      credentials: "same-origin"
+    }
+
+    const response = await fetch(`/api/playlists/${playlist.spotifyID}/likes`, options);
+    if (response.status !== 201) {
+      // a status of 409 likely means the user just clicked the button again too fast
+      if (response.status === 409) {
+        return;
+      }
+      const errorMessage = await response.text();
+      throw new Error(`${errorMessage}, ${response.status}, ${response.statusText}`);
+    }
+
+    playlist.likes += 1;
+    this.setState({ playlist: playlist });
+    await this.updateUserState();
+  }
+
+  unlike = async (likeID) => {
+    const options = {
+      method: "DELETE",
+      credentials: "same-origin"
+    }
+
+    const playlist = this.state.playlist
+
+    const response = await fetch(`/api/playlists/${playlist.spotifyID}/likes/${likeID}`, options);
+    if (response.status !== 200) {
+      // a status of 403 likely means the user just clicked the button again too fast
+      if (response.status === 403) {
+        return;
+      }
+      const errorMessage = await response.text();
+      throw new Error(`${errorMessage}, ${response.status}, ${response.statusText}`);
+    }
+
+    playlist.likes = playlist.likes - 1;
+    this.setState({ playlist: playlist });
+  }
+
+  updateUserState = async () => {
+    // getting an access token implicitly tells us that the user is logged in
+    try {
+      await this.props.getAccessToken();
+    } catch (err) {
+      if (err.message === "Sign in with Spotify Premium to Play Music") {
+        this.setState({ user: null });
+        return;
+      }
+    }
+
+    const response = await fetch("/api/users/me");
+    if (response.status !== 200) {
+      const errorMessage = await response.text();
+      throw new Error(`${errorMessage}, ${response.status}, ${response.statusText}`);
+    }
+    const user = await response.json();
+    this.setState({ user: user });
+  }
+
+  updatePlaylistState = async () => {
+    let playlistID = this.props.match.params.playlist
+
+    const response = await fetch(`/api/playlists/${playlistID}`, { credentials: "same-origin" });
+    if (response.status !== 200) {
+      const errorMessage = await response.text();
+      throw new Error(`${errorMessage}, ${response.status}, ${response.statusText}`);
+    }
+
+    const playlist = await response.json();
+
+    // sort comments by time created
+    playlist.comments.sort( (a, b) => {
+      const playlistADate = new Date(a.CreatedAt);
+      const playlistBDate = new Date(b.CreatedAt);
+      if (playlistADate < playlistBDate) {
+        return -1;
+      }
+      if (playlistADate > playlistBDate) {
+        return 1;
+      }
+      return 0;
+    });
+
+    this.setState({
+      loading: false,
+      playlist: playlist
+    });
+  }
+
+  componentDidMount() {
+    try {
+      this.updatePlaylistState();
+      this.updateUserState();
     } catch (err) {
       this.setState({
         loading: false,

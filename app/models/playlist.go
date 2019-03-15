@@ -45,7 +45,7 @@ type Playlist struct {
 	Tracks        []Track         `json:"tracks" gorm:"many2many:playlist_tracks"`
 	Comments      []Comment       `json:"comments" gorm:"ForeignKey:PlaylistID;AssociationForeignKey:spotify_id"`
 	// Likes is an int representing the total number of likes
-	Likes              int
+	Likes              int    `json:"likes"`
 	URI                string `json:"URI"`
 	UserID             uint   `json:"userID"`
 	BucketImageURL     string `json:"bucketImageURL"`
@@ -286,7 +286,7 @@ func (s *StereodosePlaylistService) Like(playlistID string, user User) (*Like, e
 		return nil, err
 	}
 
-	err = tx.Model(&Playlist{}).Where("spotify_id = ?", playlist.SpotifyID).Update("likes", playlist.Likes+1).Error
+	err = tx.Debug().Model(&Playlist{}).Where("spotify_id = ?", playlist.SpotifyID).Update("likes", playlist.Likes+1).Error
 	if err != nil {
 		tx.Rollback()
 		return nil, err

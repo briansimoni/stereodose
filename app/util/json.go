@@ -10,6 +10,7 @@ import (
 
 // JSON is a utility function that handlers can use to turn arbitrary structs
 // into JSON and write the response
+// TODO: optionally turn off the marshalIndent to speed up network requests in production
 func JSON(w io.Writer, data interface{}) error {
 	j, err := json.MarshalIndent(data, "", "	")
 	if err != nil {
