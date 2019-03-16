@@ -68,7 +68,7 @@ class App extends React.Component {
                 render={(props) =>
                   <UserProfile
                     {...props}
-                    getAccessToken={() => this.getAccessToken()}
+                    getAccessToken={this.getAccessToken}
                   />
                 }
               />
@@ -77,7 +77,7 @@ class App extends React.Component {
                 render={(props) =>
                   <UserProfile
                     {...props}
-                    getAccessToken={() => this.getAccessToken()}
+                    getAccessToken={this.getAccessToken}
                   />
                 }
               />
@@ -86,7 +86,7 @@ class App extends React.Component {
                 render={(props) =>
                   <UserProfile
                     {...props}
-                    getAccessToken={() => this.getAccessToken()}
+                    getAccessToken={this.getAccessToken}
                   />
                 }
               />
@@ -100,7 +100,7 @@ class App extends React.Component {
                 render={(props) =>
                   <Playlist
                     {...props}
-                    getAccessToken={() => this.getAccessToken()}
+                    getAccessToken={this.getAccessToken}
                     getDeviceID={() => this.deviceIDPromise}
                   />
                 }
@@ -115,7 +115,7 @@ class App extends React.Component {
             render={(props) =>
               <Player
                 {...props}
-                getAccessToken={() => this.getAccessToken()}
+                getAccessToken={this.getAccessToken}
                 setDeviceID={(deviceID) => this.setDeviceID(deviceID)}>
               </Player>
             }

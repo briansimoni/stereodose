@@ -36,8 +36,6 @@ class UserStatusIndicator extends React.Component {
     if (this.state.loggedIn === true) {
       return (
         <Fragment>
-
-
           <li className="nav-item">
             <Link className="nav-link" to="/profile">Profile</Link>
           </li>
@@ -62,6 +60,14 @@ class UserStatusIndicator extends React.Component {
   }
 
   componentDidMount() {
+    // hooking into jQuery/Bootstrap 4 API to handle menu collapse
+    if (window.$) {
+      const jQuery = window.$;
+      jQuery("nav a").click(() => {
+        jQuery('#navbarSupportedContent').collapse('hide');
+      });
+    }
+
     if (this.state.loggedIn === true) {
       fetch("/api/users/me", { credentials: "same-origin" })
         .then((response) => {

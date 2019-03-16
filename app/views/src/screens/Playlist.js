@@ -64,7 +64,7 @@ class Playlist extends React.Component {
               <h2>{playlist.name}</h2>
               <img src={playlist.bucketImageURL} alt="playlist-artwork" />
             </div>
-            <button className="btn btn-warning comment-toggle" onClick={this.toggleComments}>Show Comments ({playlist.comments.length})</button>
+            <button className="btn btn-warning comment-toggle" onClick={this.toggleComments}>Comments ({playlist.comments.length})</button>
             <Likes onLike={this.like} numberOfLikes={playlist.likes.length} />
             <ul className="list-group playlist">
               {playlist.tracks.map((track) => {
