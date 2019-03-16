@@ -666,3 +666,24 @@ func createContextRequest(method string, path string, body io.Reader, user *mode
 	req = req.WithContext(ctx)
 	return req
 }
+
+func Test_getImageKey(t *testing.T) {
+	tests := []struct {
+		name string
+		url  string
+		want string
+	}{
+		{
+			name: "Normal Test",
+			url:  "https://s3.amazonaws.com/stereodose/images/de4b88c9-4fce-409e-af8d-0c60a53d6c0f-6DRd1s2Hx7VEWWV85GYx6S.jpeg",
+			want: "images/de4b88c9-4fce-409e-af8d-0c60a53d6c0f-6DRd1s2Hx7VEWWV85GYx6S.jpeg",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getImageKey(tt.url); got != tt.want {
+				t.Errorf("getImageKey() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

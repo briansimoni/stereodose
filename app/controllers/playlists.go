@@ -170,11 +170,26 @@ func (p *PlaylistsController) DeletePlaylist(w http.ResponseWriter, r *http.Requ
 			Code:    http.StatusUnauthorized,
 		}
 	}
+
 	err = p.DB.Playlists.DeletePlaylist(ID)
 	if err != nil {
 		return errors.WithStack(err)
 	}
+
+	// not really a big deal if the images don't delete
+	// thus, these functions run concurrently and are not checked for errors
+	go p.Bucket.Delete(context.Background(), getImageKey(targetPlaylist.BucketImageURL))
+	go p.Bucket.Delete(context.Background(), getImageKey(targetPlaylist.BucketThumbnailURL))
 	return nil
+}
+
+// getImageKey takes an S3 (or generic bucket URL) and returns just the key
+func getImageKey(url string) string {
+	if url == "" {
+		return ""
+	}
+	split := strings.Split(url, "/")
+	return split[len(split)-2] + "/" + split[len(split)-1]
 }
 
 // UploadImage saves an image the corresponds to a playlist
