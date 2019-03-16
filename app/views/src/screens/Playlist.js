@@ -39,7 +39,7 @@ class Playlist extends React.Component {
                 <img src={playlist.bucketImageURL} alt="playlist-artwork" />
               </div>
               <button className="btn btn-warning comment-toggle" onClick={this.toggleComments}>Show Songs</button>
-              <Likes numberOfLikes={playlist.likes} />
+              <Likes onLike={this.like} numberOfLikes={playlist.likes.length} />
 
             </div>
           </div>
@@ -65,7 +65,7 @@ class Playlist extends React.Component {
               <img src={playlist.bucketImageURL} alt="playlist-artwork" />
             </div>
             <button className="btn btn-warning comment-toggle" onClick={this.toggleComments}>Show Comments ({playlist.comments.length})</button>
-            <Likes onLike={this.like} numberOfLikes={playlist.likes} />
+            <Likes onLike={this.like} numberOfLikes={playlist.likes.length} />
             <ul className="list-group playlist">
               {playlist.tracks.map((track) => {
                 return (
@@ -160,6 +160,7 @@ class Playlist extends React.Component {
     this.setState({ showComments: !this.state.showComments });
   }
 
+  // if 401 need to alert user
   submitComment = async (text) => {
     const options = {
       method: "POST",
@@ -207,6 +208,11 @@ class Playlist extends React.Component {
     });
   }
 
+  // TODO: fix some kind of race condition between the player state and backend
+  // there is some condition that is possible to reach such that the like button stops working
+  // TODO: change the display of the button to something different based on whether or not
+  // the user has liked the playlist or not
+  // TODO: like button is not working when comments are displayed
   like = async () => {
     const { playlist, user} = this.state
     if (user === null) {
@@ -238,7 +244,8 @@ class Playlist extends React.Component {
       throw new Error(`${errorMessage}, ${response.status}, ${response.statusText}`);
     }
 
-    playlist.likes += 1;
+    const newLike = await response.json();
+    playlist.likes.push(newLike);
     this.setState({ playlist: playlist });
     await this.updateUserState();
   }
@@ -261,7 +268,7 @@ class Playlist extends React.Component {
       throw new Error(`${errorMessage}, ${response.status}, ${response.statusText}`);
     }
 
-    playlist.likes = playlist.likes - 1;
+    playlist.likes = playlist.likes.filter( l => l.ID !== likeID);
     this.setState({ playlist: playlist });
   }
 

@@ -36,7 +36,7 @@ class Comments extends React.Component {
             )
           })}
         </ul>
-        <div className="comment-text-area form-group">
+        <div className="form-group">
           <label htmlFor="comment-textarea">Leave a Comment</label>
           <textarea className="form-control" id="comment-textarea" rows="3" onChange={this.handleChange}></textarea>
           <button type="submit" className="btn btn-primary mb-2" onClick={() => { onSubmitComment(this.state.value) }}>Submit</button>
@@ -46,6 +46,7 @@ class Comments extends React.Component {
     )
   }
 
+  // TODO: if the user is null, return
   isUserComment = (commentUserID) => {
     const user = this.props.user;
     if (user.ID === commentUserID) {

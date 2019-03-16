@@ -31,25 +31,24 @@ type PlaylistService interface {
 // It additionally has relations to users and tracks on Stereodose
 type Playlist struct {
 	//gorm.Model
-	SpotifyID     string          `json:"spotifyID" gorm:"primary_key:true"`
-	CreatedAt     time.Time       `json:"createdAt"`
-	UpdatedAt     time.Time       `json:"updatedAt"`
-	Category      string          `json:"category"`
-	SubCategory   string          `json:"subCategory"`
-	Collaborative bool            `json:"collaborative"`
-	Endpoint      string          `json:"href"`
-	Images        []PlaylistImage `json:"images"`
-	Name          string          `json:"name"`
-	IsPublic      bool            `json:"public"`
-	SnapshotID    string          `json:"snapshot_id"`
-	Tracks        []Track         `json:"tracks" gorm:"many2many:playlist_tracks"`
-	Comments      []Comment       `json:"comments" gorm:"ForeignKey:PlaylistID;AssociationForeignKey:spotify_id"`
-	// Likes is an int representing the total number of likes
-	Likes              int    `json:"likes"`
-	URI                string `json:"URI"`
-	UserID             uint   `json:"userID"`
-	BucketImageURL     string `json:"bucketImageURL"`
-	BucketThumbnailURL string `json:"bucketThumbnailURL"`
+	SpotifyID          string          `json:"spotifyID" gorm:"primary_key:true"`
+	CreatedAt          time.Time       `json:"createdAt"`
+	UpdatedAt          time.Time       `json:"updatedAt"`
+	Category           string          `json:"category"`
+	SubCategory        string          `json:"subCategory"`
+	Collaborative      bool            `json:"collaborative"`
+	Endpoint           string          `json:"href"`
+	Images             []PlaylistImage `json:"images"`
+	Name               string          `json:"name"`
+	IsPublic           bool            `json:"public"`
+	SnapshotID         string          `json:"snapshot_id"`
+	Tracks             []Track         `json:"tracks" gorm:"many2many:playlist_tracks"`
+	Comments           []Comment       `json:"comments" gorm:"ForeignKey:PlaylistID;AssociationForeignKey:spotify_id"`
+	Likes              []Like          `json:"likes" gorm:"ForeignKey:PlaylistID;AssociationForeignKey:spotify_id"`
+	URI                string          `json:"URI"`
+	UserID             uint            `json:"userID"`
+	BucketImageURL     string          `json:"bucketImageURL"`
+	BucketThumbnailURL string          `json:"bucketThumbnailURL"`
 }
 
 // PlaylistImage should contain a URL or reference to an image
@@ -85,7 +84,7 @@ func (s *StereodosePlaylistService) GetPlaylists(offset, limit, category, subcat
 // GetByID returns a playlist populated with all of its tracks
 func (s *StereodosePlaylistService) GetByID(ID string) (*Playlist, error) {
 	playlist := &Playlist{}
-	err := s.db.Preload("Tracks").Preload("Comments").Find(playlist, "spotify_id = ?", ID).Error
+	err := s.db.Preload("Tracks").Preload("Comments").Preload("Likes").Find(playlist, "spotify_id = ?", ID).Error
 	if err != nil {
 		return nil, err
 	}
@@ -210,13 +209,16 @@ func simpleArtistsToString(artists []spotify.SimpleArtist) string {
 }
 
 // DeletePlaylist hard deletes the playlist (only from the StereodoseDB)
+// TODO: find the related likes/comments and delete those too
 func (s *StereodosePlaylistService) DeletePlaylist(spotifyID string) error {
 	if spotifyID == "" {
 		return errors.New("spotifyID was empty string")
 	}
-	playlist := &Playlist{
-		SpotifyID: spotifyID,
+	playlist, err := s.GetByID(spotifyID)
+	if err != nil {
+		return err
 	}
+
 	result := s.db.Delete(playlist)
 	if result.Error != nil {
 		return result.Error
@@ -262,37 +264,22 @@ func (s *StereodosePlaylistService) DeleteComment(commentID uint) error {
 // it also adds an entry in the likes table
 // it is the responsibility of the caller to make sure the user has not liked the playlist already
 // this method by itself is effectively Medium's "claps"
-// TODO: refactor likes to how comments works
+
+// need to refactor this so the Playlist struct "knows" about who owns the likes
+// otherwise, if a playlist gets deleted/created again, the likes count can drop to negative numbers
+// comments works like this
+// could be problematic for very large number of likes
 func (s *StereodosePlaylistService) Like(playlistID string, user User) (*Like, error) {
 	if playlistID == "" {
 		return nil, errors.New("spotifyID was empty string")
 	}
 
-	playlist := new(Playlist)
-	err := s.db.Find(playlist, "spotify_id = ?", playlistID).Error
-	if err != nil {
-		return nil, err
-	}
-
 	like := &Like{
-		UserID:     user.ID,
 		PlaylistID: playlistID,
+		UserID:     user.ID,
 	}
 
-	// we use a database transaction for an "all or nothing set of database transactions"
-	tx := s.db.Begin()
-	if err = tx.Create(like).Error; err != nil {
-		tx.Rollback()
-		return nil, err
-	}
-
-	err = tx.Debug().Model(&Playlist{}).Where("spotify_id = ?", playlist.SpotifyID).Update("likes", playlist.Likes+1).Error
-	if err != nil {
-		tx.Rollback()
-		return nil, err
-	}
-
-	err = tx.Commit().Error
+	err := s.db.Create(like).Error
 	if err != nil {
 		return nil, err
 	}
@@ -302,34 +289,13 @@ func (s *StereodosePlaylistService) Like(playlistID string, user User) (*Like, e
 // Unlike will soft delete a like from a playlist
 // basically the same thing as Like but in reverse
 func (s *StereodosePlaylistService) Unlike(playlistID string, likeID uint) error {
-
 	if playlistID == "" {
 		return errors.New("spotifyID was empty string")
 	}
 
-	playlist := new(Playlist)
-	err := s.db.Find(playlist, "spotify_id = ?", playlistID).Error
-	if err != nil {
-		return err
-	}
-
 	like := new(Like)
 	like.ID = likeID
-
-	// we use a database transaction for an "all or nothing set of database transactions"
-	tx := s.db.Begin()
-	if err = tx.Delete(like).Error; err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	err = tx.Model(&Playlist{}).Where("spotify_id = ?", playlist.SpotifyID).Update("likes", playlist.Likes-1).Error
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	err = tx.Commit().Error
+	err := s.db.Delete(like).Error
 	if err != nil {
 		return err
 	}
