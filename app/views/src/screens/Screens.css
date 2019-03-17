@@ -62,6 +62,7 @@ ul.moods, ul.drugs, #moods {
 }
 
 .octicon.octicon-heart {
+    cursor: pointer;
     color: #b00606;
     font-size: 36px;
 }

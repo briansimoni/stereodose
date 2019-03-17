@@ -6,7 +6,7 @@ export default function Likes(props) {
   return(
     <span onClick={onLike}>
       <Octicon name="heart"/>
-      {props.numberOfLikes}
+      {props.number}
     </span>
   )
 }

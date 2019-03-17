@@ -10,8 +10,13 @@ import { Fragment } from "react";
 // component dependencies. In other words, it makes API calls to /api/users/me
 class Playlist extends React.Component {
 
+  // likePending is not part of state because it would cause race conditions
+  // React likes to do things like batch state updates
+  likePending = false;
+
   constructor(props) {
     super(props);
+
     this.state = {
       loading: true,
       showComments: false,
@@ -39,7 +44,7 @@ class Playlist extends React.Component {
                 <img src={playlist.bucketImageURL} alt="playlist-artwork" />
               </div>
               <button className="btn btn-warning comment-toggle" onClick={this.toggleComments}>Show Songs</button>
-              <Likes onLike={this.like} numberOfLikes={playlist.likes.length} />
+              <Likes onLike={this.like} number={playlist.likes.length} />
 
             </div>
           </div>
@@ -65,7 +70,7 @@ class Playlist extends React.Component {
               <img src={playlist.bucketImageURL} alt="playlist-artwork" />
             </div>
             <button className="btn btn-warning comment-toggle" onClick={this.toggleComments}>Comments ({playlist.comments.length})</button>
-            <Likes onLike={this.like} numberOfLikes={playlist.likes.length} />
+            <Likes onLike={this.like} number={playlist.likes.length} />
             <ul className="list-group playlist">
               {playlist.tracks.map((track) => {
                 return (
@@ -208,24 +213,26 @@ class Playlist extends React.Component {
     });
   }
 
-  // TODO: fix some kind of race condition between the player state and backend
   // there is some condition that is possible to reach such that the like button stops working
   // TODO: change the display of the button to something different based on whether or not
   // the user has liked the playlist or not
-  // TODO: like button is not working when comments are displayed
   like = async () => {
-    const { playlist, user} = this.state
-    if (user === null) {
+    const { playlist, user } = this.state
+    const likePending = this.likePending;
+    if (user === null || likePending ) {
       return;
     }
+    this.likePending = true;
+
     // The user already liked this playlist. Unlike.
-    const like = user.likes.find( (like) => like.playlistID)
+    const like = user.likes.find( (like) => like.playlistID);
     if (like) {
       await this.unlike(like.ID);
       user.likes = user.likes.filter(l => l.ID !== like.ID);
       this.setState({
-        user: user
+        user: user,
       });
+      this.likePending = false;
       return;
     }
 
@@ -236,18 +243,17 @@ class Playlist extends React.Component {
 
     const response = await fetch(`/api/playlists/${playlist.spotifyID}/likes`, options);
     if (response.status !== 201) {
-      // a status of 409 likely means the user just clicked the button again too fast
-      if (response.status === 409) {
-        return;
-      }
       const errorMessage = await response.text();
       throw new Error(`${errorMessage}, ${response.status}, ${response.statusText}`);
     }
 
     const newLike = await response.json();
     playlist.likes.push(newLike);
-    this.setState({ playlist: playlist });
+    this.setState({
+      playlist: playlist,
+    });
     await this.updateUserState();
+    this.likePending = false;
   }
 
   unlike = async (likeID) => {
@@ -260,10 +266,6 @@ class Playlist extends React.Component {
 
     const response = await fetch(`/api/playlists/${playlist.spotifyID}/likes/${likeID}`, options);
     if (response.status !== 200) {
-      // a status of 403 likely means the user just clicked the button again too fast
-      if (response.status === 403) {
-        return;
-      }
       const errorMessage = await response.text();
       throw new Error(`${errorMessage}, ${response.status}, ${response.statusText}`);
     }
