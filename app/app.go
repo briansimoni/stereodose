@@ -71,7 +71,7 @@ func createRouter(c *config.Config) *util.AppRouter {
 
 	app.HandleFunc("/robots.txt", serveFile(robotsTXT, nil))
 	app.HandleFunc("/manifest.json", serveFile(manifest, nil))
-	app.HandleFunc("/sw.js", serveFile(manifest, map[string]string{"Content-Type": "application/javascript"}))
+	app.HandleFunc("/sw.js", serveFile(serviceWorker, map[string]string{"Content-Type": "application/javascript"}))
 
 	healthRouter := util.AppRouter{app.PathPrefix("/api/health").Subrouter()}
 	healthRouter.AppHandler("/", health.CheckHealth).Methods(http.MethodGet)
@@ -177,7 +177,7 @@ func init() {
 
 	serviceWorkerFile, err := os.Open("./app/views/build/sw.js")
 	if err != nil {
-		log.Fatalf("Unable to open manifest.json")
+		log.Fatalf("Unable to open sw.js")
 	}
 	defer serviceWorkerFile.Close()
 	serviceWorker, err = ioutil.ReadAll(serviceWorkerFile)
