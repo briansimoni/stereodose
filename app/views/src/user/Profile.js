@@ -6,105 +6,93 @@ import "./Profile.css";
 
 class UserProfile extends React.Component {
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      spotifyPlaylists: null,
-      stereodosePlaylists: null,
-      categories: null,
-      loading: true
-    }
+  state = {
+    spotifyPlaylists: null,
+    stereodosePlaylists: null,
   }
 
   render() {
-    const { spotifyPlaylists, stereodosePlaylists, categories, loading } = this.state;
+    const { spotifyPlaylists, stereodosePlaylists } = this.state;
+    const categories = this.props.categories;
 
-    if (spotifyPlaylists !== null && stereodosePlaylists !== null && !loading) {
+    if (spotifyPlaylists && stereodosePlaylists && categories) {
       return (
 
         <div className="container">
 
           <div className="row">
             <div className="col">
-      
+              {this.props.location.pathname === "/profile/shared" &&
+                <div label="Playlists Shared to Stereodose">
+                  <h2 id="content-title">Playlists Shared to Stereodose</h2>
+                  <table className="table">
+                    <tbody>
+                      <tr>
+                        <th>Playlist Name</th>
+                        <th>Drug</th>
+                        <th>Mood</th>
+                        <th>Delete?</th>
+                      </tr>
+                      {stereodosePlaylists.map((playlist) => {
+                        return <StereodosePlaylist
+                          key={playlist.spotifyID}
+                          playlist={playlist}
+                          onUpdate={() => { this.checkPlaylists() }}
+                        />
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              }
 
-                {this.props.location.pathname === "/profile/shared" &&
-                  <div label="Playlists Shared to Stereodose">
-                    <h2 id="content-title">Playlists Shared to Stereodose</h2>
-                    <table className="table">
-                      <tbody>
-                        <tr>
-                          <th>Playlist Name</th>
-                          <th>Drug</th>
-                          <th>Mood</th>
-                          <th>Delete?</th>
-                        </tr>
-                        {stereodosePlaylists.map((playlist) => {
-                          return <StereodosePlaylist
-                            key={playlist.spotifyID}
-                            playlist={playlist}
-                            onUpdate={() => { this.checkPlaylists() }}
-                          />
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                }
+              {this.props.location.pathname === "/profile/available" &&
+                <div label="Playlists Available">
+                  <ShareSpotifyPlaylist
+                    playlists={spotifyPlaylists}
+                    categories={categories}
+                    onUpdate={() => { this.checkPlaylists() }}
+                  />
+                </div>
+              }
 
-                {this.props.location.pathname === "/profile/available" &&
-                  <div label="Playlists Available">
-                    <ShareSpotifyPlaylist
-                      playlists={spotifyPlaylists}
-                      categories={categories}
-                      onUpdate={() => { this.checkPlaylists() }}
-                    />
-                  </div>
-                }
+              {this.props.location.pathname === "/profile" &&
+                <div>TODO: add some profile data stuff here</div>
+              }
 
-                {this.props.location.pathname === "/profile" &&
-                  <div>TODO: add some profile data stuff here</div>
-                }
-
-
-
-              </div>
-     
+            </div>
           </div>
-
         </div>
       )
     }
     return (
-      <div>
-        <h2>Loading...</h2>
-      </div>
+      <div>...loading</div>
     );
   }
 
   async componentDidMount() {
-    let resp = await fetch("/api/categories/", { credentials: "same-origin" });
-    let categories = await resp.json();
-    let state = this.state;
-    state.categories = categories;
-    this.setState(state);
-    this.checkPlaylists();
+    try {
+      this.checkPlaylists();
+    } catch (err) {
+      alert(err.message);
+    }
   }
 
   checkPlaylists = async () => {
-    let SDK = new Spotify();
-    // TODO: catch errors here
-    let token = await this.props.getAccessToken();
+    const SDK = new Spotify();
+    const token = await this.props.getAccessToken();
     SDK.setAccessToken(token);
-    let userPlaylists = await SDK.getUserPlaylists();
+    const userPlaylists = await SDK.getUserPlaylists();
 
-    let response = await fetch("/api/playlists/me", { credentials: "same-origin" });
-    let stereodosePlaylists = await response.json();
+    const response = await fetch("/api/playlists/me", { credentials: "same-origin" });
+    if (response.status !== 200) {
+      throw new Error(`${response.status} Unable to fetch user profile`);
+    }
+    const stereodosePlaylists = await response.json();
 
-    let diffedSpotifyPlaylists = [];
-    let diffedStereodosePlaylists = [];
+    const diffedSpotifyPlaylists = [];
+    const diffedStereodosePlaylists = [];
 
-    let spotifyPlaylists = userPlaylists.items;
+    const spotifyPlaylists = userPlaylists.items;
     for (let i = 0; i < spotifyPlaylists.length; i++) {
       let match = false;
       for (let j = 0; j < stereodosePlaylists.length; j++) {
@@ -119,11 +107,10 @@ class UserProfile extends React.Component {
       }
     }
 
-    let state = this.state;
-    state.spotifyPlaylists = diffedSpotifyPlaylists;
-    state.stereodosePlaylists = diffedStereodosePlaylists;
-    state.loading = false;
-    this.setState(state);
+    this.setState({
+      spotifyPlaylists: diffedSpotifyPlaylists,
+      stereodosePlaylists: diffedStereodosePlaylists
+    });
   }
 }
 

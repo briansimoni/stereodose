@@ -27,7 +27,7 @@ class ShareSpotifyPlaylist extends React.Component {
   render() {
     const { playlists, categories } = this.props;
     const { selectedPlaylist, selectedDrug, selectedMood, imageBlob } = this.state;
-    if (!playlists) {
+    if (!playlists || !categories) {
       return <div></div>
     }
 

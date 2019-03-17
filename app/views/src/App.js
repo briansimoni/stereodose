@@ -25,7 +25,8 @@ class App extends React.Component {
 
     this.state = {
       accessToken: null,
-      loggedIn: false
+      categories: null,
+      loggedIn: false,
     }
 
     this.deviceIDPromise = new Promise((resolve, reject) => {
@@ -68,6 +69,7 @@ class App extends React.Component {
                 render={(props) =>
                   <UserProfile
                     {...props}
+                    categories={this.state.categories}
                     getAccessToken={this.getAccessToken}
                   />
                 }
@@ -77,6 +79,7 @@ class App extends React.Component {
                 render={(props) =>
                   <UserProfile
                     {...props}
+                    categories={this.state.categories}
                     getAccessToken={this.getAccessToken}
                   />
                 }
@@ -86,13 +89,32 @@ class App extends React.Component {
                 render={(props) =>
                   <UserProfile
                     {...props}
+                    categories={this.state.categories}
                     getAccessToken={this.getAccessToken}
                   />
                 }
               />
 
-              <Route exact path="/" component={Drugs} />
-              <Route exact path="/:drug" component={Drug} />
+              <Route exact path="/"
+                render={(props) =>
+                  <Drugs
+                    {...props}
+                    categories={this.state.categories}
+                  />
+                }
+              />
+
+              {/* <Route exact path="/:drug" component={Drug} /> */}
+              <Route exact path="/:drug"
+                render={(props) => 
+                  <Drug
+                    {...props}
+                    categories={this.state.categories}
+                  />
+                }
+              />
+
+              
               <Route exact path="/:drug/:subcategory" component={Playlists} />
               <Route
                 exact
@@ -123,6 +145,19 @@ class App extends React.Component {
         </div>
       </BrowserRouter >
     )
+  }
+
+  componentDidMount() {
+    this.getCategories();
+  }
+
+  getCategories = async () => {
+    const response = await fetch('/api/categories/', { credentials: 'same-origin' });
+    if (response.status !== 200) {
+      throw new Error("Unable to fetch categories");
+    }
+    const categories = await response.json();
+    this.setState({categories: categories});
   }
 
   // pass setDeviceID to the player component so we can lift "state" up
