@@ -63,6 +63,12 @@ ul.moods, ul.drugs, #moods {
 
 .octicon.octicon-heart {
     cursor: pointer;
+    color: gray;
+    font-size: 36px;
+}
+
+.octicon.octicon-heart.liked {
+    cursor: pointer;
     color: #b00606;
     font-size: 36px;
 }

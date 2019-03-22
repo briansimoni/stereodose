@@ -45,6 +45,7 @@ type Playlist struct {
 	Tracks             []Track         `json:"tracks" gorm:"many2many:playlist_tracks"`
 	Comments           []Comment       `json:"comments" gorm:"ForeignKey:PlaylistID;AssociationForeignKey:spotify_id"`
 	Likes              []Like          `json:"likes" gorm:"ForeignKey:PlaylistID;AssociationForeignKey:spotify_id"`
+	LikesCount         uint            `json:"likesCount"`
 	URI                string          `json:"URI"`
 	UserID             uint            `json:"userID"`
 	BucketImageURL     string          `json:"bucketImageURL"`
@@ -279,7 +280,27 @@ func (s *StereodosePlaylistService) Like(playlistID string, user User) (*Like, e
 		UserID:     user.ID,
 	}
 
-	err := s.db.Create(like).Error
+	tx := s.db.Begin()
+
+	var playlist Playlist
+	err := tx.Where("spotify_id = ?", playlistID).Find(&playlist).Error
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	err = tx.Create(like).Error
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	err = tx.Model(&playlist).Update("likes_count", playlist.LikesCount+1).Error
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+	err = tx.Commit().Error
 	if err != nil {
 		return nil, err
 	}
@@ -293,11 +314,26 @@ func (s *StereodosePlaylistService) Unlike(playlistID string, likeID uint) error
 		return errors.New("spotifyID was empty string")
 	}
 
+	tx := s.db.Begin()
+
+	var playlist Playlist
+	err := tx.Where("spotify_id = ?", playlistID).Find(&playlist).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
 	like := new(Like)
 	like.ID = likeID
-	err := s.db.Delete(like).Error
+	err = tx.Delete(like).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = tx.Model(&playlist).Update("likes_count", playlist.LikesCount-1).Error
 	if err != nil {
 		return err
 	}
-	return nil
+	return tx.Commit().Error
 }

@@ -49,8 +49,6 @@ class App extends React.Component {
     return (
       <BrowserRouter>
         <div>
-
-
           <Route
             path="/"
             render={(props) =>
@@ -147,8 +145,12 @@ class App extends React.Component {
     )
   }
 
-  componentDidMount() {
-    this.getCategories();
+  async componentDidMount() {
+    try {
+      await this.getCategories();
+    } catch(err) {
+      alert(err.message);
+    }
   }
 
   getCategories = async () => {
