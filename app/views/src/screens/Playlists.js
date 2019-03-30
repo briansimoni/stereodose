@@ -1,9 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./Screens.css";
+import Pagination from "./Pagination";
 
 // Playlists renders the playlists that correspond to a particular drug + mood
 class Playlists extends React.Component {
+
+  resultsPerPage = 15;
 
   constructor(props) {
     super(props);
@@ -33,7 +36,11 @@ class Playlists extends React.Component {
       // this makes it way easier to render with react
       // With Bootstrap remember total row width is 12 columns.
       // So columns of length 4 mean you get 3 columns per row
-      const rows = playlists.reduce((accumulator, currentPlaylist, index) => {
+      // A slice of total playlists is used to allow pagination to work correctly
+      // Only the first 15 (or whatever the desired number of results per page)
+      // is taken as a slice
+      const playlistsSlice = playlists.slice(0, this.resultsPerPage);
+      const rows = playlistsSlice.reduce((accumulator, currentPlaylist, index) => {
         if (index % 3 === 0) {
           return accumulator.concat([playlists.slice(index, index + 3)])
         }
@@ -64,25 +71,20 @@ class Playlists extends React.Component {
               </div>
             )
           })}
+
+          <Pagination resultsPerPage={this.resultsPerPage} match={match} playlists={playlists} />
+
+
         </div>
 
       );
     }
   }
 
+  // when this component loads, grab the query params for pagination
   async componentDidMount() {
-    let drug = this.props.match.params.drug;
-    let subcategory = this.props.match.params.subcategory;
-
     try {
-      let response = await fetch(`/api/playlists/?category=${drug}&subcategory=${subcategory}`, { credentials: "same-origin" });
-      if (response.status !== 200) {
-        throw new Error(`Error fetching playlists ${response.status}, ${response.statusText}`);
-      }
-      let playlists = await response.json();
-      if (playlists.length === 0) {
-        throw new Error(`No playlists found for drug: ${drug}, mood: ${subcategory}`);
-      }
+      const playlists = await this.fetchPlaylists();
       this.setState({
         loading: false,
         playlists: playlists
@@ -93,6 +95,46 @@ class Playlists extends React.Component {
         error: err.message
       });
     }
+  }
+
+  // updating the page queryParam seems to trigger an update
+  async componentDidUpdate() {
+    try {
+      const oldPlaylists = this.state.playlists;
+      if (!oldPlaylists) {
+        return;
+      }
+      const newPlaylists = await this.fetchPlaylists();
+      // maybe want to deep equal instead of JSON.stringify
+      if (JSON.stringify(newPlaylists) === JSON.stringify(oldPlaylists)) {
+        return;
+      }
+      this.setState({ playlists: newPlaylists });
+    } catch (err) {
+      this.setState({
+        loading: false,
+        error: err.message
+      });
+    }
+  }
+
+  fetchPlaylists = async () => {
+    let drug = this.props.match.params.drug;
+    let subcategory = this.props.match.params.subcategory;
+
+    const params = new URLSearchParams(window.location.search);
+    const page = params.get('page') !== null ? parseInt(params.get('page')) : 1;
+    const offset = page === 1 ? 0 : (page * this.resultsPerPage) - this.resultsPerPage;
+
+    const response = await fetch(`/api/playlists/?category=${drug}&subcategory=${subcategory}&limit=20&offset=${offset}`, { credentials: "same-origin" });
+    if (response.status !== 200) {
+      throw new Error(`Error fetching playlists ${response.status}, ${response.statusText}`);
+    }
+    const playlists = await response.json();
+    if (playlists.length === 0) {
+      throw new Error(`No playlists found for drug: ${drug}, mood: ${subcategory}`);
+    }
+    return playlists;
   }
 
 }

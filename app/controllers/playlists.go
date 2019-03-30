@@ -37,7 +37,8 @@ func NewPlaylistsController(db *models.StereoDoseDB, b *blob.Bucket) *PlaylistsC
 }
 
 // GetPlaylists will return a subset of all the playlists in the DB
-// either offset or limit are required parameters
+// if offset is not provided, it is set to 0 by default
+// if limit is not provided, it is set to 10 by default
 func (p *PlaylistsController) GetPlaylists(w http.ResponseWriter, r *http.Request) error {
 	queryValues := r.URL.Query()
 	offset := queryValues.Get("offset")

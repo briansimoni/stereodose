@@ -81,7 +81,21 @@ class UserProfile extends React.Component {
     const SDK = new Spotify();
     const token = await this.props.getAccessToken();
     SDK.setAccessToken(token);
-    const userPlaylists = await SDK.getUserPlaylists();
+
+    let spotifyPlaylists = [];
+    let allPlaylistsLoaded = false;
+    let offset = 0;
+    while(!allPlaylistsLoaded) {
+      const userPlaylists = await SDK.getUserPlaylists({
+        limit: 50,
+        offset: offset
+      });
+      spotifyPlaylists = spotifyPlaylists.concat(userPlaylists.items);
+      if (userPlaylists.items.length < 50) {
+        allPlaylistsLoaded = true;
+      }
+      offset = offset + 50;
+    }
 
     const response = await fetch("/api/playlists/me", { credentials: "same-origin" });
     if (response.status !== 200) {
@@ -92,7 +106,7 @@ class UserProfile extends React.Component {
     const diffedSpotifyPlaylists = [];
     const diffedStereodosePlaylists = [];
 
-    const spotifyPlaylists = userPlaylists.items;
+    // const spotifyPlaylists = userPlaylists.items;
     for (let i = 0; i < spotifyPlaylists.length; i++) {
       let match = false;
       for (let j = 0; j < stereodosePlaylists.length; j++) {

@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/briansimoni/stereodose/app/controllers"
 	"github.com/briansimoni/stereodose/app/models"
@@ -20,16 +21,12 @@ import (
 )
 
 var (
-	store         *sessions.CookieStore
-	db            *gorm.DB
-	stereoDoseDB  *models.StereoDoseDB
-	cloudBucket   *blob.Bucket
-	file          *os.File
-	indexHTML     []byte
-	robotsTXT     []byte
-	manifest      []byte
-	serviceWorker []byte
-	err           error
+	store        *sessions.CookieStore
+	db           *gorm.DB
+	stereoDoseDB *models.StereoDoseDB
+	cloudBucket  *blob.Bucket
+	err          error
+	fileCache    map[string][]byte
 )
 
 // InitApp puts together the Router to use as the app's main HTTP handler
@@ -69,9 +66,9 @@ func createRouter(c *config.Config) *util.AppRouter {
 	fs := http.StripPrefix("/public/", http.FileServer(http.Dir("app/views/build/")))
 	app.PathPrefix("/public/").Handler(fs)
 
-	app.HandleFunc("/robots.txt", serveFile(robotsTXT, nil))
-	app.HandleFunc("/manifest.json", serveFile(manifest, nil))
-	app.HandleFunc("/sw.js", serveFile(serviceWorker, map[string]string{"Content-Type": "application/javascript"}))
+	app.HandleFunc("/robots.txt", serveFile(fileCache["/robots.txt"], nil))
+	app.HandleFunc("/manifest.json", serveFile(fileCache["/manifest.json"], nil))
+	app.HandleFunc("/sw.js", serveFile(fileCache["/sw.js"], map[string]string{"Content-Type": "application/javascript"}))
 
 	healthRouter := util.AppRouter{app.PathPrefix("/api/health").Subrouter()}
 	healthRouter.AppHandler("/", health.CheckHealth).Methods(http.MethodGet)
@@ -115,12 +112,12 @@ func createRouter(c *config.Config) *util.AppRouter {
 	categoriesRouter := util.AppRouter{app.PathPrefix("/api/categories").Subrouter()}
 	categoriesRouter.AppHandler("/", categories.GetAvailableCategories).Methods(http.MethodGet)
 
-	app.HandleFunc("/", serveFile(indexHTML, nil))
+	app.HandleFunc("/", serveFile(fileCache["/index.html"], nil))
 	// Serving the React app on 404's enables the use of arbitrary routes with react browser-router
 	// Otherwise a request to /some/arbitrary/path from a different origin would simply 404
 	// Could use the hash router for a looser coupling but /#/some/path is ugly
-	app.HandleFunc("/{page1}", serveFile(indexHTML, nil))
-	app.HandleFunc("/{page1}/{page2}", serveFile(indexHTML, nil))
+	app.HandleFunc("/{page1}", serveFile(fileCache["/index.html"], nil))
+	app.HandleFunc("/{page1}/{page2}", serveFile(fileCache["/index.html"], nil))
 	app.NotFoundHandler = handlers.LoggingHandler(os.Stdout, http.HandlerFunc(serveReactApp404))
 
 	return app
@@ -128,7 +125,7 @@ func createRouter(c *config.Config) *util.AppRouter {
 
 func serveReactApp404(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
-	fmt.Fprint(w, string(indexHTML))
+	fmt.Fprint(w, string(fileCache["/index.html"]))
 }
 
 // serve file takes file data and optionally headers and returns an http.Handler function
@@ -141,47 +138,40 @@ func serveFile(data []byte, headers map[string]string) func(w http.ResponseWrite
 	}
 }
 
-// load the contents of index.html and robots.txt into memory only when the app starts up
-// instead of on each request
-func init() {
-	file, err = os.Open("./app/views/build/index.html")
+// loadFile adds hard-coded files to a cache which can be used later
+// the fileCache map uses /filename.extension as the key
+// for example, the key for ./app/views/build/index.html is simply /index.html
+func loadFile(filePath string) error {
+	split := strings.Split(filePath, "/")
+	name := "/" + split[len(split)-1]
+	file, err := os.Open(filePath)
 	if err != nil {
-		log.Fatalf("Unable to open index.html: %s", err.Error())
+		return err
 	}
 	defer file.Close()
+	data, err := ioutil.ReadAll(file)
+	if err != nil {
+		return err
+	}
+	fileCache[name] = data
+	return nil
+}
 
-	indexHTML, err = ioutil.ReadAll(file)
-	if err != nil {
-		log.Fatalf("Unable to read the contents of index.html, %s", err.Error())
-	}
-
-	robotsFile, err := os.Open("./app/views/public/robots.txt")
-	if err != nil {
-		log.Fatalf("Unable to open robots.txt: %s", err.Error())
-	}
-	defer robotsFile.Close()
-	robotsTXT, err = ioutil.ReadAll(robotsFile)
-	if err != nil {
-		log.Fatalf("Unable to read contents of robots.txt %s", err.Error())
-	}
-
-	manifestFile, err := os.Open("./app/views/public/manifest.json")
-	if err != nil {
-		log.Fatalf("Unable to open manifest.json")
-	}
-	defer manifestFile.Close()
-	manifest, err = ioutil.ReadAll(manifestFile)
-	if err != nil {
-		log.Fatalf("Unable to read contents of manifest.json %s", err.Error())
+// load the contents of certain static files into memory only when the app starts up
+// instead of on each request
+func init() {
+	fileCache = make(map[string][]byte, 0)
+	files := []string{
+		"./app/views/build/index.html",
+		"./app/views/public/robots.txt",
+		"./app/views/public/manifest.json",
+		"./app/views/build/sw.js",
 	}
 
-	serviceWorkerFile, err := os.Open("./app/views/build/sw.js")
-	if err != nil {
-		log.Fatalf("Unable to open sw.js")
-	}
-	defer serviceWorkerFile.Close()
-	serviceWorker, err = ioutil.ReadAll(serviceWorkerFile)
-	if err != nil {
-		log.Fatalf("Unable to read contents of serviceworker.json %s", err.Error())
+	for _, file := range files {
+		err := loadFile(file)
+		if err != nil {
+			log.Fatalf("Unable to load file: %s. %s", file, err.Error())
+		}
 	}
 }
