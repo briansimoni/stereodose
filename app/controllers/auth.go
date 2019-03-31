@@ -319,35 +319,21 @@ func (a *AuthController) saveUserData(token *oauth2.Token, u *spotify.PrivateUse
 		DisplayName:  u.DisplayName,
 		Email:        u.Email,
 		SpotifyID:    u.ID,
-		Images:       u.Images,
 		Product:      u.Product,
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
+	}
+	user.Images = make([]models.UserImage, len(u.Images))
+	for i, spotifyImage := range u.Images {
+		var image models.UserImage
+		image.Height = spotifyImage.Height
+		image.Width = spotifyImage.Width
+		image.URL = spotifyImage.URL
+		user.Images[i] = image
 	}
 	user, err := a.DB.Users.FirstOrCreate(user, token)
 	if err != nil {
 		return nil, err
 	}
 	return user, nil
-}
-
-// Middleware checks to see if the user is logged in before
-// allowing the request to continue
-func (a *AuthController) Middleware(next http.HandlerFunc) http.Handler {
-	f := func(w http.ResponseWriter, r *http.Request) error {
-		s, err := a.Store.Get(r, sessionName)
-		if err != nil {
-			return errors.WithStack(err)
-		}
-		tok, ok := s.Values["Token"].(oauth2.Token)
-		if !ok || !tok.Valid() {
-			s.Values["return_path"] = r.URL.Path
-			s.Save(r, w)
-			http.Redirect(w, r, "/auth/login", http.StatusTemporaryRedirect)
-			return nil
-		}
-		next.ServeHTTP(w, r)
-		return nil
-	}
-	return util.Handler{f}
 }

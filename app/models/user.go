@@ -24,19 +24,19 @@ type User struct {
 	DisplayName string `json:"displayName"`
 	Email       string `json:"email"`
 	// TODO: may want to change this to not unique to handle soft delete cases
-	SpotifyID    string          `json:"spotifyID" gorm:"unique;not null"`
-	RefreshToken string          `json:"-"` // Hide the RefreshToken in json responses
-	AccessToken  string          `json:"accessToken"`
-	Images       []spotify.Image `json:"images"`
-	Playlists    []Playlist      `json:"playlists"`
-	Comments     []Comment       `json:"comments"`
-	Likes        []Like          `json:"likes"`
+	SpotifyID    string      `json:"spotifyID" gorm:"unique;not null"`
+	RefreshToken string      `json:"-"` // Hide the RefreshToken in json responses
+	AccessToken  string      `json:"accessToken"`
+	Images       []UserImage `json:"images"`
+	Playlists    []Playlist  `json:"playlists"`
+	Comments     []Comment   `json:"comments"`
+	Likes        []Like      `json:"likes"`
 	// Product is the user's subscription level: "premium, free etc..."
 	Product string `json:"product"`
 }
 
 // UserImage should contain a URL or reference to an image
-// It originally comes from Spotify
+// It originally comes from Spotify, thus the embedded type
 type UserImage struct {
 	gorm.Model
 	spotify.Image
@@ -53,7 +53,7 @@ type StereodoseUserService struct {
 // if it doesn't it creates one, otherwise it returns a pointer to user
 func (u *StereodoseUserService) ByID(ID uint) (*User, error) {
 	user := &User{}
-	err := u.db.Preload("Playlists").Preload("Comments").Preload("Likes").Find(user, "id = ?", ID).Error
+	err := u.db.Preload("Images").Preload("Playlists").Preload("Comments").Preload("Likes").Find(user, "id = ?", ID).Error
 	if err != nil {
 		return nil, err
 	}
