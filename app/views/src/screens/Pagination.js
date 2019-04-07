@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-// this component will have somewhat of a 2-way binding between the query params for paging and the component state
 export default function Pagination(props) {
 
   const params = new URLSearchParams(window.location.search);
@@ -11,8 +10,7 @@ export default function Pagination(props) {
   return (
     <div className="row justify-content-center">
       <nav aria-label="Playlists search results page.">
-
-
+      
         {page === 1 && // first page and previous button disabled
           <ul className="pagination">
             <li className="page-item disabled">
@@ -22,8 +20,6 @@ export default function Pagination(props) {
             <li className="page-item active">
               <Link to={`${match.url}?page=${page}`} className="page-link">{page} <span className="sr-only">(current)</span></Link>
             </li>
-
-
 
             {playlists.length > resultsPerPage &&
               <li className="page-item">
@@ -82,9 +78,7 @@ export default function Pagination(props) {
             <li className="page-item disabled">
               <Link to="" tabIndex="-1" className="page-link">Next</Link>
             </li>
-
           </ul>
-
         }
 
       </nav>
