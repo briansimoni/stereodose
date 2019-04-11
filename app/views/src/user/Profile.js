@@ -14,7 +14,7 @@ class UserProfile extends React.Component {
 
   render() {
     const { spotifyPlaylists, stereodosePlaylists, user } = this.state;
-    const categories = this.props.categories;
+    const categories = this.props.app.state.categories;
 
     if (spotifyPlaylists && stereodosePlaylists && categories) {
       return (
@@ -109,7 +109,7 @@ class UserProfile extends React.Component {
 
   checkPlaylists = async () => {
     const SDK = new Spotify();
-    const token = await this.props.getAccessToken();
+    const token = await this.props.app.getAccessToken();
     SDK.setAccessToken(token);
 
     let spotifyPlaylists = [];

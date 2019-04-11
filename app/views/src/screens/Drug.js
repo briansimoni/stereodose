@@ -10,7 +10,7 @@ export default function Drug(props) {
 
   const drug = props.match.params.drug;
   const match = props.match;
-  const categories = props.categories;
+  const categories = props.app.state.categories;
 
   if (categories !== null && !(drug in categories)) {
     return <Route component={NoMatch} />

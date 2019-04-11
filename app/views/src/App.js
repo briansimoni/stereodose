@@ -9,6 +9,9 @@ import UserProfile from './user/Profile';
 import Header from './user/Header';
 import NoMatch from './404';
 
+// idea:
+// make the App instance the observer
+// App can subscribe to events and provide methods (Promises) to return event values
 class App extends React.Component {
 
   accessToken = null
@@ -22,6 +25,8 @@ class App extends React.Component {
 
   constructor(props) {
     super(props);
+
+    this.observers = [];
 
     this.state = {
       accessToken: null,
@@ -37,6 +42,30 @@ class App extends React.Component {
     this.loggedInPromise = new Promise((resolve) => {
       this.loggedInPromiseResolver = resolve;
     })
+  }
+
+  // subscribe, unsubscribe, fireDeviceID are my first attempt at using
+  // the observer pattern instead of some weird Promise callback shit
+  subscribe = (fn) => {
+    console.log('subscribed');
+    this.observers.push(fn);
+  }
+
+  unsubscribe = (fn) => {
+    this.observers = this.observers.filter((item) => {
+      return item !== fn;
+    });
+  }
+
+  fireDeviceID = (id) => {
+    this.observers.forEach((item) => {
+      item.call(null, id);
+    });
+  }
+
+  onDeviceIDAvailable = async (id) => {
+    console.log('hello! ' + id);
+    return id;
   }
 
   isUserLoggedIn = loggedIn => {
@@ -67,8 +96,7 @@ class App extends React.Component {
                 render={(props) =>
                   <UserProfile
                     {...props}
-                    categories={this.state.categories}
-                    getAccessToken={this.getAccessToken}
+                    app={this}
                   />
                 }
               />
@@ -77,8 +105,7 @@ class App extends React.Component {
                 render={(props) =>
                   <UserProfile
                     {...props}
-                    categories={this.state.categories}
-                    getAccessToken={this.getAccessToken}
+                    app={this}
                   />
                 }
               />
@@ -87,8 +114,7 @@ class App extends React.Component {
                 render={(props) =>
                   <UserProfile
                     {...props}
-                    categories={this.state.categories}
-                    getAccessToken={this.getAccessToken}
+                    app={this}
                   />
                 }
               />
@@ -97,7 +123,7 @@ class App extends React.Component {
                 render={(props) =>
                   <Drugs
                     {...props}
-                    categories={this.state.categories}
+                    app={this}
                   />
                 }
               />
@@ -107,7 +133,7 @@ class App extends React.Component {
                 render={(props) => 
                   <Drug
                     {...props}
-                    categories={this.state.categories}
+                    app={this}
                   />
                 }
               />
@@ -120,6 +146,7 @@ class App extends React.Component {
                 render={(props) =>
                   <Playlist
                     {...props}
+                    app={this}
                     getAccessToken={this.getAccessToken}
                     getDeviceID={() => this.deviceIDPromise}
                   />
@@ -135,7 +162,7 @@ class App extends React.Component {
             render={(props) =>
               <Player
                 {...props}
-                getAccessToken={this.getAccessToken}
+                app={this}
                 setDeviceID={(deviceID) => this.setDeviceID(deviceID)}>
               </Player>
             }

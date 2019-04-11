@@ -10,6 +10,14 @@ export default class Player extends Component {
 
   constructor(props) {
     super(props);
+
+    // Player is an observable
+    // When the device ID is obtained an event will be fired
+    // to tell the subscribers that the data is available
+    this.observers = [];
+
+    this.subscribe(this.props.app.onDeviceIDAvailable);
+
     this.state = {
       // User's session credentials
       userDeviceId: null,
@@ -24,16 +32,32 @@ export default class Player extends Component {
     };
   }
 
-  componentWillMount() {
-    this.props.getAccessToken()
-      .then((accessToken) => {
-        this.setState({
-          userAccessToken: accessToken
-        });
-      })
-      .catch((error) => {
-        this.setState({ authError: error });
-      })
+  subscribe = (fn) => {
+    console.log('subscribed');
+    this.observers.push(fn);
+  }
+
+  unsubscribe = (fn) => {
+    this.observers = this.observers.filter((item) => {
+      return item !== fn;
+    });
+  }
+
+  fireDeviceID = (id) => {
+    this.observers.forEach((item) => {
+      item.call(null, id);
+    });
+  }
+
+  async componentWillMount() {
+    try {
+      const accessToken = await this.props.app.getAccessToken();
+      this.setState({
+        userAccessToken: accessToken
+      });
+    } catch (err) {
+      this.setState({ authError: err });
+    }
   }
 
   onPlayPause = async () => {
@@ -86,7 +110,7 @@ export default class Player extends Component {
     let SDK = new Spotify();
     let token;
     try {
-      token = await this.props.getAccessToken();
+      token = await this.props.app.getAccessToken();
     } catch (err) {
       alert(err.message);
     }
@@ -105,7 +129,8 @@ export default class Player extends Component {
     } = this.state;
 
     if (userDeviceId) {
-      this.props.setDeviceID(userDeviceId);
+      this.props.app.setDeviceID(userDeviceId);
+      this.fireDeviceID(userDeviceId);
     }
 
     let webPlaybackSdkProps = {
@@ -113,7 +138,7 @@ export default class Player extends Component {
       playerInitialVolume: 1.0,
       playerRefreshRateMs: 100,
       playerAutoConnect: true,
-      onPlayerRequestAccessToken: (() => this.props.getAccessToken()),
+      onPlayerRequestAccessToken: (() => this.props.app.getAccessToken()),
       onPlayerLoading: (() => this.setState({ playerLoaded: true })),
       onPlayerWaitingForDevice: (data => this.setState({ playerSelected: false, userDeviceId: data.device_id })),
       onPlayerDeviceSelected: (() => this.setState({ playerSelected: true })),

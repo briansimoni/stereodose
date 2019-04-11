@@ -17,6 +17,8 @@ class Playlist extends React.Component {
   constructor(props) {
     super(props);
 
+    this.props.app.subscribe(this.handler);
+
     this.state = {
       loading: true,
       showComments: false,
@@ -24,6 +26,15 @@ class Playlist extends React.Component {
       user: null,
       error: null
     };
+  }
+
+  componentWillUnmount() {
+    console.log('unsubscribed');
+    this.props.app.unsubscribe(this.handler);
+  }
+
+  handler = (event) => {
+    console.log(event);
   }
 
   render() {
