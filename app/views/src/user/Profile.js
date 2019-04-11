@@ -62,8 +62,16 @@ class UserProfile extends React.Component {
                   <div className="row">
                     <div className="col text-center">
 
-                      <img src={user.images[user.images.length - 1].url} alt="profile" className="img-thumbnail" />
-                      <br/>
+                      {/*hotfix*/}
+                      {user.images && user.images.length > 0 &&
+                        <img src={user.images[user.images.length - 1].url} alt="profile" className="img-thumbnail" />
+                      }
+
+                      {(!user.images || !user.images.length > 0) &&
+                        <img src="" alt="profile" className="img-thumbnail" />
+                      }
+
+                      <br />
                       {user.displayName}
                     </div>
                   </div>
