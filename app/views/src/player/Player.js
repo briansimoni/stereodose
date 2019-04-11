@@ -25,7 +25,7 @@ export default class Player extends Component {
   }
 
   componentWillMount() {
-    this.props.getAccessToken()
+    this.props.app.getAccessToken()
       .then((accessToken) => {
         this.setState({
           userAccessToken: accessToken
@@ -86,7 +86,7 @@ export default class Player extends Component {
     let SDK = new Spotify();
     let token;
     try {
-      token = await this.props.getAccessToken();
+      token = await this.props.app.getAccessToken();
     } catch (err) {
       alert(err.message);
     }
@@ -96,7 +96,6 @@ export default class Player extends Component {
 
   render() {
     let {
-      userDeviceId,
       userAccessToken,
       playerLoaded,
       playerSelected,
@@ -104,18 +103,21 @@ export default class Player extends Component {
       authError
     } = this.state;
 
-    if (userDeviceId) {
-      this.props.setDeviceID(userDeviceId);
-    }
+    // if (userDeviceId) {
+    //   this.props.setDeviceID(userDeviceId);
+    // }
 
     let webPlaybackSdkProps = {
       playerName: "Stereodose",
       playerInitialVolume: 1.0,
       playerRefreshRateMs: 100,
       playerAutoConnect: true,
-      onPlayerRequestAccessToken: (() => this.props.getAccessToken()),
+      onPlayerRequestAccessToken: (() => this.props.app.getAccessToken()),
       onPlayerLoading: (() => this.setState({ playerLoaded: true })),
-      onPlayerWaitingForDevice: (data => this.setState({ playerSelected: false, userDeviceId: data.device_id })),
+      onPlayerWaitingForDevice: ((data) => {
+        this.setState({ playerSelected: false, userDeviceId: data.device_id })
+        this.props.app.setState({deviceID: data.device_id});
+      }),
       onPlayerDeviceSelected: (() => this.setState({ playerSelected: true })),
       onPlayerStateChange: (playerState => this.setState({ playerState: playerState })),
       onPlayerError: (playerError => alert(playerError))
