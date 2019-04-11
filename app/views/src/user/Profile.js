@@ -9,17 +9,17 @@ class UserProfile extends React.Component {
   state = {
     spotifyPlaylists: null,
     stereodosePlaylists: null,
+    user: null
   }
 
   render() {
-    const { spotifyPlaylists, stereodosePlaylists } = this.state;
+    const { spotifyPlaylists, stereodosePlaylists, user } = this.state;
     const categories = this.props.app.state.categories;
 
     if (spotifyPlaylists && stereodosePlaylists && categories) {
       return (
 
         <div className="container">
-
           <div className="row">
             <div className="col">
               {this.props.location.pathname === "/profile/shared" &&
@@ -55,8 +55,36 @@ class UserProfile extends React.Component {
                 </div>
               }
 
-              {this.props.location.pathname === "/profile" &&
-                <div>TODO: add some profile data stuff here</div>
+              {this.props.location.pathname === "/profile" && user &&
+
+                <div>
+
+                  <div className="row">
+                    <div className="col text-center">
+
+                      <img src={user.images[user.images.length - 1].url} alt="profile" className="img-thumbnail" />
+                      <br/>
+                      {user.displayName}
+                    </div>
+                  </div>
+
+
+
+                  <div className="row">
+                    <div className="col-md-4">
+                      <h3 className="text-center">Likes: {user.likes.length}</h3>
+                    </div>
+
+                    <div className="col-md-4">
+                      <h3 className="text-center">Comments: {user.comments.length}</h3>
+                    </div>
+
+                    <div className="col-md-4">
+                      <h3 className="text-center">Shared: {stereodosePlaylists.length}</h3>
+                    </div>
+                  </div>
+                </div>
+
               }
 
             </div>
@@ -71,7 +99,8 @@ class UserProfile extends React.Component {
 
   async componentDidMount() {
     try {
-      this.checkPlaylists();
+      await this.checkPlaylists();
+      await this.fetchUserData();
     } catch (err) {
       alert(err.message);
     }
@@ -85,7 +114,7 @@ class UserProfile extends React.Component {
     let spotifyPlaylists = [];
     let allPlaylistsLoaded = false;
     let offset = 0;
-    while(!allPlaylistsLoaded) {
+    while (!allPlaylistsLoaded) {
       const userPlaylists = await SDK.getUserPlaylists({
         limit: 50,
         offset: offset
@@ -125,6 +154,15 @@ class UserProfile extends React.Component {
       spotifyPlaylists: diffedSpotifyPlaylists,
       stereodosePlaylists: diffedStereodosePlaylists
     });
+  }
+
+  fetchUserData = async () => {
+    const response = await fetch("/api/users/me", { credentials: "same-origin" });
+    if (response.status !== 200) {
+      throw new Error(`${response.status} Unable to fetch user profile`);
+    }
+    const user = await response.json();
+    this.setState({ user: user });
   }
 }
 
