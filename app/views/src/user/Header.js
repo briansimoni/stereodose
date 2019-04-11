@@ -19,7 +19,7 @@ export default function Header(props) {
             <li className="nav-item">
               <Link className="nav-link" to="/">Home</Link>
             </li>
-            <UserStatusIndicator isUserLoggedIn={props.isUserLoggedIn}/>
+            <UserStatusIndicator app={props.app} isUserLoggedIn={props.isUserLoggedIn}/>
           </ul>
         </div>
 

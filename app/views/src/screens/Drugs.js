@@ -6,8 +6,8 @@ import "./Screens.css";
 // Weed, Ecstacy, Shrooms, LSD
 export default function Drugs(props) {
 
-  const categories = props.categories;
-  if (categories !== null) {
+  const categories = props.app.state.categories;
+  if (categories) {
     let drugNames = Object.keys(categories);
 
     return (

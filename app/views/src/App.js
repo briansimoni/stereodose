@@ -12,8 +12,6 @@ import NoMatch from './404';
 class App extends React.Component {
 
   accessToken = null
-  deviceIDPromise
-  deviceIDResolver
 
   // loggedInPromise resolves at a later time with the user's logged in status (true/false)
   loggedInPromise
@@ -28,11 +26,6 @@ class App extends React.Component {
       categories: null,
       loggedIn: false,
     }
-
-    this.deviceIDPromise = new Promise((resolve, reject) => {
-      resolve = resolve.bind(this);
-      this.deviceIDResolver = resolve;
-    });
 
     this.loggedInPromise = new Promise((resolve) => {
       this.loggedInPromiseResolver = resolve;
@@ -52,7 +45,9 @@ class App extends React.Component {
           <Route
             path="/"
             render={(props) =>
-              <Header {...props}
+              <Header 
+              {...props}
+              app={this}
                 isUserLoggedIn={(loggedIn) =>
                   this.loggedInPromiseResolver(loggedIn)
                 }
@@ -67,8 +62,7 @@ class App extends React.Component {
                 render={(props) =>
                   <UserProfile
                     {...props}
-                    categories={this.state.categories}
-                    getAccessToken={this.getAccessToken}
+                    app={this}
                   />
                 }
               />
@@ -77,8 +71,7 @@ class App extends React.Component {
                 render={(props) =>
                   <UserProfile
                     {...props}
-                    categories={this.state.categories}
-                    getAccessToken={this.getAccessToken}
+                    app={this}
                   />
                 }
               />
@@ -87,8 +80,7 @@ class App extends React.Component {
                 render={(props) =>
                   <UserProfile
                     {...props}
-                    categories={this.state.categories}
-                    getAccessToken={this.getAccessToken}
+                    app={this}
                   />
                 }
               />
@@ -97,7 +89,7 @@ class App extends React.Component {
                 render={(props) =>
                   <Drugs
                     {...props}
-                    categories={this.state.categories}
+                    app={this}
                   />
                 }
               />
@@ -107,7 +99,7 @@ class App extends React.Component {
                 render={(props) => 
                   <Drug
                     {...props}
-                    categories={this.state.categories}
+                    app={this}
                   />
                 }
               />
@@ -120,8 +112,7 @@ class App extends React.Component {
                 render={(props) =>
                   <Playlist
                     {...props}
-                    getAccessToken={this.getAccessToken}
-                    getDeviceID={() => this.deviceIDPromise}
+                    app={this}
                   />
                 }
               />
@@ -135,8 +126,8 @@ class App extends React.Component {
             render={(props) =>
               <Player
                 {...props}
-                getAccessToken={this.getAccessToken}
-                setDeviceID={(deviceID) => this.setDeviceID(deviceID)}>
+                app={this}
+              >
               </Player>
             }
           />

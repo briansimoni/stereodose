@@ -69,6 +69,7 @@ class UserStatusIndicator extends React.Component {
     }
 
     if (this.state.loggedIn === true) {
+      console.log('me');
       fetch("/api/users/me", { credentials: "same-origin" })
         .then((response) => {
           return response.json();

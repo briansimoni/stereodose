@@ -140,8 +140,11 @@ class Playlist extends React.Component {
     }
 
     try {
-      const deviceID = await this.props.getDeviceID();
-      const accessToken = await this.props.getAccessToken();
+      const deviceID = this.props.app.state.deviceID;
+      if (!deviceID) {
+        return;
+      }
+      const accessToken = await this.props.app.getAccessToken();
 
       const response = await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceID}`, {
         method: "PUT",
@@ -277,7 +280,7 @@ class Playlist extends React.Component {
   updateUserState = async () => {
     // getting an access token implicitly tells us that the user is logged in
     try {
-      await this.props.getAccessToken();
+      await this.props.app.getAccessToken();
     } catch (err) {
       if (err.message === "Sign in with Spotify Premium to Play Music") {
         this.setState({ user: null });
