@@ -44,7 +44,7 @@ class Playlist extends React.Component {
                 <img src={playlist.bucketImageURL} alt="playlist-artwork" />
               </div>
               <button className="btn btn-warning comment-toggle" onClick={this.toggleComments}>Show Songs</button>
-              <Likes onLike={this.like} number={playlist.likes.length} user={this.state.user}/>
+              <Likes onLike={this.like} number={playlist.likes.length} user={this.state.user} />
 
             </div>
           </div>
@@ -217,26 +217,33 @@ class Playlist extends React.Component {
   }
 
   // there is some condition that is possible to reach such that the like button stops working
-  // TODO: change the display of the button to something different based on whether or not
   // the user has liked the playlist or not
   like = async () => {
-    const { playlist, user } = this.state
+    const { playlist, user } = this.state;
     const likePending = this.likePending;
-    if (user === null || likePending ) {
+    if (user === null || likePending) {
       return;
     }
     this.likePending = true;
 
     // The user already liked this playlist. Unlike.
-    const like = user.likes.find( (like) => like.playlistID);
+    const like = user.likes.find((like) => like.playlistID === playlist.spotifyID);
     if (like) {
-      await this.unlike(like.ID);
-      user.likes = user.likes.filter(l => l.ID !== like.ID);
-      this.setState({
-        user: user,
-      });
-      this.likePending = false;
-      return;
+      try {
+        await this.unlike(like.ID);
+        user.likes = user.likes.filter(l => l.ID !== like.ID);
+        this.setState({
+          user: user,
+        });
+        this.likePending = false;
+        return;
+      } catch (err) {
+        this.setState({
+          loading: false,
+          error: err
+        });
+        return;
+      }
     }
 
     const options = {
@@ -273,7 +280,7 @@ class Playlist extends React.Component {
       throw new Error(`${errorMessage}, ${response.status}, ${response.statusText}`);
     }
 
-    playlist.likes = playlist.likes.filter( l => l.ID !== likeID);
+    playlist.likes = playlist.likes.filter(l => l.ID !== likeID);
     this.setState({ playlist: playlist });
   }
 
@@ -309,7 +316,7 @@ class Playlist extends React.Component {
     const playlist = await response.json();
 
     // sort comments by time created
-    playlist.comments.sort( (a, b) => {
+    playlist.comments.sort((a, b) => {
       const playlistADate = new Date(a.CreatedAt);
       const playlistBDate = new Date(b.CreatedAt);
       if (playlistADate < playlistBDate) {

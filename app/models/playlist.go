@@ -314,17 +314,41 @@ func (s *StereodosePlaylistService) Unlike(playlistID string, likeID uint) error
 		return errors.New("spotifyID was empty string")
 	}
 
-	tx := s.db.Begin()
-
-	var playlist Playlist
-	err := tx.Where("spotify_id = ?", playlistID).Find(&playlist).Error
+	playlist := &Playlist{}
+	err := s.db.Preload("Likes").Find(playlist, "spotify_id = ?", playlistID).Error
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 
-	like := new(Like)
+	authorized := false
+	for _, like := range playlist.Likes {
+		log.Println(playlist.Likes)
+		if like.PlaylistID == playlistID {
+			authorized = true
+			break
+		}
+	}
+	if !authorized {
+		return errors.New("This like does not belong to this playlist")
+	}
+
+	like := &Like{}
 	like.ID = likeID
+
+	// idk I was drunk and this fixed some bug. I don't even know how
+	// It just creates a new array of likes. It does not include the like
+	// that we are deleting
+	playlist.Likes = func() []Like {
+		newList := make([]Like, 0)
+		for _, l := range playlist.Likes {
+			if l.PlaylistID != playlistID {
+				newList = append(newList, l)
+			}
+		}
+		return newList
+	}()
+
+	tx := s.db.Begin()
 	err = tx.Delete(like).Error
 	if err != nil {
 		tx.Rollback()
