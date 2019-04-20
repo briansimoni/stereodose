@@ -42,3 +42,7 @@ span.nav-link {
 .ReactCrop {
 	width: 100%;
 }
+
+.profile-main ul {
+	list-style: none;
+}

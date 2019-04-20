@@ -13,6 +13,7 @@ type Comment struct {
 	UserID      uint   `json:"userID"`
 	PlaylistID  string `json:"playlistID"`
 	DisplayName string `json:"displayName"`
+	Permalink   string `json:"permalink"`
 }
 
 // CommentService is an interface for directly performing actions on the comments table

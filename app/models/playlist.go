@@ -2,7 +2,9 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"log"
+	"net/url"
 	"strings"
 	"time"
 
@@ -50,6 +52,7 @@ type Playlist struct {
 	UserID             uint            `json:"userID"`
 	BucketImageURL     string          `json:"bucketImageURL"`
 	BucketThumbnailURL string          `json:"bucketThumbnailURL"`
+	Permalink          string          `json:"permalink"`
 }
 
 // PlaylistImage should contain a URL or reference to an image
@@ -123,6 +126,7 @@ func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlis
 	if err != nil {
 		return nil, err
 	}
+	permalink := url.QueryEscape(fmt.Sprintf("/%s/%s/%s", category, subCategory, playlistID))
 	playlist := &Playlist{
 		SpotifyID:          string(list.ID),
 		Collaborative:      list.Collaborative,
@@ -136,6 +140,7 @@ func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlis
 		SubCategory:        subCategory,
 		BucketImageURL:     image,
 		BucketThumbnailURL: thumbnail,
+		Permalink:          permalink,
 	}
 	for _, image := range list.Images {
 		playlist.Images = append(playlist.Images, PlaylistImage{Image: image})
@@ -144,9 +149,8 @@ func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlis
 	if err != nil {
 		return nil, err
 	}
-	for i, trk := range tracks {
+	for _, trk := range tracks {
 		track := trk.Track
-		log.Println(i, track.Name)
 		trackToAdd := Track{
 			SpotifyID:   string(track.ID),
 			Name:        track.Name,
@@ -236,14 +240,22 @@ func (s *StereodosePlaylistService) Comment(playlistID, text string, user User) 
 		return nil, errors.New("spotifyID was empty string")
 	}
 
+	// grab the permalink from the playlist struct
+	playlist := &Playlist{}
+	err := s.db.Find(playlist, "spotify_id = ?", playlistID).Error
+	if err != nil {
+		return nil, err
+	}
+
 	comment := &Comment{
 		Content:     text,
 		UserID:      user.ID,
 		PlaylistID:  playlistID,
 		DisplayName: user.DisplayName,
+		Permalink:   playlist.Permalink,
 	}
 
-	err := s.db.Create(comment).Error
+	err = s.db.Create(comment).Error
 	if err != nil {
 		return nil, err
 	}
@@ -288,6 +300,8 @@ func (s *StereodosePlaylistService) Like(playlistID string, user User) (*Like, e
 		tx.Rollback()
 		return nil, err
 	}
+	like.Permalink = playlist.Permalink
+	like.PlaylistName = playlist.Name
 
 	err = tx.Create(like).Error
 	if err != nil {

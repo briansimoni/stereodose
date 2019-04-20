@@ -1,8 +1,10 @@
 import React from "react";
 import Spotify from "spotify-web-api-js";
+import { Link } from "react-router-dom";
 import ShareSpotifyPlaylist from "./sharing/ShareSpotifyPlaylist";
 import StereodosePlaylist from "./StereodosePlaylist";
 import "./Profile.css";
+import profilePlaceholder from "../images/profile-placeholder.jpeg";
 
 class UserProfile extends React.Component {
 
@@ -18,7 +20,6 @@ class UserProfile extends React.Component {
 
     if (spotifyPlaylists && stereodosePlaylists && categories) {
       return (
-
         <div className="container">
           <div className="row">
             <div className="col">
@@ -57,18 +58,18 @@ class UserProfile extends React.Component {
 
               {this.props.location.pathname === "/profile" && user &&
 
-                <div>
+                <div className="text-center profile-main">
 
                   <div className="row">
-                    <div className="col text-center">
+                    <div className="col">
 
                       {/*hotfix*/}
                       {user.images && user.images.length > 0 &&
-                        <img src={user.images[user.images.length - 1].url} alt="profile" className="img-thumbnail" />
+                        <img src={user.images[user.images.length - 1].url} alt="profile" className="img-thumbnail rounded-circle" />
                       }
 
                       {(!user.images || !user.images.length > 0) &&
-                        <img src="" alt="profile" className="img-thumbnail" />
+                        <img src={profilePlaceholder} alt="profile" className="img-thumbnail rounded-circle" />
                       }
 
                       <br />
@@ -76,19 +77,37 @@ class UserProfile extends React.Component {
                     </div>
                   </div>
 
-
+                  <div className="row">
+                    <div className="col-md-6"><h2><Link className="nav-link" to="/profile/shared">Playlists Shared</Link></h2></div>
+                    <div className="col-md-6"><h2><Link to="/profile/available">Playlists Available</Link></h2></div>
+                  </div>
 
                   <div className="row">
                     <div className="col-md-4">
-                      <h3 className="text-center">Likes: {user.likes.length}</h3>
+                      <h3>Likes: {user.likes.length}</h3>
+                      <ul>
+                        {user.likes.map((like) =>
+                          <li key={like.ID}><Link to={like.permalink}>{like.playlistName}</Link></li>
+                        )}
+                      </ul>
                     </div>
 
                     <div className="col-md-4">
-                      <h3 className="text-center">Comments: {user.comments.length}</h3>
+                      <h3>Comments: {user.comments.length}</h3>
+                      <ul>
+                        {user.comments.map((comment) =>
+                            <li key={comment.ID}><Link to={comment.permalink}>{`${comment.content.slice(0,15)}...`}</Link></li>
+                          )}
+                      </ul>
                     </div>
 
                     <div className="col-md-4">
-                      <h3 className="text-center">Shared: {stereodosePlaylists.length}</h3>
+                      <h3>Shared: {stereodosePlaylists.length}</h3>
+                      <ul>
+                        {stereodosePlaylists.map((playlist) =>
+                          <li key={playlist.spotifyID}><Link to={playlist.permalink}>{playlist.name}</Link></li>
+                        )}
+                      </ul>
                     </div>
                   </div>
                 </div>

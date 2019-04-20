@@ -39,12 +39,6 @@ class UserStatusIndicator extends React.Component {
           <li className="nav-item">
             <Link className="nav-link" to="/profile">Profile</Link>
           </li>
-          <li className="nav-item">
-            <Link className="nav-link" to="/profile/shared">Shared</Link>
-          </li>
-          <li className="nav-item">
-            <Link className="nav-link" to="/profile/available">Playlists Available</Link>
-          </li>
           {/* Logout is a special case. Need to use a plain <a> tag instead of <Link>*/}
           <li className="nav-item">
             <a href="/auth/logout" className="nav-link">logout</a>
@@ -69,7 +63,6 @@ class UserStatusIndicator extends React.Component {
     }
 
     if (this.state.loggedIn === true) {
-      console.log('me');
       fetch("/api/users/me", { credentials: "same-origin" })
         .then((response) => {
           return response.json();
