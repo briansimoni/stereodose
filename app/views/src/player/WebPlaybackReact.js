@@ -106,6 +106,14 @@ export default class WebPlayback extends Component {
     });
 
     this.webPlaybackInstance.on("ready", data => {
+      // fix per https://github.com/spotify/web-playback-sdk/issues/75
+      const iframe = document.querySelector('iframe[src="https://sdk.scdn.co/embedded/index.html"]');
+      if (iframe) {
+        iframe.style.display = 'block';
+        iframe.style.position = 'absolute';
+        iframe.style.top = '-1000px';
+        iframe.style.left = '-1000px';
+      }
       this.props.onPlayerWaitingForDevice(data);
     });
 
