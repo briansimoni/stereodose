@@ -4,6 +4,7 @@ import Drug from './screens/Drug';
 import Playlists from './screens/Playlists';
 import Playlist from './screens/Playlist';
 import Player from './player/Player';
+import About from './screens/About';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import UserProfile from './user/Profile';
 import Header from './user/Header';
@@ -45,9 +46,9 @@ class App extends React.Component {
           <Route
             path="/"
             render={(props) =>
-              <Header 
-              {...props}
-              app={this}
+              <Header
+                {...props}
+                app={this}
                 isUserLoggedIn={(loggedIn) =>
                   this.loggedInPromiseResolver(loggedIn)
                 }
@@ -94,9 +95,18 @@ class App extends React.Component {
                 }
               />
 
+              <Route exact path="/about"
+                render={(props) =>
+                  <About
+                    {...props}
+                    app={this}
+                  />
+                }
+              />
+
               {/* <Route exact path="/:drug" component={Drug} /> */}
               <Route exact path="/:drug"
-                render={(props) => 
+                render={(props) =>
                   <Drug
                     {...props}
                     app={this}
@@ -104,7 +114,7 @@ class App extends React.Component {
                 }
               />
 
-              
+
               <Route exact path="/:drug/:subcategory" component={Playlists} />
               <Route
                 exact
@@ -139,7 +149,7 @@ class App extends React.Component {
   async componentDidMount() {
     try {
       await this.getCategories();
-    } catch(err) {
+    } catch (err) {
       alert(err.message);
     }
   }
@@ -150,7 +160,7 @@ class App extends React.Component {
       throw new Error("Unable to fetch categories");
     }
     const categories = await response.json();
-    this.setState({categories: categories});
+    this.setState({ categories: categories });
   }
 
   // pass setDeviceID to the player component so we can lift "state" up

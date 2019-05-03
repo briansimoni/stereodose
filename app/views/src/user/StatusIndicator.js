@@ -39,6 +39,9 @@ class UserStatusIndicator extends React.Component {
           <li className="nav-item">
             <Link className="nav-link" to="/profile">Profile</Link>
           </li>
+          <li className="nav-item">
+            <Link className="nav-link" to="/about">About</Link>
+          </li>
           {/* Logout is a special case. Need to use a plain <a> tag instead of <Link>*/}
           <li className="nav-item">
             <a href="/auth/logout" className="nav-link">logout</a>
@@ -82,7 +85,7 @@ class UserStatusIndicator extends React.Component {
       throw new Error("You do not have Spotify Premium. The web player will not work");
     }
     const displayName = user.displayName ? user.displayName : user.spotifyID;
-    this.setState({ user });
+    this.setState({ user, username: displayName });
   }
 
   // checkSessionCookie returns true if the user is logged in

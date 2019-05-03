@@ -22,9 +22,14 @@ main {
 }
 
 ul.moods, ul.drugs, #moods {
+    text-transform: capitalize;
     padding-left: 0px;
     list-style: none;
     text-align: center;
+}
+
+ul.drugs li {
+    padding: 5px;
 }
 
 .mood-choice-header {
