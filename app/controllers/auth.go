@@ -78,7 +78,9 @@ type refreshTokenResponse struct {
 // Login is the handler that you can send the user to initiate an authorization code flow
 func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 
-	s, err := a.Store.Get(r, sessionName)
+	// stereodose_auth_state is a separate cookie from the actual session cookie
+	// this allows for the presence of a _stereodose_session cookie to be proof of authentication
+	s, err := a.Store.Get(r, "stereodose_auth_state")
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -122,11 +124,18 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 // In this step of authorization, we exchange a code for an access token
 // and we query the user's profile on Spotify to get their identity
 func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error {
-	s, err := a.Store.Get(r, sessionName)
+	authState, err := a.Store.Get(r, "stereodose_auth_state")
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	err = checkState(r, s)
+	err = checkState(r, authState)
+	if err != nil {
+		return err
+	}
+
+	// per documentation, delete the session by setting Max Age less than 0
+	authState.Options.MaxAge = -1
+	err = authState.Save(r, w)
 	if err != nil {
 		return err
 	}
@@ -156,6 +165,11 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error 
 		if err != nil {
 			return errors.New("Error obtaining token from Spotify: " + err.Error())
 		}
+	}
+
+	s, err := a.Store.Get(r, sessionName)
+	if err != nil {
+		return errors.WithStack(err)
 	}
 
 	s.Values[token] = *tok

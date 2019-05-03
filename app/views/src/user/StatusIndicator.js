@@ -53,7 +53,7 @@ class UserStatusIndicator extends React.Component {
     window.location = "/auth/login";
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     // hooking into jQuery/Bootstrap 4 API to handle menu collapse
     if (window.$) {
       const jQuery = window.$;
@@ -63,30 +63,26 @@ class UserStatusIndicator extends React.Component {
     }
 
     if (this.state.loggedIn === true) {
-      fetch("/api/users/me", { credentials: "same-origin" })
-        .then((response) => {
-          return response.json();
-        })
-        .then((user) => {
-          let state = this.state;
-          // check the user's display name
-          if (user.displayName !== "") {
-            state.username = user.displayName;
-          } else {
-            state.username = user.spotifyID;
-          }
-
-          // check the user's product level: premium or not
-          if (user.product !== "premium") {
-            alert("You do not have Spotify Premium. The web player will not work");
-          }
-          state.user = user;
-          this.setState(state);
-        })
-        .catch((err) => {
-          alert(err.message);
-        });
+      try {
+        await this.fetchProfileData();
+      } catch(err) {
+        alert(err.message);
+      }
     }
+  }
+
+  async fetchProfileData() {
+    const response = await fetch("/api/users/me", { credentials: "same-origin" });
+    if (response.status !== 200) {
+      throw new Error(`Unable to fetch profile data ${response.statusText}`);
+    }
+    const user = await response.json();
+    // check the user's product level: premium or not
+    if (user.product !== "premium") {
+      throw new Error("You do not have Spotify Premium. The web player will not work");
+    }
+    const displayName = user.displayName ? user.displayName : user.spotifyID;
+    this.setState({ user });
   }
 
   // checkSessionCookie returns true if the user is logged in
