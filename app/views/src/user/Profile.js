@@ -21,8 +21,8 @@ class UserProfile extends React.Component {
     if (spotifyPlaylists && stereodosePlaylists && categories) {
       return (
         <div className="container">
-          <div className="row">
-            <div className="col">
+          <div className="row justify-content-md-center">
+            <div className="col col-md-auto">
               {this.props.location.pathname === "/profile/shared" &&
                 <div label="Playlists Shared to Stereodose">
                   <h2 id="content-title">Playlists Shared to Stereodose</h2>

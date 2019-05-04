@@ -43,11 +43,11 @@ class ShareSpotifyPlaylist extends React.Component {
             <h2 id="content-title">Upload An Image</h2>
           </div>
 
-          <div className="text-center">
+          <div>
             <PickImage onBlobCreated={this.onBlobCreated} />
           </div>
 
-          <div className="text-center">
+          <div>
             <h4>Playlist: {this.state.selectedPlaylist.name}</h4>
             <h4>Drug: {this.state.selectedDrug}</h4>
             <h4>Mood: {this.state.selectedMood}</h4>
@@ -127,7 +127,7 @@ class ShareSpotifyPlaylist extends React.Component {
     const data = new FormData();
     data.append('playlist-image', blob);
     data.append('filename', 'playlist-image');
-    let response = await fetch(`/api/playlists/${this.state.selectedPlaylist.id}/image`, {
+    const response = await fetch(`/api/playlists/${this.state.selectedPlaylist.id}/image`, {
       method: "POST",
       body: data
     });
@@ -148,7 +148,7 @@ class ShareSpotifyPlaylist extends React.Component {
     const { imageURL, thumbnailURL } = await this.uploadImage(this.state.imageBlob);
 
     const { selectedPlaylist, selectedMood, selectedDrug } = this.state;
-    let resp = await fetch(`/api/playlists/`, {
+    const resp = await fetch(`/api/playlists/`, {
       method: "POST",
       credentials: "same-origin",
       body: JSON.stringify({

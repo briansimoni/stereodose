@@ -87,14 +87,23 @@ export default class PickImage extends React.Component {
     const { src, crop } = this.state;
     return (
       <div>
+
+        
         <form>
-          <input
-            ref={fileInputRef}
-            type="file"
-            id="file-upload"
-            name="playlist-image"
-            accept=".jpg,.jpeg,.png"
-            onChange={this.onSelectFile} />
+          <div className="input-group mb-3">
+            <div className="custom-file">
+              <input
+              className="custom-file-input"
+              ref={fileInputRef}
+              type="file"
+              id="file-upload"
+              name="playlist-image"
+              accept=".jpg,.jpeg,.png"
+              onChange={this.onSelectFile} />
+               <label class="custom-file-label" for="file-upload" aria-describedby="file-upload">Choose file</label>
+            </div>
+          </div>
+          
 
         </form>
         {!src &&
