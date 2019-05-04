@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"net/url"
 	"strings"
 	"time"
 
@@ -126,7 +125,7 @@ func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlis
 	if err != nil {
 		return nil, err
 	}
-	permalink := url.QueryEscape(fmt.Sprintf("/%s/%s/%s", category, subCategory, playlistID))
+	permalink := fmt.Sprintf("/%s/%s/%s", category, subCategory, playlistID)
 	playlist := &Playlist{
 		SpotifyID:          string(list.ID),
 		Collaborative:      list.Collaborative,
