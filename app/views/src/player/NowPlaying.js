@@ -29,18 +29,21 @@ export default class NowPlaying extends Component {
     return (
       <Fragment>
         <div className="row">
-          <div className="col-sm-1">
+          <div className="d-none d-md-block col-md-2 col-lg-1">
             <img id="album-image" src={album_image} alt={track_name} />
           </div>
-          <div className="col-md-1">
-            <div className="row justify-content-center">
-              <span><a href={track_uri}>{track_name}</a> by <a href={artist_uri}>{artist_name}</a></span>
+          <div className="col-sm-3 col-md-2 col-lg-2">
+            <div className="row">
+              <div className="col text-center">
+                <span><a href={track_uri}>{track_name}</a> by <a href={artist_uri}>{artist_name}</a></span>
+              </div>
+              
             </div>
             {/* <div className="row justify-content-center">
               <span><a href={album_uri}>{album_name}</a></span>
             </div> */}
           </div>
-          <div className="col-md-8 text-center">
+          <div className="col-sm-7 col-md-7 col-lg-7 text-center">
             <br />
             <div className="controls">
               <RepeatButton onClick={this.props.onChangeRepeat} repeatMode={playerState.repeat_mode}/>
