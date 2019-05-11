@@ -4,17 +4,17 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/briansimoni/stereodose/app/controllers"
 	"github.com/briansimoni/stereodose/app/models"
 	"github.com/briansimoni/stereodose/app/util"
 	"github.com/briansimoni/stereodose/config"
 	"github.com/google/go-cloud/blob"
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
@@ -51,10 +51,11 @@ func InitApp(c *config.Config, db *gorm.DB) *util.AppRouter {
 }
 
 func createRouter(c *config.Config) *util.AppRouter {
-	app := &util.AppRouter{mux.NewRouter()}
-	app.Use(func(next http.Handler) http.Handler {
-		return handlers.LoggingHandler(os.Stdout, next)
-	})
+	app := &util.AppRouter{Router: mux.NewRouter()}
+	// app.Use(func(next http.Handler) http.Handler {
+	// 	return handlers.LoggingHandler(os.Stdout, next)
+	// })
+	app.Use(util.RequestLogger)
 
 	categories := controllers.NewCategoriesController()
 	users := controllers.NewUsersController(stereoDoseDB)
@@ -70,25 +71,25 @@ func createRouter(c *config.Config) *util.AppRouter {
 	app.HandleFunc("/manifest.json", serveFile(fileCache["/manifest.json"], nil))
 	app.HandleFunc("/sw.js", serveFile(fileCache["/sw.js"], map[string]string{"Content-Type": "application/javascript"}))
 
-	healthRouter := util.AppRouter{app.PathPrefix("/api/health").Subrouter()}
+	healthRouter := util.AppRouter{Router: app.PathPrefix("/api/health").Subrouter()}
 	healthRouter.AppHandler("/", health.CheckHealth).Methods(http.MethodGet)
 
-	authRouter := util.AppRouter{app.PathPrefix("/auth").Subrouter()}
+	authRouter := util.AppRouter{Router: app.PathPrefix("/auth").Subrouter()}
 	authRouter.AppHandler("/login", auth.Login).Methods(http.MethodGet)
 	authRouter.AppHandler("/logout", auth.Logout).Methods(http.MethodGet)
 	authRouter.AppHandler("/callback", auth.Callback).Methods(http.MethodGet)
 	authRouter.AppHandler("/refresh", auth.Refresh).Methods(http.MethodGet)
 	authRouter.AppHandler("/token", auth.GetMyAccessToken).Methods(http.MethodGet)
 
-	usersRouter := util.AppRouter{app.PathPrefix("/api/users/").Subrouter()}
+	usersRouter := util.AppRouter{Router: app.PathPrefix("/api/users/").Subrouter()}
 	usersRouter.Use(UserContextMiddleware)
 	usersRouter.AppHandler("/me", users.Me).Methods(http.MethodGet)
 
 	// The order that the routes are registered does matter
 	// authPlaylistsRouter contains endpoints that require an authenticated user
-	authPlaylistsRouter := util.AppRouter{app.PathPrefix("/api/playlists").Subrouter()}
+	authPlaylistsRouter := util.AppRouter{Router: app.PathPrefix("/api/playlists").Subrouter()}
 	authPlaylistsRouter.Use(UserContextMiddleware)
-	playlistsRouter := util.AppRouter{app.PathPrefix("/api/playlists").Subrouter()}
+	playlistsRouter := util.AppRouter{Router: app.PathPrefix("/api/playlists").Subrouter()}
 
 	playlistsRouter.AppHandler("/", playlists.GetPlaylists).Methods(http.MethodGet)
 	playlistsRouter.AppHandler("/", playlists.GetPlaylists).
@@ -109,7 +110,7 @@ func createRouter(c *config.Config) *util.AppRouter {
 	authPlaylistsRouter.AppHandler("/{id}/likes", playlists.Like).Methods(http.MethodPost)
 	authPlaylistsRouter.AppHandler("/{playlistID}/likes/{likeID}", playlists.Unlike).Methods(http.MethodDelete)
 
-	categoriesRouter := util.AppRouter{app.PathPrefix("/api/categories").Subrouter()}
+	categoriesRouter := util.AppRouter{Router: app.PathPrefix("/api/categories").Subrouter()}
 	categoriesRouter.AppHandler("/", categories.GetAvailableCategories).Methods(http.MethodGet)
 
 	app.HandleFunc("/", serveFile(fileCache["/index.html"], nil))
@@ -118,7 +119,8 @@ func createRouter(c *config.Config) *util.AppRouter {
 	// Could use the hash router for a looser coupling but /#/some/path is ugly
 	app.HandleFunc("/{page1}", serveFile(fileCache["/index.html"], nil))
 	app.HandleFunc("/{page1}/{page2}", serveFile(fileCache["/index.html"], nil))
-	app.NotFoundHandler = handlers.LoggingHandler(os.Stdout, http.HandlerFunc(serveReactApp404))
+	// app.NotFoundHandler = util.RequestLogger(app.NotFoundHandler)
+	app.NotFoundHandler = util.RequestLogger(http.HandlerFunc(serveReactApp404))
 
 	return app
 }

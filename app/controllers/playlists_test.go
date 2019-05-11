@@ -170,7 +170,7 @@ var controller = &PlaylistsController{
 }
 
 func TestPlaylistsController_GetPlaylistByID(t *testing.T) {
-	var testRouter = &util.AppRouter{mux.NewRouter()}
+	var testRouter = &util.AppRouter{Router: mux.NewRouter()}
 	tt := []struct {
 		name       string
 		value      string
@@ -202,7 +202,7 @@ func TestPlaylistsController_GetPlaylistByID(t *testing.T) {
 }
 
 func TestPlaylistsController_GetPlaylists(t *testing.T) {
-	var testRouter = &util.AppRouter{mux.NewRouter()}
+	var testRouter = &util.AppRouter{Router: mux.NewRouter()}
 	tt := []struct {
 		name   string
 		limit  string
@@ -250,7 +250,7 @@ func TestPlaylistsController_CreatePlaylist(t *testing.T) {
 		Category:    "weed",
 		SubCategory: "chill",
 	}
-	var testRouter = &util.AppRouter{mux.NewRouter()}
+	var testRouter = &util.AppRouter{Router: mux.NewRouter()}
 	tt := []struct {
 		name   string
 		status int
@@ -290,7 +290,7 @@ func TestPlaylistsController_CreatePlaylist(t *testing.T) {
 }
 
 func TestPlaylistsController_GetMyPlaylists(t *testing.T) {
-	var testRouter = &util.AppRouter{mux.NewRouter()}
+	var testRouter = &util.AppRouter{Router: mux.NewRouter()}
 	tt := []struct {
 		name   string
 		status int
@@ -328,7 +328,7 @@ func TestPlaylistsController_GetMyPlaylists(t *testing.T) {
 }
 
 func TestPlaylistsController_DeletePlaylist(t *testing.T) {
-	var testRouter = &util.AppRouter{mux.NewRouter()}
+	var testRouter = &util.AppRouter{Router: mux.NewRouter()}
 
 	user1 := models.User{}
 	user1.ID = 1
@@ -536,7 +536,7 @@ func TestPlaylistsController_DeleteComment(t *testing.T) {
 	testUser2 := models.User{}
 	testUser2.ID = 2
 
-	testRouter := util.AppRouter{mux.NewRouter()}
+	testRouter := util.AppRouter{Router: mux.NewRouter()}
 	testRouter.AppHandler("/api/playlists/{playlistID}/comments/{commentID}", controller.DeleteComment).Methods(http.MethodDelete)
 
 	request1 := createContextRequest(http.MethodDelete, "/api/playlists/1/comments/1", nil, &testUser)
@@ -579,7 +579,7 @@ func TestPlaylistsController_Like(t *testing.T) {
 	testUser2 := models.User{}
 	testUser2.ID = 9999
 
-	testRouter := util.AppRouter{mux.NewRouter()}
+	testRouter := util.AppRouter{Router: mux.NewRouter()}
 	testRouter.AppHandler("/api/playlists/{id}/likes", controller.Like).Methods(http.MethodPost)
 
 	request1 := createContextRequest(http.MethodPost, "/api/playlists/1/likes", nil, &testUser)
@@ -620,7 +620,7 @@ func TestPlaylistsController_Unlike(t *testing.T) {
 	testUser2 := models.User{}
 	testUser2.ID = 9999
 
-	testRouter := util.AppRouter{mux.NewRouter()}
+	testRouter := util.AppRouter{Router: mux.NewRouter()}
 	testRouter.AppHandler("/api/playlists/{playlistID}/likes/{likeID}", controller.Unlike).Methods(http.MethodDelete)
 
 	request1 := createContextRequest(http.MethodDelete, "/api/playlists/1/likes/0", nil, &testUser)

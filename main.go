@@ -2,9 +2,10 @@ package main
 
 import (
 	"encoding/gob"
-	"log"
 	"net/http"
 	"os"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/briansimoni/stereodose/app"
 	"github.com/briansimoni/stereodose/config"
@@ -46,6 +47,11 @@ func main() {
 }
 
 // Register the oauth2.Token type so we can store it in sessions later
+// additionally set the logger to either JSON or plaintext output
 func init() {
 	gob.Register(oauth2.Token{})
+	// TODO: configure logger based on environment variables
+	logger := &log.JSONFormatter{}
+	log.SetFormatter(logger)
+
 }
