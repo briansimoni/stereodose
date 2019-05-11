@@ -56,15 +56,16 @@ func RequestLogger(h http.Handler) http.Handler {
 		sw := &statusWriter{ResponseWriter: w}
 		h.ServeHTTP(sw, req)
 		log.WithFields(logrus.Fields{
-			"RemoteHost":    req.RemoteAddr,
-			"Host":          req.Host,
-			"Method":        req.Method,
-			"Path":          req.URL.Path,
-			"UserAgent":     req.UserAgent(),
-			"Referer":       req.Referer(),
-			"TransactionID": id,
-			"StatusCode":    sw.status,
-			"Length":        sw.length,
+			"RemoteAddress":   req.RemoteAddr,
+			"ForwardedScheme": req.Proto,
+			"Host":            req.Host,
+			"Method":          req.Method,
+			"Path":            req.URL.Path,
+			"UserAgent":       req.UserAgent(),
+			"Referer":         req.Referer(),
+			"TransactionID":   id,
+			"StatusCode":      sw.status,
+			"Length":          sw.length,
 		}).Info("RequestLog")
 	}
 	return http.HandlerFunc(next)

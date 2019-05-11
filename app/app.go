@@ -15,6 +15,7 @@ import (
 	"github.com/briansimoni/stereodose/app/util"
 	"github.com/briansimoni/stereodose/config"
 	"github.com/google/go-cloud/blob"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
@@ -52,9 +53,8 @@ func InitApp(c *config.Config, db *gorm.DB) *util.AppRouter {
 
 func createRouter(c *config.Config) *util.AppRouter {
 	app := &util.AppRouter{Router: mux.NewRouter()}
-	// app.Use(func(next http.Handler) http.Handler {
-	// 	return handlers.LoggingHandler(os.Stdout, next)
-	// })
+
+	app.Use(handlers.ProxyHeaders)
 	app.Use(util.RequestLogger)
 
 	categories := controllers.NewCategoriesController()
