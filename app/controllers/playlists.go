@@ -7,11 +7,13 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 
 	// register jpeg type
 	"image/jpeg"
@@ -127,10 +129,18 @@ func (p *PlaylistsController) CreatePlaylist(w http.ResponseWriter, r *http.Requ
 		return errors.New("Unable to obtain user from session")
 	}
 
-	_, err = p.DB.Playlists.CreatePlaylistBySpotifyID(user, data.SpotifyID, data.Category, data.SubCategory, data.ImageURL, data.ThumbnailURL)
+	playlist, err := p.DB.Playlists.CreatePlaylistBySpotifyID(user, data.SpotifyID, data.Category, data.SubCategory, data.ImageURL, data.ThumbnailURL)
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	log.WithFields(logrus.Fields{
+		"Type":          "AppLog",
+		"TransactionID": r.Context().Value(util.TransactionIDKey),
+		"Name":          playlist.Name,
+		"Category":      playlist.Category,
+		"SubCategory":   playlist.SubCategory,
+		"UserID":        playlist.UserID,
+	}).Info("Successfully Created New Playlist")
 	w.WriteHeader(http.StatusCreated)
 	return nil
 }

@@ -1,18 +1,24 @@
 package util
 
 import (
-	"log"
+	"fmt"
 	"net/http"
+	"strings"
+
+	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/pkg/errors"
 )
 
 type stackTracerError interface {
 	StackTrace() errors.StackTrace
+	error
 }
 
 type statusError interface {
 	Status() int
+	error
 }
 
 // Handler struct allows for functions to return errors and still implement
@@ -24,19 +30,31 @@ type Handler struct {
 func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err := h.H(w, r)
 	if err != nil {
+		transactionID := r.Context().Value(TransactionIDKey)
 		switch e := err.(type) {
 		case statusError:
-			log.Printf("statusStackTracer %T\n", e)
-			log.Printf("[ERROR] %d %s\n", e.Status(), err.Error())
+			log.WithFields(logrus.Fields{
+				"Type":          "AppLog",
+				"TransactionID": transactionID,
+				"ErrorType":     fmt.Sprintf("%T", e),
+			}).Error(e.Error())
 			http.Error(w, "error: "+err.Error(), e.Status())
 		case stackTracerError:
-			log.Printf("%T\n", e)
 			st := e.StackTrace()
-			log.Printf("[ERROR] %s\n%+v", err.Error(), st[0])
+			prettyStackTrace := strings.Split(strings.Replace(fmt.Sprintf("%+v", st), "\t", "    ", -1), "\n")
+			log.WithFields(logrus.Fields{
+				"Type":          "AppLog",
+				"TransactionID": transactionID,
+				"ErrorType":     fmt.Sprintf("%T", e),
+				"StackTrace":    prettyStackTrace,
+			}).Error(e.Error())
 			http.Error(w, "error: "+err.Error(), http.StatusInternalServerError)
 		default:
-			log.Printf("%T\n", e)
-			log.Println("[ERROR]", e.Error())
+			log.WithFields(logrus.Fields{
+				"Type":          "AppLog",
+				"TransactionID": transactionID,
+				"ErrorType":     fmt.Sprintf("%T", e),
+			}).Error(e.Error())
 			http.Error(w, "error: "+e.Error(), http.StatusInternalServerError)
 		}
 	}
