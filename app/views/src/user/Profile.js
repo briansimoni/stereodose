@@ -96,8 +96,8 @@ class UserProfile extends React.Component {
                       <h3>Comments: {user.comments.length}</h3>
                       <ul>
                         {user.comments.map((comment) =>
-                            <li key={comment.ID}><Link to={comment.permalink}>{`${comment.content.slice(0,15)}...`}</Link></li>
-                          )}
+                          <li key={comment.ID}><Link to={comment.permalink}>{`${comment.content.slice(0, 15)}...`}</Link></li>
+                        )}
                       </ul>
                     </div>
 
@@ -120,7 +120,11 @@ class UserProfile extends React.Component {
       )
     }
     return (
-      <div>...loading</div>
+      <div className="row justify-content-md-center">
+        <div className="spinner-grow text-success text-center" role="status">
+          <span className="sr-only">Loading...</span>
+        </div>
+      </div>
     );
   }
 

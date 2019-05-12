@@ -29,7 +29,13 @@ class Playlist extends React.Component {
   render() {
     let { loading, showComments, playlist, error } = this.state;
     if (loading) {
-      return <div></div>
+      return (
+        <div className="row justify-content-md-center">
+          <div className="spinner-grow text-success text-center" role="status">
+            <span className="sr-only">Loading...</span>
+          </div>
+        </div>
+      )
     }
     if (error) {
       return <h3>{error.message}</h3>

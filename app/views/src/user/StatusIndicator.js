@@ -22,7 +22,13 @@ class UserStatusIndicator extends React.Component {
 
   render() {
     if (this.state.loggedIn === null) {
-      return <div><p>loading</p></div>
+      return (
+        <div className="row justify-content-md-center">
+          <div className="spinner-grow text-success text-center" role="status">
+            <span className="sr-only">Loading...</span>
+          </div>
+        </div>
+      )
     }
 
     if (this.state.loggedIn === false) {
@@ -68,7 +74,7 @@ class UserStatusIndicator extends React.Component {
     if (this.state.loggedIn === true) {
       try {
         await this.fetchProfileData();
-      } catch(err) {
+      } catch (err) {
         alert(err.message);
       }
     }

@@ -34,6 +34,10 @@ export default function Drug(props) {
   }
 
   return (
-    <div>loading...</div>
+    <div className="row justify-content-md-center">
+      <div className="spinner-grow text-success text-center" role="status">
+        <span className="sr-only">Loading...</span>
+      </div>
+    </div>
   )
 }

@@ -22,7 +22,13 @@ class Playlists extends React.Component {
     let err = this.state.error;
     let playlists = this.state.playlists;
     if (loading) {
-      return <div></div>
+      return (
+        <div className="row justify-content-md-center">
+          <div className="spinner-grow text-success text-center" role="status">
+            <span className="sr-only">Loading...</span>
+          </div>
+        </div>
+      )
     }
 
     if (err) {
