@@ -3,9 +3,7 @@ import { Fragment } from "react";
 import { Link } from "react-router-dom";
 import "./Profile.css";
 
-// UserStatusIndicator encapsulates the logic of the user's status:
-// logged in or not; Spotify premium or not
-class UserStatusIndicator extends React.Component {
+class UserNavItems extends React.Component {
   constructor(props) {
     super(props);
 
@@ -15,9 +13,8 @@ class UserStatusIndicator extends React.Component {
       user: {}
     };
 
-    let loggedIn = this.checkSessionCookie();
+    let loggedIn = this.props.app.userLoggedIn();
     this.state.loggedIn = loggedIn;
-    this.props.isUserLoggedIn(loggedIn);
   }
 
   render() {
@@ -44,9 +41,6 @@ class UserStatusIndicator extends React.Component {
         <Fragment>
           <li className="nav-item">
             <Link className="nav-link" to="/profile">Profile</Link>
-          </li>
-          <li className="nav-item">
-            <Link className="nav-link" to="/about">About</Link>
           </li>
           {/* Logout is a special case. Need to use a plain <a> tag instead of <Link>*/}
           <li className="nav-item">
@@ -93,38 +87,6 @@ class UserStatusIndicator extends React.Component {
     const displayName = user.displayName ? user.displayName : user.spotifyID;
     this.setState({ user, username: displayName });
   }
-
-  // checkSessionCookie returns true if the user is logged in
-  // false otherwise
-  checkSessionCookie() {
-    // stolen from Stack Overflow
-    function getCookie(name) {
-      var dc = document.cookie;
-      var prefix = name + "=";
-      var begin = dc.indexOf("; " + prefix);
-      if (begin === -1) {
-        begin = dc.indexOf(prefix);
-        if (begin !== 0) return null;
-      }
-      else {
-        begin += 2;
-        var end = document.cookie.indexOf(";", begin);
-        if (end === -1) {
-          end = dc.length;
-        }
-      }
-      // because unescape has been deprecated, replaced with decodeURI
-      //return unescape(dc.substring(begin + prefix.length, end));
-      return decodeURI(dc.substring(begin + prefix.length, end));
-    }
-
-    let cookie = getCookie("_stereodose-session");
-    if (!cookie) {
-      return false
-    }
-
-    return true;
-  }
 }
 
-export default UserStatusIndicator;
+export default UserNavItems;

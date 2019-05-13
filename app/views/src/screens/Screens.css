@@ -39,6 +39,7 @@ ul.drugs li {
 
 #playlist-heading {
     text-align: center;
+    margin-bottom: 20px;
 }
 
 #playlist-heading > img {
@@ -85,4 +86,8 @@ ul.drugs li {
 
 .comment-toggle {
     float: right;
+}
+
+.spinner-grow {
+    margin: 0 auto;
 }

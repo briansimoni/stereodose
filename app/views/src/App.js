@@ -14,11 +14,6 @@ class App extends React.Component {
 
   accessToken = null
 
-  // loggedInPromise resolves at a later time with the user's logged in status (true/false)
-  loggedInPromise
-  // callback function that can be called to resolve when we know that the user is logged in or not
-  loggedInPromiseResolver
-
   constructor(props) {
     super(props);
 
@@ -27,16 +22,6 @@ class App extends React.Component {
       categories: null,
       loggedIn: false,
     }
-
-    this.loggedInPromise = new Promise((resolve) => {
-      this.loggedInPromiseResolver = resolve;
-    })
-  }
-
-  isUserLoggedIn = loggedIn => {
-    let state = this.state;
-    state.loggedIn = loggedIn;
-    this.setState(state);
   }
 
   render() {
@@ -49,9 +34,6 @@ class App extends React.Component {
               <Header
                 {...props}
                 app={this}
-                isUserLoggedIn={(loggedIn) =>
-                  this.loggedInPromiseResolver(loggedIn)
-                }
               />
             }
           />
@@ -174,8 +156,7 @@ class App extends React.Component {
   // Should be able to pass this function around as a prop to components that need a token
   // i.e. <Player> and <Playlist>
   getAccessToken = async () => {
-    let loggedIn = await this.loggedInPromise;
-    if (loggedIn === false) {
+    if (!this.userLoggedIn()) {
       throw new Error("Sign in with Spotify Premium to Play Music");
     }
     let token;
@@ -212,6 +193,37 @@ class App extends React.Component {
     if (now < expiresDate) {
       return false;
     }
+    return true;
+  }
+
+  // userLoggedIn returns true if the user is logged in, false otherwise
+  userLoggedIn() {
+    // stolen from Stack Overflow
+    function getCookie(name) {
+      var dc = document.cookie;
+      var prefix = name + "=";
+      var begin = dc.indexOf("; " + prefix);
+      if (begin === -1) {
+        begin = dc.indexOf(prefix);
+        if (begin !== 0) return null;
+      }
+      else {
+        begin += 2;
+        var end = document.cookie.indexOf(";", begin);
+        if (end === -1) {
+          end = dc.length;
+        }
+      }
+      // because unescape has been deprecated, replaced with decodeURI
+      //return unescape(dc.substring(begin + prefix.length, end));
+      return decodeURI(dc.substring(begin + prefix.length, end));
+    }
+
+    let cookie = getCookie("_stereodose-session");
+    if (!cookie) {
+      return false
+    }
+
     return true;
   }
 }

@@ -15,7 +15,7 @@ class Comments extends React.Component {
   }
 
   render = () => {
-    const { comments, onSubmitComment, onDeleteComment } = this.props;
+    const { comments, onSubmitComment, onDeleteComment, user } = this.props;
     return (
       <div className="comments">
         <ul className="list-group">
@@ -36,19 +36,25 @@ class Comments extends React.Component {
             )
           })}
         </ul>
-        <div className="form-group">
-          <label htmlFor="comment-textarea">Leave a Comment</label>
-          <textarea className="form-control" id="comment-textarea" rows="3" onChange={this.handleChange}></textarea>
-          <button type="submit" className="btn btn-primary mb-2" onClick={() => { onSubmitComment(this.state.value) }}>Submit</button>
-        </div>
+        {user &&
+          <div className="form-group">
+            <label htmlFor="comment-textarea">Leave a Comment</label>
+            <textarea className="form-control" id="comment-textarea" rows="3" onChange={this.handleChange}></textarea>
+            <button type="submit" className="btn btn-primary mb-2" onClick={() => { onSubmitComment(this.state.value) }}>Submit</button>
+          </div>
+        }
       </div>
 
     )
   }
 
-  // TODO: if the user is null, return
+  // isUser comment will return a boolean indicating whether
+  // the userID attached to the comment matches the current User ID
   isUserComment = (commentUserID) => {
     const user = this.props.user;
+    if (!user) {
+      return;
+    }
     if (user.ID === commentUserID) {
       return true;
     }

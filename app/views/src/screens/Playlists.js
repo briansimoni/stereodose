@@ -23,8 +23,8 @@ class Playlists extends React.Component {
     let playlists = this.state.playlists;
     if (loading) {
       return (
-        <div className="row justify-content-md-center">
-          <div className="spinner-grow text-success text-center" role="status">
+        <div className="row">
+          <div className="spinner-grow text-success" role="status">
             <span className="sr-only">Loading...</span>
           </div>
         </div>
