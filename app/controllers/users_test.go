@@ -3,20 +3,17 @@ package controllers
 import (
 	"context"
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/briansimoni/stereodose/app/models"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 )
-
-// type UserService interface {
-// 	ByID(ID uint) (*User, error)
-// 	FirstOrCreate(user *User, tok *oauth2.Token) (*User, error)
-// 	Update(user *User) error
-// }
 
 type fakeUserService struct{}
 
@@ -110,4 +107,8 @@ func TestUsersController_Me(t *testing.T) {
 			}
 		})
 	}
+}
+
+func init() {
+	log.SetOutput(ioutil.Discard)
 }

@@ -1,12 +1,14 @@
 package controllers
 
 import (
-	"log"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"strings"
 	"testing"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/briansimoni/stereodose/app/models"
 	"github.com/briansimoni/stereodose/config"
@@ -176,4 +178,8 @@ func generateFakeCookie() (*http.Cookie, error) {
 		Value: value,
 	}
 	return c, nil
+}
+
+func init() {
+	log.SetOutput(ioutil.Discard)
 }
