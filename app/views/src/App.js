@@ -6,35 +6,31 @@ import Playlist from './screens/Playlist';
 import Player from './player/Player';
 import About from './screens/About';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import UserProfile from './user/Profile';
+import Profile from './user/Profile';
 import Header from './user/Header';
 import NoMatch from './404';
 
+// App is the top level component for Stereodose.
+// A reference to itself is passed to child components for an inversion of control.
+// Simply stated, this allows for child components to use App's high level methods
+// such as getAccessToken() and getCategories() without making wasteful HTTP calls
+// since both of those pieces of data are held in App's memory
 class App extends React.Component {
 
   accessToken = null
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      accessToken: null,
-      categories: null,
-      loggedIn: false,
-    }
+  state = {
+    categories: null,
   }
 
   render() {
     return (
       <BrowserRouter>
         <div>
-          <Route
-            path="/"
+
+          <Route path="/"
             render={(props) =>
-              <Header
-                {...props}
-                app={this}
-              />
+              <Header {...props} app={this} />
             }
           />
 
@@ -43,69 +39,45 @@ class App extends React.Component {
             <Switch>
               <Route exact path="/profile"
                 render={(props) =>
-                  <UserProfile
-                    {...props}
-                    app={this}
-                  />
+                  <Profile {...props} app={this} />
                 }
               />
 
               <Route exact path="/profile/shared"
                 render={(props) =>
-                  <UserProfile
-                    {...props}
-                    app={this}
-                  />
+                  <Profile {...props} app={this} />
                 }
               />
 
               <Route exact path="/profile/available"
                 render={(props) =>
-                  <UserProfile
-                    {...props}
-                    app={this}
-                  />
+                  <Profile {...props} app={this} />
                 }
               />
 
               <Route exact path="/"
                 render={(props) =>
-                  <Drugs
-                    {...props}
-                    app={this}
-                  />
+                  <Drugs {...props} app={this} />
                 }
               />
 
               <Route exact path="/about"
                 render={(props) =>
-                  <About
-                    {...props}
-                    app={this}
-                  />
+                  <About {...props} app={this} />
                 }
               />
 
-              {/* <Route exact path="/:drug" component={Drug} /> */}
               <Route exact path="/:drug"
                 render={(props) =>
-                  <Drug
-                    {...props}
-                    app={this}
-                  />
+                  <Drug {...props} app={this} />
                 }
               />
 
-
               <Route exact path="/:drug/:subcategory" component={Playlists} />
-              <Route
-                exact
-                path="/:drug/:subcategory/:playlist"
+
+              <Route exact path="/:drug/:subcategory/:playlist"
                 render={(props) =>
-                  <Playlist
-                    {...props}
-                    app={this}
-                  />
+                  <Playlist {...props} app={this} />
                 }
               />
 
@@ -113,14 +85,9 @@ class App extends React.Component {
             </Switch>
           </main>
 
-          <Route
-            path="/"
+          <Route path="/"
             render={(props) =>
-              <Player
-                {...props}
-                app={this}
-              >
-              </Player>
+              <Player {...props} app={this} />
             }
           />
         </div>
@@ -142,26 +109,19 @@ class App extends React.Component {
       throw new Error("Unable to fetch categories");
     }
     const categories = await response.json();
-    this.setState({ categories: categories });
-  }
-
-  // pass setDeviceID to the player component so we can lift "state" up
-  // and then move it over to peers
-  setDeviceID = deviceID => {
-    this.deviceIDResolver(deviceID);
+    this.setState({ categories });
   }
 
   // getAccessToken will return a Promise to resolve to a Spotify API access_token
   // The token is cached in the member variable of this object and updated upon expiry
-  // Should be able to pass this function around as a prop to components that need a token
-  // i.e. <Player> and <Playlist>
   getAccessToken = async () => {
     if (!this.userLoggedIn()) {
       throw new Error("Sign in with Spotify Premium to Play Music");
     }
     let token;
     if (this.accessToken === null) {
-      let response = await fetch("/auth/token", { credentials: "same-origin" });
+      console.log('getting token');
+      const response = await fetch("/auth/token", { credentials: "same-origin" });
       if (response.status !== 200) {
         throw new Error(`Unable to fetch Spotify access token: ${response.status} ${response.statusText}`);
       }
@@ -174,7 +134,7 @@ class App extends React.Component {
       this.accessToken = token;
       return token.access_token;
     }
-    let response = await fetch("/auth/refresh", { credentials: "same-origin" });
+    const response = await fetch("/auth/refresh", { credentials: "same-origin" });
     if (response.status !== 200) {
       throw new Error(`Unable to refresh Spotify access token: ${response.status} ${response.statusText}`);
     }
@@ -187,9 +147,9 @@ class App extends React.Component {
   }
 
   tokenIsExpired(token) {
-    let expiresOn = token.expiry;
-    let now = new Date();
-    let expiresDate = new Date(expiresOn);
+    const expiresOn = token.expiry;
+    const now = new Date();
+    const expiresDate = new Date(expiresOn);
     if (now < expiresDate) {
       return false;
     }
