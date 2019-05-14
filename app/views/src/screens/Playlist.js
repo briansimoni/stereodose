@@ -50,7 +50,7 @@ class Playlist extends React.Component {
                 <img src={playlist.bucketImageURL} alt="playlist-artwork" />
               </div>
               <button className="btn btn-warning comment-toggle" onClick={this.toggleComments}>Show Songs</button>
-              <Likes onLike={this.like} number={playlist.likes.length} user={this.state.user} />
+              <Likes onLike={this.like} playlist={playlist} user={this.state.user} />
 
             </div>
           </div>
@@ -76,7 +76,7 @@ class Playlist extends React.Component {
               <img src={playlist.bucketImageURL} alt="playlist-artwork" />
             </div>
             <button className="btn btn-warning comment-toggle" onClick={this.toggleComments}>Comments ({playlist.comments.length})</button>
-            <Likes onLike={this.like} number={playlist.likes.length} user={this.state.user} />
+            <Likes onLike={this.like} playlist={playlist} user={this.state.user} />
             <ul className="list-group playlist">
               {playlist.tracks.map((track) => {
                 return (
