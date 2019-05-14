@@ -5,6 +5,9 @@ import Octicon from "react-octicon";
 class Comments extends React.Component {
   constructor(props) {
     super(props);
+
+    this.textArea = React.createRef();
+
     this.state = {
       value: ""
     };
@@ -15,7 +18,7 @@ class Comments extends React.Component {
   }
 
   render = () => {
-    const { comments, onSubmitComment, onDeleteComment, user } = this.props;
+    const { comments, onDeleteComment, user } = this.props;
     return (
       <div className="comments">
         <ul className="list-group">
@@ -39,13 +42,18 @@ class Comments extends React.Component {
         {user &&
           <div className="form-group">
             <label htmlFor="comment-textarea">Leave a Comment</label>
-            <textarea className="form-control" id="comment-textarea" rows="3" onChange={this.handleChange}></textarea>
-            <button type="submit" className="btn btn-primary mb-2" onClick={() => { onSubmitComment(this.state.value) }}>Submit</button>
+            <textarea ref={this.textArea} className="form-control" id="comment-textarea" rows="3" onChange={this.handleChange}></textarea>
+            <button type="submit" className="btn btn-primary mb-2" onClick={() => { this.submitComment(this.state.value) }}>Submit</button>
           </div>
         }
       </div>
-
     )
+  }
+
+  // submitComment wraps the parent function and clears the text after a button click
+  submitComment = async (text) => {
+    await this.props.onSubmitComment(text);
+    this.textArea.current.value = "";
   }
 
   // isUser comment will return a boolean indicating whether
