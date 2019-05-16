@@ -120,7 +120,6 @@ class App extends React.Component {
     }
     let token;
     if (this.accessToken === null) {
-      console.log('getting token');
       const response = await fetch("/auth/token", { credentials: "same-origin" });
       if (response.status !== 200) {
         throw new Error(`Unable to fetch Spotify access token: ${response.status} ${response.statusText}`);
