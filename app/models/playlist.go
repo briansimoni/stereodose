@@ -76,6 +76,7 @@ func (s *StereodosePlaylistService) GetPlaylists(offset, limit, category, subcat
 		Offset(offset).
 		Limit(limit).
 		Where("category = ? AND sub_category = ?", category, subcategory).
+		Order("likes_count desc").
 		Find(&playlists).Error
 
 	if err != nil {

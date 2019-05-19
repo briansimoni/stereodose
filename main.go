@@ -23,9 +23,12 @@ func main() {
 	}
 	db, err := gorm.Open("postgres", connectionString)
 	if err != nil {
-		log.Fatal(err.Error())
+		log.WithFields(log.Fields{
+			"Type": "AppLog",
+		}).Fatal("Unable to connect to the database", err.Error())
 	}
 	defer db.Close()
+
 	c := &config.Config{
 		ClientID:      os.Getenv("STEREODOSE_CLIENT_ID"),
 		ClientSecret:  os.Getenv("STEREODOSE_CLIENT_SECRET"),
@@ -34,23 +37,36 @@ func main() {
 		EncryptionKey: os.Getenv("STEREODOSE_ENCRYPTION_KEY"),
 	}
 	err = c.Verify()
+
 	if err != nil {
-		log.Fatal(err.Error())
+		log.WithFields(log.Fields{
+			"Type": "AppLog",
+		}).Fatal("Incorrect or missing configuration", err.Error())
 	}
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "4000"
 	}
+
 	stereodose := app.InitApp(c, db)
-	log.Println("Starting stereodose app on port", port)
-	log.Fatal(http.ListenAndServe(":"+port, stereodose))
+
+	log.WithFields(log.Fields{
+		"Type": "AppLog",
+	}).Info("Starting Stereodose on port: " + port)
+
+	err = http.ListenAndServe(":"+port, stereodose)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"Type": "AppLog",
+		}).Fatal("The server encountered a fatal error", err.Error())
+	}
 }
 
 // Register the oauth2.Token type so we can store it in sessions later
 // additionally set the logger to either JSON or plaintext output
 func init() {
 	gob.Register(oauth2.Token{})
-	// TODO: configure logger based on environment variables
 	logger := &log.JSONFormatter{}
 	log.SetFormatter(logger)
 

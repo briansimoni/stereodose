@@ -68,9 +68,13 @@ class Playlists extends React.Component {
                         <img src={thumbnailImageURL} alt="playlist-artwork" />
                       </Link>
 
-                      <Link to={`${match.url}/${playlist.spotifyID}`}>
-                        <h4>{playlist.name}</h4>
-                      </Link>
+                      <div>
+                        <Link to={`${match.url}/${playlist.spotifyID}`}>
+                          <h4>{playlist.name}</h4>
+                        </Link>
+                        <p>likes: {playlist.likesCount}</p>
+                      </div>
+
                     </div>
                   )
                 })}

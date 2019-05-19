@@ -7,6 +7,10 @@ main {
     text-align: center;
 }
 
+.playlists h4 {
+    margin-bottom: 0;
+}
+
 .playlists img {
     max-width: 250px;
 }
