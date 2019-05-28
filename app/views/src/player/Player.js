@@ -82,6 +82,11 @@ export default class Player extends Component {
     }
   }
 
+  seek = async (position, options) => {
+    // const SDK = await this.getSDK();
+    console.log('seeking', position, options);
+  }
+
   getSDK = async () => {
     let SDK = new Spotify();
     let token;
@@ -167,6 +172,7 @@ export default class Player extends Component {
                       onPreviousSong={this.previousSong}
                       onChangeVolume={this.changeVolume}
                       onChangeRepeat={this.changeRepeatMode}
+                      onSeek={this.seek}
                     />
                   </Fragment>
                 </div>
