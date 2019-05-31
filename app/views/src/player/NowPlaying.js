@@ -52,7 +52,7 @@ export default class NowPlaying extends Component {
               <div onClick={this.props.onNextSong} className="arrow-right"></div>
               <VolumeSlider className="volume-slider" onChangeVolume={this.props.onChangeVolume}/>
             </div>
-            <ProgressBar position={position_ms} duration={duration_ms}/>
+            <ProgressBar onSeek={this.props.onSeek} position={position_ms} duration={duration_ms}/>
           </div>
         </div>
       </Fragment>

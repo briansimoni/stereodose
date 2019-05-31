@@ -82,6 +82,14 @@ export default class Player extends Component {
     }
   }
 
+  // position is the desired percentage to seek to
+  // duration is the total length in ms of the song.
+  seek = async (position, duration) => {
+    const SDK = await this.getSDK();
+    const ms = Math.round((position / 100) * duration);
+    return SDK.seek(ms, { device_id: this.state.userDeviceId });
+  }
+
   getSDK = async () => {
     let SDK = new Spotify();
     let token;
@@ -167,6 +175,7 @@ export default class Player extends Component {
                       onPreviousSong={this.previousSong}
                       onChangeVolume={this.changeVolume}
                       onChangeRepeat={this.changeRepeatMode}
+                      onSeek={this.seek}
                     />
                   </Fragment>
                 </div>
