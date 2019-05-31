@@ -6,13 +6,8 @@ import "./ProgressBar.css";
 // It displays visually like a loading bar
 export default class ProgressBar extends React.Component {
 
-
-  onUpdate = update => {
-    console.log(update);
-  }
-
-  onChange = values => {
-    this.props.onSeek(values);
+  onSlideEnd = async (values) => {
+    await this.props.onSeek(values, this.props.duration);
   }
 
   render() {
@@ -21,8 +16,7 @@ export default class ProgressBar extends React.Component {
 
     return (
       <Slider
-        onChange={this.onChange}
-        onUpdate={this.onUpdate}
+        onSlideEnd={this.onSlideEnd}
         className="progress-bar-slider"
         domain={[0, 100]}
         values={[percentage]}
