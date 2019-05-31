@@ -85,12 +85,9 @@ export default class Player extends Component {
   // position is the desired percentage to seek to
   // duration is the total length in ms of the song.
   seek = async (position, duration) => {
-
     const SDK = await this.getSDK();
     const ms = Math.round((position / 100) * duration);
-    console.log('seeking to', ms);
-    const seekResponse = await SDK.seek(ms, { device_id: this.state.userDeviceId });
-    console.log(seekResponse);
+    return SDK.seek(ms, { device_id: this.state.userDeviceId });
   }
 
   getSDK = async () => {
