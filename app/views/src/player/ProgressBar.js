@@ -107,7 +107,6 @@ function Track(props) {
   const { source, target, getTrackProps } = props;
   return (
     <div
-      onMouseDown={(e) => { console.log('track mousedown', e) }}
       className="progress-bar-track"
       style={{
         left: `${source.percent}%`,
