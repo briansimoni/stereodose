@@ -6,8 +6,34 @@ import "./ProgressBar.css";
 // It displays visually like a loading bar
 export default class ProgressBar extends React.Component {
 
-  onSlideEnd = async (values) => {
-    await this.props.onSeek(values, this.props.duration);
+  updatedValues = null;
+
+  constructor(props) {
+    super(props);
+
+    this.railRef = React.createRef();
+    this.trackRef = React.createRef();
+  }
+
+  componentDidMount() {
+    // for some reason with the compound-slider API and even the DOM mouseup API
+    // I couldn't get it to consistently fire. Maybe some kind of race condition...
+    // This isn't the most ideal experience but I think its pitfalls are hardly noticeable.
+    //  setTimeout with 0 defers seeking until the values have been updated
+    this.railRef.current.addEventListener('mousedown', (e) => {
+      setTimeout(() => { this.props.onSeek(this.values, this.props.duration) }, 0);
+    });
+
+    this.trackRef.current.addEventListener('mousedown', (e) => {
+      setTimeout(() => { this.props.onSeek(this.values, this.props.duration) }, 0);
+    })
+
+  }
+
+  // I'm storing updated values outside of state because I don't need this to trigger
+  // another render
+  onUpdate = (values) => {
+    this.values = values;
   }
 
   render() {
@@ -17,16 +43,17 @@ export default class ProgressBar extends React.Component {
     return (
       <Slider
         disabled={this.props.disabled}
-        onSlideEnd={this.onSlideEnd}
+        onUpdate={this.onUpdate}
         className="progress-bar-slider"
         domain={[0, 100]}
         values={[percentage]}
       >
         <Rail>
           {({ getRailProps }) => (  // adding the rail props sets up events on the rail
-            <div className="progress-bar-rail" {...getRailProps()} />
+            <div ref={this.railRef} className="progress-bar-rail" {...getRailProps()} />
           )}
         </Rail>
+
         <Handles>
           {({ handles, getHandleProps }) => (
             <div className="slider-handles">
@@ -42,7 +69,7 @@ export default class ProgressBar extends React.Component {
         </Handles>
         <Tracks right={false}>
           {({ tracks, getTrackProps }) => (
-            <div className="slider-tracks">
+            <div ref={this.trackRef} className="slider-tracks">
               {tracks.map(({ id, source, target }) => (
                 <Track
                   key={id}
@@ -80,6 +107,7 @@ function Track(props) {
   const { source, target, getTrackProps } = props;
   return (
     <div
+      onMouseDown={(e) => { console.log('track mousedown', e) }}
       className="progress-bar-track"
       style={{
         left: `${source.percent}%`,

@@ -113,7 +113,7 @@ export default class Player extends Component {
     let webPlaybackSdkProps = {
       app: this.props.app,
       playerName: "Stereodose",
-      playerInitialVolume: 1.0,
+      playerInitialVolume: 0.5,
       playerRefreshRateMs: 100,
       playerAutoConnect: true,
       onPlayerRequestAccessToken: (() => this.props.app.getAccessToken()),
