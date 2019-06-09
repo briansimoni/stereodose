@@ -16,6 +16,7 @@ export default class ProgressBar extends React.Component {
 
     return (
       <Slider
+        disabled={this.props.disabled}
         onSlideEnd={this.onSlideEnd}
         className="progress-bar-slider"
         domain={[0, 100]}

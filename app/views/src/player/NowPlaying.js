@@ -39,9 +39,6 @@ export default class NowPlaying extends Component {
               </div>
               
             </div>
-            {/* <div className="row justify-content-center">
-              <span><a href={album_uri}>{album_name}</a></span>
-            </div> */}
           </div>
           <div className="col-sm-7 col-md-7 col-lg-7 text-center">
             <br />
@@ -50,9 +47,9 @@ export default class NowPlaying extends Component {
               <div onClick={this.props.onPreviousSong} className="arrow-left"></div>
               <div onClick={this.props.onPlayPause} id="play-pause" className={playerState.paused ? "button play": "button pause"} alt="play-pause-button"></div>
               <div onClick={this.props.onNextSong} className="arrow-right"></div>
-              <VolumeSlider className="volume-slider" onChangeVolume={this.props.onChangeVolume}/>
+              <VolumeSlider className="volume-slider" onChangeVolume={this.props.onChangeVolume} disabled={false}/>
             </div>
-            <ProgressBar onSeek={this.props.onSeek} position={position_ms} duration={duration_ms}/>
+            <ProgressBar onSeek={this.props.onSeek} position={position_ms} duration={duration_ms} disabled={false}/>
           </div>
         </div>
       </Fragment>

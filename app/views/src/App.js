@@ -13,15 +13,20 @@ import NoMatch from './404';
 // App is the top level component for Stereodose.
 // A reference to itself is passed to child components for an inversion of control.
 // Simply stated, this allows for child components to use App's high level methods
-// such as getAccessToken() and getCategories() without making wasteful HTTP calls
+// such as getAccessToken(), getCategories(), and Player methods without making wasteful HTTP calls
 // since both of those pieces of data are held in App's memory
 class App extends React.Component {
 
-  accessToken = null
+  // accessToken is a Spotify OAuth token
+  accessToken = null;
+  // player is an instance of https://developer.spotify.com/documentation/web-playback-sdk/reference/#api-spotify-player
+  // The WebPlaybackReact component sets this property.
+  // It's methods seem to perform better than making API calls, however the SDK is still experimental
+  player = null;
 
   state = {
     categories: null,
-  }
+  };
 
   render() {
     return (

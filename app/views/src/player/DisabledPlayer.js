@@ -23,7 +23,7 @@ export default function DisabledPlayer(props) {
           <div className="arrow-right disabled"></div>
           <VolumeSlider className="volume-slider disabled" disabled={true}/>
         </div>
-        <ProgressBar position={0} duration={100} />
+        <ProgressBar position={0} duration={100} disabled={true}/>
       </div>
     </div>
   );
