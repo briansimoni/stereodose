@@ -39,6 +39,7 @@ export default class WebPlayback extends Component {
 
   waitForDeviceToBeSelected() {
     return new Promise(resolve => {
+      // setInterval with no second param defaults to 10 ms 
       this.deviceSelectedInterval = setInterval(() => {
         if (this.webPlaybackInstance) {
           this.webPlaybackInstance.getCurrentState().then(state => {
@@ -143,6 +144,7 @@ export default class WebPlayback extends Component {
     // Wait for device to be ready
     let device_data = await this.setupWaitingForDevice();
     this.props.onPlayerWaitingForDevice(device_data);
+    this.props.app.player = this.webPlaybackInstance;
 
     // let device_id = this.webPlaybackInstance._options.id;
     // await this.transferPlayback(device_id);

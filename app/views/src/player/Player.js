@@ -36,33 +36,29 @@ export default class Player extends Component {
       })
   }
 
-  onPlayPause = async () => {
-    let SDK = await this.getSDK();
-    let options = { device_id: this.state.userDeviceId };
-    let paused = this.state.playerState.paused;
+  onPlayPause = () => {
+    const paused = this.state.playerState.paused;
+    const { player } = this.props.app
     if (paused) {
-      SDK.play(options);
+      return player.resume();
     } else {
-      SDK.pause(options);
+      return player.pause();
     }
   }
 
-  nextSong = async () => {
-    const options = { device_id: this.state.userDeviceId };
-    const SDK = await this.getSDK();
-    SDK.skipToNext(options);
+  nextSong = () => {
+    this.props.app.player.nextTrack();
   }
 
   previousSong = async () => {
-    const options = { device_id: this.state.userDeviceId };
-    const SDK = await this.getSDK();
-    SDK.skipToPrevious(options);
+    this.props.app.player.previousTrack();
   }
 
   changeVolume = async (volume) => {
-    const options = { device_id: this.state.userDeviceId };
-    const SDK = await this.getSDK();
-    SDK.setVolume(volume, options);
+    // const options = { device_id: this.state.userDeviceId };
+    // const SDK = await this.getSDK();
+    // SDK.setVolume(volume, options);
+    this.props.app.player.setVolume(volume);
   }
 
   changeRepeatMode = async () => {
@@ -84,10 +80,9 @@ export default class Player extends Component {
 
   // position is the desired percentage to seek to
   // duration is the total length in ms of the song.
-  seek = async (position, duration) => {
-    const SDK = await this.getSDK();
+  seek = (position, duration) => {
     const ms = Math.round((position / 100) * duration);
-    return SDK.seek(ms, { device_id: this.state.userDeviceId });
+    this.props.app.player.seek(ms)
   }
 
   getSDK = async () => {
@@ -116,6 +111,7 @@ export default class Player extends Component {
     // }
 
     let webPlaybackSdkProps = {
+      app: this.props.app,
       playerName: "Stereodose",
       playerInitialVolume: 1.0,
       playerRefreshRateMs: 100,

@@ -34,7 +34,7 @@ If you don't want to use a .env file, you can use regular system environment var
 
 Once you have the variables set, on the **the very first run only** you need to
 
-`cd /app/views/ && npm install && npm run build`
+`cd app/views/ && npm install && npm run build`
 
 for all successive starts of your dev environment:
 ```
