@@ -55,9 +55,10 @@ export default class Player extends Component {
   }
 
   changeVolume = async (volume) => {
-    const options = { device_id: this.state.userDeviceId };
-    const SDK = await this.getSDK();
-    SDK.setVolume(volume, options);
+    // const options = { device_id: this.state.userDeviceId };
+    // const SDK = await this.getSDK();
+    // SDK.setVolume(volume, options);
+    this.props.app.player.setVolume(volume);
   }
 
   changeRepeatMode = async () => {

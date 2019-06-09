@@ -25,8 +25,9 @@ class VolumeSlider extends React.Component {
   }
 
   onChange = values => {
-    const percent = Math.round(values[0]);
-    this.props.onChangeVolume(percent);
+    // values is a set of percentages
+    // the web SDK takes a value from 0 - 1
+    this.props.onChangeVolume(values[0] / 100);
   }
 
   render() {
