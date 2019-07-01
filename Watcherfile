@@ -3,7 +3,7 @@
 # This is used with docker-compose in dev environments for hot reloading
 # It watches the files
 
-FROM golang:1.10
+FROM golang:1.12
 
 COPY . /go/src/github.com/briansimoni/stereodose
 

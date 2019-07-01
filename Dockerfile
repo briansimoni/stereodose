@@ -1,7 +1,7 @@
 # multistage dockerfile for lightweight production images
 
 # first, build the go binary
-FROM golang:1.10 as go
+FROM golang:1.12 as go
 
 COPY . /go/src/github.com/briansimoni/stereodose
 
