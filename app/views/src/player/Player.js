@@ -78,6 +78,12 @@ export default class Player extends Component {
     }
   }
 
+  shuffle = async () => {
+    const SDK = await this.getSDK();
+    const options = { device_id: this.state.userDeviceId };
+    return SDK.setShuffle(!this.state.playerState.shuffle, options);
+  }
+
   // position is the desired percentage to seek to
   // duration is the total length in ms of the song.
   seek = (position, duration) => {
@@ -171,6 +177,7 @@ export default class Player extends Component {
                       onPreviousSong={this.previousSong}
                       onChangeVolume={this.changeVolume}
                       onChangeRepeat={this.changeRepeatMode}
+                      onShuffle={this.shuffle}
                       onSeek={this.seek}
                     />
                   </Fragment>

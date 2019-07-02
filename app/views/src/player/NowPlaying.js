@@ -3,6 +3,7 @@ import { Fragment } from 'react';
 import ProgressBar from './ProgressBar';
 import VolumeSlider from './VolumeSlider';
 import RepeatButton from "./RepeatButton";
+import ShuffleButton from "./ShuffleButton";
 
 export default class NowPlaying extends Component {
   render() {
@@ -43,6 +44,7 @@ export default class NowPlaying extends Component {
           <div className="col-sm-7 col-md-7 col-lg-7 text-center">
             <br />
             <div className="controls">
+              <ShuffleButton onClick={this.props.onShuffle}/>
               <RepeatButton onClick={this.props.onChangeRepeat} repeatMode={playerState.repeat_mode}/>
               <div onClick={this.props.onPreviousSong} className="arrow-left"></div>
               <div onClick={this.props.onPlayPause} id="play-pause" className={playerState.paused ? "button play": "button pause"} alt="play-pause-button"></div>
