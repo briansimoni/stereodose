@@ -55,9 +55,6 @@ export default class Player extends Component {
   }
 
   changeVolume = async (volume) => {
-    // const options = { device_id: this.state.userDeviceId };
-    // const SDK = await this.getSDK();
-    // SDK.setVolume(volume, options);
     this.props.app.player.setVolume(volume);
   }
 
@@ -76,6 +73,12 @@ export default class Player extends Component {
       default: // 2 is track
         SDK.setRepeat('off', options);
     }
+  }
+
+  shuffle = async () => {
+    const SDK = await this.getSDK();
+    const options = { device_id: this.state.userDeviceId };
+    return SDK.setShuffle(!this.state.playerState.shuffle, options);
   }
 
   // position is the desired percentage to seek to
@@ -171,6 +174,7 @@ export default class Player extends Component {
                       onPreviousSong={this.previousSong}
                       onChangeVolume={this.changeVolume}
                       onChangeRepeat={this.changeRepeatMode}
+                      onShuffle={this.shuffle}
                       onSeek={this.seek}
                     />
                   </Fragment>

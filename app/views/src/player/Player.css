@@ -179,3 +179,32 @@ body {
 	font-size: 12px;
 	font-weight: 700;
 }
+
+.octicon-git-pull-request {
+	cursor: pointer;
+	margin-right: 125px;
+	margin-left: -125px;
+	margin-top: 5px;
+	font-size: 20px;
+}
+
+@media only screen and (max-width: 767.98px) {
+	.octicon-git-pull-request {
+		cursor: pointer;
+		margin-right: -225px;
+		margin-left: 225px;
+	}
+}
+
+.octicon-git-pull-request.shuffle.disabled {
+	cursor: not-allowed;
+	color: gray;
+}
+
+.octicon-git-pull-request.shuffle.off {
+	color: white;
+}
+
+.octicon-git-pull-request.shuffle.on {
+	color: green;
+}
