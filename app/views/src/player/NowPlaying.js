@@ -24,9 +24,6 @@ export default class NowPlaying extends Component {
       }
     } = playerState.track_window.current_track;
 
-    // playerState.repeat_mode // integer
-    // playerState.shuffle // bool
-
     return (
       <Fragment>
         <div className="row">
@@ -44,7 +41,7 @@ export default class NowPlaying extends Component {
           <div className="col-sm-7 col-md-7 col-lg-7 text-center">
             <br />
             <div className="controls">
-              <ShuffleButton onClick={this.props.onShuffle}/>
+              <ShuffleButton shuffle={this.props.playerState.shuffle} onClick={this.props.onShuffle}/>
               <RepeatButton onClick={this.props.onChangeRepeat} repeatMode={playerState.repeat_mode}/>
               <div onClick={this.props.onPreviousSong} className="arrow-left"></div>
               <div onClick={this.props.onPlayPause} id="play-pause" className={playerState.paused ? "button play": "button pause"} alt="play-pause-button"></div>
