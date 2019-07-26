@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import { Fragment } from 'react';
 import ProgressBar from './ProgressBar';
 import VolumeSlider from './VolumeSlider';
-import RepeatButton from "./RepeatButton";
-import ShuffleButton from "./ShuffleButton";
+import RepeatButton from './RepeatButton';
+import ShuffleButton from './ShuffleButton';
 
 export default class NowPlaying extends Component {
   render() {
@@ -12,13 +12,9 @@ export default class NowPlaying extends Component {
       playerState: { position: position_ms }
     } = this.props;
     let {
-      uri: track_uri,
       name: track_name,
       duration_ms,
-      artists: [{
-        name: artist_name,
-        uri: artist_uri
-      }],
+      artists: [{ name: artist_name }],
       album: {
         images: [{ url: album_image }]
       }
@@ -33,22 +29,29 @@ export default class NowPlaying extends Component {
           <div className="col-sm-3 col-md-2 col-lg-2">
             <div className="row">
               <div className="col text-center">
-                <span><a href={track_uri}>{track_name}</a> by <a href={artist_uri}>{artist_name}</a></span>
+                <span>
+                  <span className="greenTrackName">{track_name}</span> by{' '}
+                  <span className="greenTrackName">{artist_name}</span>
+                </span>
               </div>
-              
             </div>
           </div>
           <div className="col-sm-7 col-md-7 col-lg-7 text-center">
             <br />
             <div className="controls">
-              <ShuffleButton shuffle={this.props.playerState.shuffle} onClick={this.props.onShuffle}/>
-              <RepeatButton onClick={this.props.onChangeRepeat} repeatMode={playerState.repeat_mode}/>
-              <div onClick={this.props.onPreviousSong} className="arrow-left"></div>
-              <div onClick={this.props.onPlayPause} id="play-pause" className={playerState.paused ? "button play": "button pause"} alt="play-pause-button"></div>
-              <div onClick={this.props.onNextSong} className="arrow-right"></div>
-              <VolumeSlider className="volume-slider" onChangeVolume={this.props.onChangeVolume} disabled={false}/>
+              <ShuffleButton shuffle={this.props.playerState.shuffle} onClick={this.props.onShuffle} />
+              <RepeatButton onClick={this.props.onChangeRepeat} repeatMode={playerState.repeat_mode} />
+              <div onClick={this.props.onPreviousSong} className="arrow-left" />
+              <div
+                onClick={this.props.onPlayPause}
+                id="play-pause"
+                className={playerState.paused ? 'button play' : 'button pause'}
+                alt="play-pause-button"
+              />
+              <div onClick={this.props.onNextSong} className="arrow-right" />
+              <VolumeSlider className="volume-slider" onChangeVolume={this.props.onChangeVolume} disabled={false} />
             </div>
-            <ProgressBar onSeek={this.props.onSeek} position={position_ms} duration={duration_ms} disabled={false}/>
+            <ProgressBar onSeek={this.props.onSeek} position={position_ms} duration={duration_ms} disabled={false} />
           </div>
         </div>
       </Fragment>
