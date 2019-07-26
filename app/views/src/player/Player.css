@@ -1,210 +1,216 @@
-
 body {
-	/* Margin bottom by footer height plus the margin between other stuff*/
-	margin-bottom: 175px;
+  /* Margin bottom by footer height plus the margin between other stuff*/
+  margin-bottom: 175px;
 }
 
 .footer {
-	bottom: 0;
-	width: 100%;
-	/* Set the fixed height of the footer here */
-	height: 125px;
-	/* Vertically center the text there */
-	/* line-height: 60px; */
-	background-color: black;
-	padding-top: 15px;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 125px;
+  /* Vertically center the text there */
+  /* line-height: 60px; */
+  background-color: black;
+  padding-top: 15px;
 }
 
 #player-message-not-signed-in {
-	text-align: center;
-	color: #008f0c;
-	cursor: pointer;
+  text-align: center;
+  color: #008f0c;
+  cursor: pointer;
 }
 
 #album-image {
-	height: 100px;
+  height: 100px;
 }
 
 .controls {
-	padding-bottom: 10px;
-	display: flex;
-	justify-content: center;
+  padding-bottom: 10px;
+  display: flex;
+  justify-content: center;
 }
 
 .button.play {
+  width: 0;
+  height: 0;
+  border-top: 15px solid transparent;
+  border-bottom: 15px solid transparent;
 
-	width: 0; 
-	height: 0; 
-	border-top: 15px solid transparent;
-	border-bottom: 15px solid transparent;
-	
-	border-left: 15px solid #008f0c;
-	display: inline-block;
-	/* transition: 100ms all ease; */
+  border-left: 15px solid #008f0c;
+  display: inline-block;
+  /* transition: 100ms all ease; */
 }
 
-.button.pause{
-	border: 0;
-	background: transparent;
-	box-sizing: border-box;
-	width: 0;
-	height: 30px;
+.button.pause {
+  border: 0;
+  background: transparent;
+  box-sizing: border-box;
+  width: 0;
+  height: 30px;
 
-	border-style: double;
-	border-width: 0px 0 0px 22px;
+  border-style: double;
+  border-width: 0px 0 0px 22px;
 
-	border-color: transparent transparent transparent #008f0c;
-	/* transition: 100ms all ease; */
-	cursor: pointer;
-	display: inline-block;
+  border-color: transparent transparent transparent #008f0c;
+  /* transition: 100ms all ease; */
+  cursor: pointer;
+  display: inline-block;
 }
 
 .arrow-left {
-	display: inline-block;
-	margin-right: 40px;
-	margin-top: 5px;
-	width: 0; 
-	height: 0; 
-	border-top: 10px solid transparent;
-	border-bottom: 10px solid transparent; 
-	border-right:10px solid #008f0c;
-	cursor: pointer;
+  display: inline-block;
+  margin-right: 40px;
+  margin-top: 5px;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-right: 10px solid #008f0c;
+  cursor: pointer;
 }
 
 .arrow-left.disabled {
-	border-right:10px solid #3f4041;
-	cursor: not-allowed;
+  border-right: 10px solid #3f4041;
+  cursor: not-allowed;
 }
 
 .arrow-right {
-	display: inline-block;
-	margin-left: 40px;
-	margin-top: 5px;
-	width: 0; 
-	height: 0; 
-	border-top: 10px solid transparent;
-	border-bottom: 10px solid transparent;
-	
-	border-left: 10px solid #008f0c;
-	cursor: pointer;
+  display: inline-block;
+  margin-left: 40px;
+  margin-top: 5px;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+
+  border-left: 10px solid #008f0c;
+  cursor: pointer;
 }
 
 .arrow-right.disabled {
-	border-left: 10px solid #3f4041;
-	cursor: not-allowed;
+  border-left: 10px solid #3f4041;
+  cursor: not-allowed;
 }
 
 .button.play.disabled {
-	border: 0;
-	background: transparent;
-	box-sizing: border-box;
-	width: 0;
-	height: 30px;
+  border: 0;
+  background: transparent;
+  box-sizing: border-box;
+  width: 0;
+  height: 30px;
 
-	border-style: double;
-	border-width: 0px 0 0px 22px;
+  border-style: double;
+  border-width: 0px 0 0px 22px;
 
-	border-color: transparent transparent transparent #3f4041;
-	/* transition: 100ms all ease; */
-	cursor: not-allowed;
-	display: inline-block;
+  border-color: transparent transparent transparent #3f4041;
+  /* transition: 100ms all ease; */
+  cursor: not-allowed;
+  display: inline-block;
 }
 
 .progress-bar {
-	background-color: #008f0c;
+  background-color: #008f0c;
 }
 
 .octicon.unmute {
-	color: green;
-	position: absolute;
-	right: -45px;
-	top: 30px;
-	font-size: 20px;
+  color: green;
+  position: absolute;
+  right: -45px;
+  top: 30px;
+  font-size: 20px;
 }
 
 .volume-slider {
-	display: none;
-	position: absolute;
-	width: 100px;
-	top: 0px;
-	margin-left: 200px;
+  display: none;
+  position: absolute;
+  width: 100px;
+  top: 0px;
+  margin-left: 200px;
+  cursor: pointer;
 }
 
-.slider-handles > div#volume-slider-handle {
-	position: 'absolute';
-	margin-left: -5.5;
-	margin-top: 33;
-	z-index: 2;
-	width: 15;
-	height: 15;
-	border: 0;
-	text-align: 'center';
-	cursor: 'pointer';
-	border-radius: '50%';
-	background-color: 'green';
-	color: '#333';
+.volume-slider.disabled {
+  cursor: not-allowed;
+}
+
+/* .slider-handles.disabled {
+  cursor: not-allowed !important;
+} */
+*/ .slider-handles > div#volume-slider-handle {
+  position: 'absolute';
+  margin-left: -5.5;
+  margin-top: 33;
+  z-index: 2;
+  width: 15;
+  height: 15;
+  border: 0;
+  text-align: 'center';
+  cursor: 'pointer';
+  border-radius: '50%';
+  background-color: 'green';
+  color: '#333';
 }
 
 @media only screen and (min-width: 768px) {
-	.volume-slider {
-		display: inline-block;
-	}
+  .volume-slider {
+    display: inline-block;
+  }
 }
 
 .octicon.repeat {
-	cursor: pointer;
-	margin-right: 75px;
-	margin-left: -75px;
-	margin-top: 5px;
-	font-size: 20px;
+  cursor: pointer;
+  margin-right: 75px;
+  margin-left: -75px;
+  margin-top: 5px;
+  font-size: 20px;
 }
 
 .octicon.repeat.context {
-	color: green;
+  color: green;
 }
 
 .octicon.repeat.track {
-	color: green;
+  color: green;
 }
 
 .octicon.repeat.disabled {
-	color: #3f4041;
-	cursor: not-allowed;
+  color: #3f4041;
+  cursor: not-allowed;
 }
 
 .octicon.repeat.track::after {
-	position: absolute;
-	content: "1";
-	color: green;
-	font-size: 12px;
-	font-weight: 700;
+  position: absolute;
+  content: '1';
+  color: green;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .octicon-git-pull-request {
-	cursor: pointer;
-	margin-right: 125px;
-	margin-left: -125px;
-	margin-top: 5px;
-	font-size: 20px;
+  cursor: pointer;
+  margin-right: 125px;
+  margin-left: -125px;
+  margin-top: 5px;
+  font-size: 20px;
 }
 
 @media only screen and (max-width: 767.98px) {
-	.octicon-git-pull-request {
-		cursor: pointer;
-		margin-right: -225px;
-		margin-left: 225px;
-	}
+  .octicon-git-pull-request {
+    cursor: pointer;
+    margin-right: -225px;
+    margin-left: 225px;
+  }
 }
 
 .octicon-git-pull-request.shuffle.disabled {
-	cursor: not-allowed;
-	color: gray;
+  cursor: not-allowed;
+  color: gray;
 }
 
 .octicon-git-pull-request.shuffle.off {
-	color: white;
+  color: white;
 }
 
 .octicon-git-pull-request.shuffle.on {
-	color: green;
+  color: green;
 }
