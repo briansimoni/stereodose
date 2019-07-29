@@ -1,17 +1,16 @@
-import React from "react";
-import { Fragment } from "react";
-import PickPlaylist from "./PickPlaylist";
-import PickDrug from "./PickDrug";
-import PickMood from "./PickMood";
-import PickImage from "./PickImage";
-import SharePlaylistButton from "./SharePlaylistButton";
+import React from 'react';
+import { Fragment } from 'react';
+import PickPlaylist from './PickPlaylist';
+import PickDrug from './PickDrug';
+import PickMood from './PickMood';
+import PickImage from './PickImage';
+import SharePlaylistButton from './SharePlaylistButton';
 
 // ShareSpotifyPlaylist is the component that allows users to share Spotify Playlists to Stereodose
 // It will maintain the state of a particular playlist as a user selects different options before uploading
 // The parent component (Profile) is responsible for passing required information
 // e.g. access tokens, the set of playlists, moods, categories, update callbacks, etc...
 class ShareSpotifyPlaylist extends React.Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -20,15 +19,15 @@ class ShareSpotifyPlaylist extends React.Component {
       selectedMood: null,
       imageBlob: null,
       // inFlight is a boolean to usesd to disable stuff while requests are pending
-      inFlight: false,
-    }
+      inFlight: false
+    };
   }
 
   render() {
     const { playlists, categories } = this.props;
     const { selectedPlaylist, selectedDrug, selectedMood, imageBlob } = this.state;
     if (!playlists || !categories) {
-      return <div></div>
+      return <div />;
     }
 
     if (selectedMood) {
@@ -57,15 +56,17 @@ class ShareSpotifyPlaylist extends React.Component {
             <SharePlaylistButton
               disabled={buttonDisabled}
               onShareStereodose={this.shareToStereodose}
-              inFlight={this.state.inFlight} />
+              inFlight={this.state.inFlight}
+            />
           </div>
 
           <div className="cancel text-center">
-            <button className="btn btn-danger" onClick={this.cancel}>Cancel</button>
+            <button className="btn btn-danger" onClick={this.cancel}>
+              Cancel
+            </button>
           </div>
-
         </Fragment>
-      )
+      );
     }
 
     if (selectedPlaylist && selectedDrug) {
@@ -78,7 +79,9 @@ class ShareSpotifyPlaylist extends React.Component {
             drug={selectedDrug}
           />
           <div className="cancel text-center">
-            <button className="btn btn-danger" onClick={this.cancel}>Cancel</button>
+            <button className="btn btn-danger" onClick={this.cancel}>
+              Cancel
+            </button>
           </div>
         </Fragment>
       );
@@ -87,48 +90,43 @@ class ShareSpotifyPlaylist extends React.Component {
     if (selectedPlaylist) {
       return (
         <Fragment>
-          <PickDrug
-            onSelectDrug={this.onSelectDrug}
-            categories={categories}
-            playlist={selectedPlaylist}
-          />
+          <PickDrug onSelectDrug={this.onSelectDrug} categories={categories} playlist={selectedPlaylist} />
           <div className="cancel text-center">
-            <button className="btn btn-danger" onClick={this.cancel}>Cancel</button>
+            <button className="btn btn-danger" onClick={this.cancel}>
+              Cancel
+            </button>
           </div>
         </Fragment>
-
       );
     }
 
-
-
     if (playlists) {
-      return <PickPlaylist onSelectPlaylist={this.onSelectPlaylist} playlists={playlists} />
+      return <PickPlaylist onSelectPlaylist={this.onSelectPlaylist} playlists={playlists} />;
     }
   }
 
   onBlobCreated = blob => {
     this.setState({ imageBlob: blob });
-  }
+  };
 
   onSelectPlaylist = playlist => {
     this.setState({ selectedPlaylist: playlist });
-  }
+  };
 
   onSelectDrug = drug => {
     this.setState({ selectedDrug: drug });
-  }
+  };
 
   onSelectMood = mood => {
-    this.setState({ selectedMood: mood })
-  }
+    this.setState({ selectedMood: mood });
+  };
 
   uploadImage = async blob => {
     const data = new FormData();
     data.append('playlist-image', blob);
     data.append('filename', 'playlist-image');
     const response = await fetch(`/api/playlists/${this.state.selectedPlaylist.id}/image`, {
-      method: "POST",
+      method: 'POST',
       body: data
     });
     if (response.status !== 201) {
@@ -137,7 +135,7 @@ class ShareSpotifyPlaylist extends React.Component {
     }
     const json = await response.json();
     return json;
-  }
+  };
 
   shareToStereodose = async () => {
     // disable button while request is in flight
@@ -149,8 +147,8 @@ class ShareSpotifyPlaylist extends React.Component {
 
     const { selectedPlaylist, selectedMood, selectedDrug } = this.state;
     const resp = await fetch(`/api/playlists/`, {
-      method: "POST",
-      credentials: "same-origin",
+      method: 'POST',
+      credentials: 'same-origin',
       body: JSON.stringify({
         SpotifyID: selectedPlaylist.id,
         Category: selectedDrug,
@@ -160,9 +158,9 @@ class ShareSpotifyPlaylist extends React.Component {
       })
     });
     if (resp.status !== 201) {
-      alert("error! " + resp.status + " " + resp.statusText);
+      alert('error! ' + resp.status + ' ' + resp.statusText);
     }
-    alert("Share Successful!");
+    alert('Share Successful!');
     this.setState({
       selectedPlaylist: null,
       selectedDrug: null,
@@ -171,7 +169,7 @@ class ShareSpotifyPlaylist extends React.Component {
       inFlight: false
     });
     this.props.onUpdate();
-  }
+  };
 
   cancel = () => {
     this.setState({
@@ -180,8 +178,7 @@ class ShareSpotifyPlaylist extends React.Component {
       selectedMood: null,
       imageBlob: null
     });
-  }
-
+  };
 }
 
 export default ShareSpotifyPlaylist;

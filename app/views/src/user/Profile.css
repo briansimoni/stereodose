@@ -1,48 +1,48 @@
 nav img {
-	height: 60px;
+  height: 60px;
 }
 
 #logo {
-	height: 30px;
+  height: 30px;
 }
 
 .signin-button {
-	color: #008f0c;
-	cursor: pointer;
+  color: #008f0c;
+  cursor: pointer;
 }
 
 #content-title {
-	margin-top: 30px;
-	margin-bottom: 30px;
-	text-align: center;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  text-align: center;
 }
 
 span.nav-link {
-	cursor: pointer;
+  cursor: pointer;
 }
 
 .list-group-item-action {
-	color: #008f0c;
-	text-align: center;
-	cursor: pointer;
+  color: #008f0c;
+  text-align: center;
+  cursor: pointer;
 }
 
 .cancel {
-	margin-top: 25px;
+  margin-top: 25px;
 }
 
 .navbar-toggler {
-	float: right;
+  float: right;
 }
 
 .navbar-dark .navbar-nav .nav-link {
-    color: #008f0c;
+  color: #008f0c;
 }
 
 .ReactCrop {
-	width: 100%;
+  width: 100%;
 }
 
 .profile-main ul {
-	list-style: none;
+  list-style: none;
 }

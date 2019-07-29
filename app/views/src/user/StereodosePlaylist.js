@@ -1,8 +1,7 @@
-import React from "react";
-import Octicon from "react-octicon";
+import React from 'react';
+import Octicon from 'react-octicon';
 
 class StereodosePlaylist extends React.Component {
-
   render() {
     return (
       <tr>
@@ -15,20 +14,20 @@ class StereodosePlaylist extends React.Component {
           </button>
         </td>
       </tr>
-    )
+    );
   }
 
   deleteFromStereodose = async () => {
     let id = this.props.playlist.spotifyID;
     let resp = await fetch(`/api/playlists/${id}`, {
-      method: "DELETE",
-      credentials: "same-origin"
+      method: 'DELETE',
+      credentials: 'same-origin'
     });
     if (resp.status !== 200) {
-      alert(resp.status + " " + resp.statusText);
+      alert(resp.status + ' ' + resp.statusText);
     }
     this.props.onUpdate();
-  }
+  };
 }
 
 export default StereodosePlaylist;

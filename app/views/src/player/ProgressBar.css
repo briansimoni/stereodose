@@ -3,40 +3,40 @@
  * It is the outermost div and therefore the "root" style
 */
 .progress-bar-slider {
-    position: relative;
-    width: 100%;
-    height: 20px;
-    margin-top:5px;
+  position: relative;
+  width: 100%;
+  height: 20px;
+  margin-top: 5px;
 }
 
 .progress-bar-slider .progress-bar-rail {
-    position: absolute;
-    width: 100%;
-    height: 10px;
-    border-radius: 5px;
-    background-color: #8B9CB6;
-    cursor: pointer;
+  position: absolute;
+  width: 100%;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #8b9cb6;
+  cursor: pointer;
 }
 
 .progress-bar-slider .progress-bar-handle {
-    position: absolute;
-    margin-left: -15px;
-    margin-top: -5px;
-    z-index: 2;
-    width: 20px;
-    height: 20px;
-    border: 0;
-    text-align: center;
-    cursor: pointer;
-    border-radius: 50%;
-    background-color: #008f0c;
+  position: absolute;
+  margin-left: -15px;
+  margin-top: -5px;
+  z-index: 2;
+  width: 20px;
+  height: 20px;
+  border: 0;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 50%;
+  background-color: #008f0c;
 }
 
 .progress-bar-slider .progress-bar-track {
-    position: absolute;
-    height: 10px;
-    z-index: 1;
-    background-color: rgb(20, 88, 20);
-    border-radius: 5px;
-    cursor: pointer;
+  position: absolute;
+  height: 10px;
+  z-index: 1;
+  background-color: rgb(20, 88, 20);
+  border-radius: 5px;
+  cursor: pointer;
 }

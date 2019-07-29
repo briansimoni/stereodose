@@ -2,14 +2,14 @@ import React, { Component, Fragment } from 'react';
 import Spotify from 'spotify-web-api-js';
 
 export default class WebPlayback extends Component {
-  deviceSelectedInterval = null
-  statePollingInterval = null
-  webPlaybackInstance = null
+  deviceSelectedInterval = null;
+  statePollingInterval = null;
+  webPlaybackInstance = null;
 
   state = {
     playerReady: false,
     playerSelected: false
-  }
+  };
 
   async handleState(state) {
     if (state) {
@@ -32,14 +32,16 @@ export default class WebPlayback extends Component {
       if ('Spotify' in window) {
         resolve();
       } else {
-        window.onSpotifyWebPlaybackSDKReady = () => { resolve(); };
+        window.onSpotifyWebPlaybackSDKReady = () => {
+          resolve();
+        };
       }
     });
   }
 
   waitForDeviceToBeSelected() {
     return new Promise(resolve => {
-      // setInterval with no second param defaults to 10 ms 
+      // setInterval with no second param defaults to 10 ms
       this.deviceSelectedInterval = setInterval(() => {
         if (this.webPlaybackInstance) {
           this.webPlaybackInstance.getCurrentState().then(state => {
@@ -59,8 +61,6 @@ export default class WebPlayback extends Component {
     return SDK.WebPlayback.transferPlayback([deviceID]);
   }
 
-
-
   startStatePolling() {
     this.statePollingInterval = setInterval(async () => {
       let state = await this.webPlaybackInstance.getCurrentState();
@@ -79,34 +79,34 @@ export default class WebPlayback extends Component {
       name: this.props.playerName,
       volume: this.props.playerInitialVolume,
       getOAuthToken: async callback => {
-        if (typeof this.props.onPlayerRequestAccessToken !== "undefined") {
+        if (typeof this.props.onPlayerRequestAccessToken !== 'undefined') {
           let userAccessToken = await this.props.onPlayerRequestAccessToken();
           callback(userAccessToken);
         }
       }
     });
 
-    this.webPlaybackInstance.on("initialization_error", e => {
+    this.webPlaybackInstance.on('initialization_error', e => {
       this.props.onPlayerError(e.message);
     });
 
-    this.webPlaybackInstance.on("authentication_error", e => {
+    this.webPlaybackInstance.on('authentication_error', e => {
       this.props.onPlayerError(e.message);
     });
 
-    this.webPlaybackInstance.on("account_error", e => {
+    this.webPlaybackInstance.on('account_error', e => {
       this.props.onPlayerError(e.message);
     });
 
-    this.webPlaybackInstance.on("playback_error", e => {
+    this.webPlaybackInstance.on('playback_error', e => {
       this.props.onPlayerError(e.message);
     });
 
-    this.webPlaybackInstance.on("player_state_changed", async state => {
+    this.webPlaybackInstance.on('player_state_changed', async state => {
       await this.handleState(state);
     });
 
-    this.webPlaybackInstance.on("ready", data => {
+    this.webPlaybackInstance.on('ready', data => {
       // fix per https://github.com/spotify/web-playback-sdk/issues/75
       const iframe = document.querySelector('iframe[src="https://sdk.scdn.co/embedded/index.html"]');
       if (iframe) {
@@ -125,7 +125,7 @@ export default class WebPlayback extends Component {
 
   setupWaitingForDevice() {
     return new Promise(resolve => {
-      this.webPlaybackInstance.on("ready", data => {
+      this.webPlaybackInstance.on('ready', data => {
         resolve(data);
       });
     });
@@ -155,6 +155,6 @@ export default class WebPlayback extends Component {
   }
 
   render() {
-    return (<Fragment>{this.props.children}</Fragment>);
+    return <Fragment>{this.props.children}</Fragment>;
   }
-};
+}

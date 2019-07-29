@@ -1,97 +1,99 @@
 main {
-    margin-top: 25px;
+  margin-top: 25px;
 }
 
 .playlists {
-    list-style: none;
-    text-align: center;
+  list-style: none;
+  text-align: center;
 }
 
 .playlists h4 {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .playlists img {
-    max-width: 250px;
+  max-width: 250px;
 }
 
 #choose-a-playlist {
-    text-align: center;
-    color: white;
+  text-align: center;
+  color: white;
 }
 
 .drug-header {
-    text-align: center;
-    color: white;
+  text-align: center;
+  color: white;
 }
 
-ul.moods, ul.drugs, #moods {
-    text-transform: capitalize;
-    padding-left: 0px;
-    list-style: none;
-    text-align: center;
+ul.moods,
+ul.drugs,
+#moods {
+  text-transform: capitalize;
+  padding-left: 0px;
+  list-style: none;
+  text-align: center;
 }
 
 ul.drugs li {
-    padding: 5px;
+  padding: 5px;
 }
 
 .mood-choice-header {
-    text-align: center;
-    color: white;
+  text-align: center;
+  color: white;
 }
 
 #playlist-heading {
-    text-align: center;
-    margin-bottom: 20px;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 #playlist-heading > img {
-    height: 40vh
+  height: 40vh;
 }
 
 .track-play-button {
-    background-color: #008f0c;
-    color: white;
+  background-color: #008f0c;
+  color: white;
 }
 
 .playlist {
-    margin-top: 25px;
+  margin-top: 25px;
 }
 
 .comments {
-    margin-top: 25px;
+  margin-top: 25px;
 }
 
 #comment-textarea {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 .comments .delete-button {
-    float: right;
+  float: right;
 }
 
 .octicon.octicon-heart {
-    cursor: pointer;
-    color: gray;
-    font-size: 36px;
+  cursor: pointer;
+  color: gray;
+  font-size: 36px;
 }
 
 .octicon.octicon-heart.liked {
-    cursor: pointer;
-    color: #b00606;
-    font-size: 36px;
+  cursor: pointer;
+  color: #b00606;
+  font-size: 36px;
 }
 
 .octicon.octicon-heart:hover {
-    color: #ff0000;
-    font-size: 36px;
+  color: #ff0000;
+  font-size: 36px;
 }
 
 .comment-toggle {
-    float: right;
+  float: right;
 }
 
 .spinner-grow {
-    margin: 0 auto;
+  margin: 0 auto;
 }

@@ -1,7 +1,7 @@
-import React from "react";
-import { Fragment } from "react";
-import { Link } from "react-router-dom";
-import "./Profile.css";
+import React from 'react';
+import { Fragment } from 'react';
+import { Link } from 'react-router-dom';
+import './Profile.css';
 
 class UserNavItems extends React.Component {
   constructor(props) {
@@ -9,7 +9,7 @@ class UserNavItems extends React.Component {
 
     this.state = {
       loggedIn: null,
-      username: "",
+      username: '',
       user: {}
     };
 
@@ -25,42 +25,52 @@ class UserNavItems extends React.Component {
             <span className="sr-only">Loading...</span>
           </div>
         </div>
-      )
+      );
     }
 
     if (this.state.loggedIn === false) {
       return (
         <li className="nav-item">
-          <span onClick={() => { this.logIn() }} className="nav-link">Sign In</span>
+          <span
+            onClick={() => {
+              this.logIn();
+            }}
+            className="nav-link"
+          >
+            Sign In
+          </span>
         </li>
-      )
+      );
     }
 
     if (this.state.loggedIn === true) {
       return (
         <Fragment>
           <li className="nav-item">
-            <Link className="nav-link" to="/profile">Profile</Link>
+            <Link className="nav-link" to="/profile">
+              Profile
+            </Link>
           </li>
           {/* Logout is a special case. Need to use a plain <a> tag instead of <Link>*/}
           <li className="nav-item">
-            <a href="/auth/logout" className="nav-link">logout</a>
+            <a href="/auth/logout" className="nav-link">
+              logout
+            </a>
           </li>
-
         </Fragment>
-      )
+      );
     }
   }
 
   logIn() {
-    window.location = "/auth/login";
+    window.location = '/auth/login';
   }
 
   async componentDidMount() {
     // hooking into jQuery/Bootstrap 4 API to handle menu collapse
     if (window.$) {
       const jQuery = window.$;
-      jQuery("nav a").click(() => {
+      jQuery('nav a').click(() => {
         jQuery('#navbarSupportedContent').collapse('hide');
       });
     }
@@ -75,14 +85,14 @@ class UserNavItems extends React.Component {
   }
 
   async fetchProfileData() {
-    const response = await fetch("/api/users/me", { credentials: "same-origin" });
+    const response = await fetch('/api/users/me', { credentials: 'same-origin' });
     if (response.status !== 200) {
       throw new Error(`Unable to fetch profile data ${response.statusText}`);
     }
     const user = await response.json();
     // check the user's product level: premium or not
-    if (user.product !== "premium") {
-      throw new Error("You do not have Spotify Premium. The web player will not work");
+    if (user.product !== 'premium') {
+      throw new Error('You do not have Spotify Premium. The web player will not work');
     }
     const displayName = user.displayName ? user.displayName : user.spotifyID;
     this.setState({ user, username: displayName });

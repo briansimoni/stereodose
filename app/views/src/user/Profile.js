@@ -1,18 +1,17 @@
-import React from "react";
-import Spotify from "spotify-web-api-js";
-import { Link } from "react-router-dom";
-import ShareSpotifyPlaylist from "./sharing/ShareSpotifyPlaylist";
-import StereodosePlaylist from "./StereodosePlaylist";
-import "./Profile.css";
-import profilePlaceholder from "../images/profile-placeholder.jpeg";
+import React from 'react';
+import Spotify from 'spotify-web-api-js';
+import { Link } from 'react-router-dom';
+import ShareSpotifyPlaylist from './sharing/ShareSpotifyPlaylist';
+import StereodosePlaylist from './StereodosePlaylist';
+import './Profile.css';
+import profilePlaceholder from '../images/profile-placeholder.jpeg';
 
 class UserProfile extends React.Component {
-
   state = {
     spotifyPlaylists: null,
     stereodosePlaylists: null,
     user: null
-  }
+  };
 
   render() {
     const { spotifyPlaylists, stereodosePlaylists, user } = this.state;
@@ -23,7 +22,7 @@ class UserProfile extends React.Component {
         <div className="container">
           <div className="row justify-content-md-center">
             <div className="col col-md-auto">
-              {this.props.location.pathname === "/profile/shared" &&
+              {this.props.location.pathname === '/profile/shared' && (
                 <div label="Playlists Shared to Stereodose">
                   <h2 id="content-title">Playlists Shared to Stereodose</h2>
                   <table className="table">
@@ -34,43 +33,50 @@ class UserProfile extends React.Component {
                         <th>Mood</th>
                         <th>Delete?</th>
                       </tr>
-                      {stereodosePlaylists.map((playlist) => {
-                        return <StereodosePlaylist
-                          key={playlist.spotifyID}
-                          playlist={playlist}
-                          onUpdate={() => { this.checkPlaylists() }}
-                        />
+                      {stereodosePlaylists.map(playlist => {
+                        return (
+                          <StereodosePlaylist
+                            key={playlist.spotifyID}
+                            playlist={playlist}
+                            onUpdate={() => {
+                              this.checkPlaylists();
+                            }}
+                          />
+                        );
                       })}
                     </tbody>
                   </table>
                 </div>
-              }
+              )}
 
-              {this.props.location.pathname === "/profile/available" &&
+              {this.props.location.pathname === '/profile/available' && (
                 <div label="Playlists Available">
                   <ShareSpotifyPlaylist
                     playlists={spotifyPlaylists}
                     categories={categories}
-                    onUpdate={() => { this.checkPlaylists() }}
+                    onUpdate={() => {
+                      this.checkPlaylists();
+                    }}
                   />
                 </div>
-              }
+              )}
 
-              {this.props.location.pathname === "/profile" && user &&
-
+              {this.props.location.pathname === '/profile' && user && (
                 <div className="text-center profile-main">
-
                   <div className="row">
                     <div className="col">
-
                       {/*hotfix*/}
-                      {user.images && user.images.length > 0 &&
-                        <img src={user.images[user.images.length - 1].url} alt="profile" className="img-thumbnail rounded-circle" />
-                      }
+                      {user.images && user.images.length > 0 && (
+                        <img
+                          src={user.images[user.images.length - 1].url}
+                          alt="profile"
+                          className="img-thumbnail rounded-circle"
+                        />
+                      )}
 
-                      {(!user.images || !user.images.length > 0) &&
+                      {(!user.images || !user.images.length > 0) && (
                         <img src={profilePlaceholder} alt="profile" className="img-thumbnail rounded-circle" />
-                      }
+                      )}
 
                       <br />
                       {user.displayName}
@@ -78,46 +84,60 @@ class UserProfile extends React.Component {
                   </div>
 
                   <div className="row">
-                    <div className="col-md-6"><h2><Link className="nav-link" to="/profile/shared">Playlists Shared</Link></h2></div>
-                    <div className="col-md-6"><h2><Link to="/profile/available">Playlists Available</Link></h2></div>
+                    <div className="col-md-6">
+                      <h2>
+                        <Link className="nav-link" to="/profile/shared">
+                          Playlists Shared
+                        </Link>
+                      </h2>
+                    </div>
+                    <div className="col-md-6">
+                      <h2>
+                        <Link to="/profile/available">Playlists Available</Link>
+                      </h2>
+                    </div>
                   </div>
 
                   <div className="row">
                     <div className="col-md-4">
                       <h3>Likes: {user.likes.length}</h3>
                       <ul>
-                        {user.likes.map((like) =>
-                          <li key={like.ID}><Link to={like.permalink}>{like.playlistName}</Link></li>
-                        )}
+                        {user.likes.map(like => (
+                          <li key={like.ID}>
+                            <Link to={like.permalink}>{like.playlistName}</Link>
+                          </li>
+                        ))}
                       </ul>
                     </div>
 
                     <div className="col-md-4">
                       <h3>Comments: {user.comments.length}</h3>
                       <ul>
-                        {user.comments.map((comment) =>
-                          <li key={comment.ID}><Link to={comment.permalink}>{`${comment.content.slice(0, 15)}...`}</Link></li>
-                        )}
+                        {user.comments.map(comment => (
+                          <li key={comment.ID}>
+                            <Link to={comment.permalink}>{`${comment.content.slice(0, 15)}...`}</Link>
+                          </li>
+                        ))}
                       </ul>
                     </div>
 
                     <div className="col-md-4">
                       <h3>Shared: {stereodosePlaylists.length}</h3>
                       <ul>
-                        {stereodosePlaylists.map((playlist) =>
-                          <li key={playlist.spotifyID}><Link to={playlist.permalink}>{playlist.name}</Link></li>
-                        )}
+                        {stereodosePlaylists.map(playlist => (
+                          <li key={playlist.spotifyID}>
+                            <Link to={playlist.permalink}>{playlist.name}</Link>
+                          </li>
+                        ))}
                       </ul>
                     </div>
                   </div>
                 </div>
-
-              }
-
+              )}
             </div>
           </div>
         </div>
-      )
+      );
     }
     return (
       <div className="row justify-content-md-center">
@@ -157,7 +177,7 @@ class UserProfile extends React.Component {
       offset = offset + 50;
     }
 
-    const response = await fetch("/api/playlists/me", { credentials: "same-origin" });
+    const response = await fetch('/api/playlists/me', { credentials: 'same-origin' });
     if (response.status !== 200) {
       throw new Error(`${response.status} Unable to fetch user profile`);
     }
@@ -185,16 +205,16 @@ class UserProfile extends React.Component {
       spotifyPlaylists: diffedSpotifyPlaylists,
       stereodosePlaylists: diffedStereodosePlaylists
     });
-  }
+  };
 
   fetchUserData = async () => {
-    const response = await fetch("/api/users/me", { credentials: "same-origin" });
+    const response = await fetch('/api/users/me', { credentials: 'same-origin' });
     if (response.status !== 200) {
       throw new Error(`${response.status} Unable to fetch user profile`);
     }
     const user = await response.json();
     this.setState({ user: user });
-  }
+  };
 }
 
-export default UserProfile
+export default UserProfile;
