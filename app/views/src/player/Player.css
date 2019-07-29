@@ -126,6 +126,11 @@ body {
   width: 100px;
   top: 0px;
   margin-left: 200px;
+  cursor: pointer;
+}
+
+.volume-slider.disabled {
+  cursor: not-allowed;
 }
 
 .slider-handles > div#volume-slider-handle {
