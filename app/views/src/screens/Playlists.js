@@ -1,11 +1,10 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import "./Screens.css";
-import Pagination from "./Pagination";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import './Screens.css';
+import Pagination from './Pagination';
 
 // Playlists renders the playlists that correspond to a particular drug + mood
 class Playlists extends React.Component {
-
   resultsPerPage = 15;
 
   constructor(props) {
@@ -14,7 +13,7 @@ class Playlists extends React.Component {
       loading: true,
       error: null,
       playlists: null
-    }
+    };
   }
 
   render() {
@@ -28,11 +27,11 @@ class Playlists extends React.Component {
             <span className="sr-only">Loading...</span>
           </div>
         </div>
-      )
+      );
     }
 
     if (err) {
-      return <h3>Error: {err}</h3>
+      return <h3>Error: {err}</h3>;
     }
 
     if (playlists) {
@@ -48,10 +47,10 @@ class Playlists extends React.Component {
       const playlistsSlice = playlists.slice(0, this.resultsPerPage);
       const rows = playlistsSlice.reduce((accumulator, currentPlaylist, index) => {
         if (index % 3 === 0) {
-          return accumulator.concat([playlists.slice(index, index + 3)])
+          return accumulator.concat([playlists.slice(index, index + 3)]);
         }
         return accumulator;
-      }, [])
+      }, []);
 
       return (
         <div className="playlists">
@@ -60,8 +59,10 @@ class Playlists extends React.Component {
           {rows.map((row, index) => {
             return (
               <div className="row" key={index}>
-                {row.map((playlist) => {
-                  const thumbnailImageURL = playlist.bucketThumbnailURL ? playlist.bucketThumbnailURL : "https://via.placeholder.com/250x200";
+                {row.map(playlist => {
+                  const thumbnailImageURL = playlist.bucketThumbnailURL
+                    ? playlist.bucketThumbnailURL
+                    : 'https://via.placeholder.com/250x200';
                   return (
                     <div className="col-md-4" key={playlist.spotifyID}>
                       <Link to={`${match.url}/${playlist.spotifyID}`}>
@@ -74,19 +75,15 @@ class Playlists extends React.Component {
                         </Link>
                         <p>likes: {playlist.likesCount}</p>
                       </div>
-
                     </div>
-                  )
+                  );
                 })}
               </div>
-            )
+            );
           })}
 
           <Pagination resultsPerPage={this.resultsPerPage} match={match} playlists={playlists} />
-
-
         </div>
-
       );
     }
   }
@@ -134,9 +131,12 @@ class Playlists extends React.Component {
 
     const params = new URLSearchParams(window.location.search);
     const page = params.get('page') !== null ? parseInt(params.get('page')) : 1;
-    const offset = page === 1 ? 0 : (page * this.resultsPerPage) - this.resultsPerPage;
+    const offset = page === 1 ? 0 : page * this.resultsPerPage - this.resultsPerPage;
 
-    const response = await fetch(`/api/playlists/?category=${drug}&subcategory=${subcategory}&limit=20&offset=${offset}`, { credentials: "same-origin" });
+    const response = await fetch(
+      `/api/playlists/?category=${drug}&subcategory=${subcategory}&limit=20&offset=${offset}`,
+      { credentials: 'same-origin' }
+    );
     if (response.status !== 200) {
       throw new Error(`Error fetching playlists ${response.status}, ${response.statusText}`);
     }
@@ -145,8 +145,7 @@ class Playlists extends React.Component {
       throw new Error(`No playlists found for drug: ${drug}, mood: ${subcategory}`);
     }
     return playlists;
-  }
-
+  };
 }
 
-export default Playlists
+export default Playlists;

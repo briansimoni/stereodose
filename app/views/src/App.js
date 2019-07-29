@@ -16,7 +16,6 @@ import NoMatch from './404';
 // such as getAccessToken(), getCategories(), and Player methods without making wasteful HTTP calls
 // since both of those pieces of data are held in App's memory
 class App extends React.Component {
-
   // accessToken is a Spotify OAuth token
   accessToken = null;
   // player is an instance of https://developer.spotify.com/documentation/web-playback-sdk/reference/#api-spotify-player
@@ -25,79 +24,42 @@ class App extends React.Component {
   player = null;
 
   state = {
-    categories: null,
+    categories: null
   };
 
   render() {
     return (
       <BrowserRouter>
         <div>
-
-          <Route path="/"
-            render={(props) =>
-              <Header {...props} app={this} />
-            }
-          />
+          <Route path="/" render={props => <Header {...props} app={this} />} />
 
           <main role="main" className="container">
             {/* Routes wrapped in a Switch match only the first route for ambiguous matches*/}
             <Switch>
-              <Route exact path="/profile"
-                render={(props) =>
-                  <Profile {...props} app={this} />
-                }
-              />
+              <Route exact path="/profile" render={props => <Profile {...props} app={this} />} />
 
-              <Route exact path="/profile/shared"
-                render={(props) =>
-                  <Profile {...props} app={this} />
-                }
-              />
+              <Route exact path="/profile/shared" render={props => <Profile {...props} app={this} />} />
 
-              <Route exact path="/profile/available"
-                render={(props) =>
-                  <Profile {...props} app={this} />
-                }
-              />
+              <Route exact path="/profile/available" render={props => <Profile {...props} app={this} />} />
 
-              <Route exact path="/"
-                render={(props) =>
-                  <Drugs {...props} app={this} />
-                }
-              />
+              <Route exact path="/" render={props => <Drugs {...props} app={this} />} />
 
-              <Route exact path="/about"
-                render={(props) =>
-                  <About {...props} app={this} />
-                }
-              />
+              <Route exact path="/about" render={props => <About {...props} app={this} />} />
 
-              <Route exact path="/:drug"
-                render={(props) =>
-                  <Drug {...props} app={this} />
-                }
-              />
+              <Route exact path="/:drug" render={props => <Drug {...props} app={this} />} />
 
               <Route exact path="/:drug/:subcategory" component={Playlists} />
 
-              <Route exact path="/:drug/:subcategory/:playlist"
-                render={(props) =>
-                  <Playlist {...props} app={this} />
-                }
-              />
+              <Route exact path="/:drug/:subcategory/:playlist" render={props => <Playlist {...props} app={this} />} />
 
               <Route component={NoMatch} />
             </Switch>
           </main>
 
-          <Route path="/"
-            render={(props) =>
-              <Player {...props} app={this} />
-            }
-          />
+          <Route path="/" render={props => <Player {...props} app={this} />} />
         </div>
-      </BrowserRouter >
-    )
+      </BrowserRouter>
+    );
   }
 
   async componentDidMount() {
@@ -111,21 +73,21 @@ class App extends React.Component {
   getCategories = async () => {
     const response = await fetch('/api/categories/', { credentials: 'same-origin' });
     if (response.status !== 200) {
-      throw new Error("Unable to fetch categories");
+      throw new Error('Unable to fetch categories');
     }
     const categories = await response.json();
     this.setState({ categories });
-  }
+  };
 
   // getAccessToken will return a Promise to resolve to a Spotify API access_token
   // The token is cached in the member variable of this object and updated upon expiry
   getAccessToken = async () => {
     if (!this.userLoggedIn()) {
-      throw new Error("Sign in with Spotify Premium to Play Music");
+      throw new Error('Sign in with Spotify Premium to Play Music');
     }
     let token;
     if (this.accessToken === null) {
-      const response = await fetch("/auth/token", { credentials: "same-origin" });
+      const response = await fetch('/auth/token', { credentials: 'same-origin' });
       if (response.status !== 200) {
         throw new Error(`Unable to fetch Spotify access token: ${response.status} ${response.statusText}`);
       }
@@ -138,7 +100,7 @@ class App extends React.Component {
       this.accessToken = token;
       return token.access_token;
     }
-    const response = await fetch("/auth/refresh", { credentials: "same-origin" });
+    const response = await fetch('/auth/refresh', { credentials: 'same-origin' });
     if (response.status !== 200) {
       throw new Error(`Unable to refresh Spotify access token: ${response.status} ${response.statusText}`);
     }
@@ -148,7 +110,7 @@ class App extends React.Component {
     token.expiry = new Date().setSeconds(token.expires_in);
     this.accessToken = token;
     return token.access_token;
-  }
+  };
 
   tokenIsExpired(token) {
     const expiresOn = token.expiry;
@@ -165,15 +127,14 @@ class App extends React.Component {
     // stolen from Stack Overflow
     function getCookie(name) {
       var dc = document.cookie;
-      var prefix = name + "=";
-      var begin = dc.indexOf("; " + prefix);
+      var prefix = name + '=';
+      var begin = dc.indexOf('; ' + prefix);
       if (begin === -1) {
         begin = dc.indexOf(prefix);
         if (begin !== 0) return null;
-      }
-      else {
+      } else {
         begin += 2;
-        var end = document.cookie.indexOf(";", begin);
+        var end = document.cookie.indexOf(';', begin);
         if (end === -1) {
           end = dc.length;
         }
@@ -183,9 +144,9 @@ class App extends React.Component {
       return decodeURI(dc.substring(begin + prefix.length, end));
     }
 
-    let cookie = getCookie("_stereodose-session");
+    let cookie = getCookie('_stereodose-session');
     if (!cookie) {
-      return false
+      return false;
     }
 
     return true;
