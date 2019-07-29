@@ -47,11 +47,11 @@ class Playlist extends React.Component {
             <img src={playlist.bucketImageURL} alt="playlist-artwork" />
           </div>
           <button className="btn btn-warning comment-toggle" onClick={this.toggleComments}>
-            {showComments ? 'Show songs' : `Commentssss (${playlist.comments.length})`}
+            {showComments ? 'Show songs' : `Comments (${playlist.comments.length})`}
           </button>
           <Likes onLike={this.like} playlist={playlist} user={this.state.user} />
 
-          {/* CONDITIONALY RENDER COMMENTS OR PLAYLIST */}
+          {/* Conditionally render either the comments or playlist tracks */}
           {!showComments ? (
             <ul className="list-group playlist">
               {playlist.tracks &&
