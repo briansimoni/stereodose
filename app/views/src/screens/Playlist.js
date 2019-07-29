@@ -1,15 +1,13 @@
-import React from "react";
-import Track from "./Track";
-import Comments from "./Comments";
-import Likes from "./Likes"
-import { Fragment } from "react";
+import React from 'react';
+import Track from './Track';
+import Comments from './Comments';
+import Likes from './Likes';
 
 // Playlist is the parent component that controls the entire display for a particular playlist.
 // It is a composite of likes, comments, tracks, and playlist image.
 // For likes and comments to work, it also keeps track of user state without parent or peer
 // component dependencies. In other words, it makes API calls to /api/users/me
 class Playlist extends React.Component {
-
   // likePending is not part of state because it would cause race conditions
   // React likes to do things like batch state updates
   likePending = false;
@@ -35,70 +33,60 @@ class Playlist extends React.Component {
             <span className="sr-only">Loading...</span>
           </div>
         </div>
-      )
+      );
     }
     if (error) {
-      return <h3>{error.message}</h3>
+      return <h3>{error.message}</h3>;
     }
-    if (playlist && showComments) {
-      return (
-        <Fragment>
-          <div className="row">
-            <div className="col">
-              <div id="playlist-heading">
-                <h2>{playlist.name}</h2>
-                <img src={playlist.bucketImageURL} alt="playlist-artwork" />
-              </div>
-              <button className="btn btn-warning comment-toggle" onClick={this.toggleComments}>Show Songs</button>
-              <Likes onLike={this.like} playlist={playlist} user={this.state.user} />
 
-            </div>
+    return (
+      <div className="row">
+        <div className="col">
+          <div id="playlist-heading">
+            <h2>{playlist.name}</h2>
+            <img src={playlist.bucketImageURL} alt="playlist-artwork" />
           </div>
-          <div className="row">
-            <div className="col">
-              <Comments
-                comments={playlist.comments}
-                onSubmitComment={this.submitComment}
-                onDeleteComment={this.deleteComment}
-                user={this.state.user}
-              />
-            </div>
-          </div>
-        </Fragment>
-      )
-    }
-    if (playlist) {
-      return (
-        <div className="row">
-          <div className="col">
-            <div id="playlist-heading">
-              <h2>{playlist.name}</h2>
-              <img src={playlist.bucketImageURL} alt="playlist-artwork" />
-            </div>
-            <button className="btn btn-warning comment-toggle" onClick={this.toggleComments}>Comments ({playlist.comments.length})</button>
-            <Likes onLike={this.like} playlist={playlist} user={this.state.user} />
+          <button className="btn btn-warning comment-toggle" onClick={this.toggleComments}>
+            {showComments ? 'Show songs' : `Comments (${playlist.comments.length})`}
+          </button>
+          <Likes onLike={this.like} playlist={playlist} user={this.state.user} />
+
+          {/* Conditionally render either the comments or playlist tracks */}
+          {!showComments ? (
             <ul className="list-group playlist">
-              {playlist.tracks.map((track) => {
-                return (
-                  <li
-                    className="list-group-item"
-                    key={track.spotifyID}>
-                    <Track track={track} playlist={playlist} onPlay={() => { this.playSong(playlist, track.URI) }} />
-                  </li>
-                )
-              })}
+              {playlist.tracks &&
+                playlist.tracks.map(track => {
+                  return (
+                    <li className="list-group-item" key={track.spotifyID}>
+                      <Track
+                        track={track}
+                        playlist={playlist}
+                        onPlay={() => {
+                          this.playSong(playlist, track.URI);
+                        }}
+                      />
+                    </li>
+                  );
+                })}
             </ul>
-          </div>
+          ) : (
+            <Comments
+              comments={playlist.comments}
+              onSubmitComment={this.submitComment}
+              onDeleteComment={this.deleteComment}
+              user={this.state.user}
+            />
+          )}
         </div>
-      )
-    }
+      </div>
+    );
   }
 
   // getContextURIs is designed so that we get an array of track URIs
   // For very large playlists, we need to get just a slice relative to the selected track
   // so that we can avoid HTTP 413 (request too large) errors
   getContextURIs(playlist, trackURI) {
-    const trackURIs = playlist.tracks.map((track) => track.URI);
+    const trackURIs = playlist.tracks.map(track => track.URI);
     // Taking a guess at the payload maximum size
     // With trial and error, length of 500 seems to be pretty safe
     // Only use slices in the case where the playlist is very large
@@ -132,18 +120,18 @@ class Playlist extends React.Component {
 
     // middle
     return a.slice(i - lowerDistance, i + upperDistance);
-  }
+  };
 
   // playSong makes an API call directly to Spotify
   // playlist can simply be the playlist object from component state
   async playSong(playlist, selectedTrack) {
     const uris = this.getContextURIs(playlist, selectedTrack);
     let data = {
-      "uris": uris,
-      "offset": {
-        "uri": selectedTrack
+      uris: uris,
+      offset: {
+        uri: selectedTrack
       }
-    }
+    };
 
     try {
       const deviceID = this.props.app.state.deviceID;
@@ -153,10 +141,10 @@ class Playlist extends React.Component {
       const accessToken = await this.props.app.getAccessToken();
 
       const response = await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceID}`, {
-        method: "PUT",
+        method: 'PUT',
         headers: {
-          "Authorization": `Bearer ${accessToken}`,
-          "Content-Type": "application/json"
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
       });
@@ -172,17 +160,17 @@ class Playlist extends React.Component {
 
   toggleComments = () => {
     this.setState({ showComments: !this.state.showComments });
-  }
+  };
 
   // if 401 need to alert user
-  submitComment = async (text) => {
+  submitComment = async text => {
     const options = {
-      method: "POST",
+      method: 'POST',
       body: JSON.stringify({
         text: text
       }),
-      credentials: "same-origin"
-    }
+      credentials: 'same-origin'
+    };
     const response = await fetch(`/api/playlists/${this.state.playlist.spotifyID}/comments`, options);
     if (response.status !== 201) {
       const errorMessage = await response.text();
@@ -197,13 +185,13 @@ class Playlist extends React.Component {
     } catch (err) {
       alert(err);
     }
-  }
+  };
 
-  deleteComment = async (commentID) => {
+  deleteComment = async commentID => {
     const options = {
-      method: "DELETE",
-      credentials: "same-origin"
-    }
+      method: 'DELETE',
+      credentials: 'same-origin'
+    };
 
     const playlist = this.state.playlist;
 
@@ -220,7 +208,7 @@ class Playlist extends React.Component {
     this.setState({
       playlist: playlist
     });
-  }
+  };
 
   // there is some condition that is possible to reach such that the like button stops working
   // the user has liked the playlist or not
@@ -233,13 +221,13 @@ class Playlist extends React.Component {
     this.likePending = true;
 
     // The user already liked this playlist. Unlike.
-    const like = user.likes.find((like) => like.playlistID === playlist.spotifyID);
+    const like = user.likes.find(like => like.playlistID === playlist.spotifyID);
     if (like) {
       try {
         await this.unlike(like.ID);
         user.likes = user.likes.filter(l => l.ID !== like.ID);
         this.setState({
-          user: user,
+          user: user
         });
         this.likePending = false;
         return;
@@ -253,9 +241,9 @@ class Playlist extends React.Component {
     }
 
     const options = {
-      method: "POST",
-      credentials: "same-origin"
-    }
+      method: 'POST',
+      credentials: 'same-origin'
+    };
 
     const response = await fetch(`/api/playlists/${playlist.spotifyID}/likes`, options);
     if (response.status !== 201) {
@@ -266,19 +254,19 @@ class Playlist extends React.Component {
     const newLike = await response.json();
     playlist.likes.push(newLike);
     this.setState({
-      playlist: playlist,
+      playlist: playlist
     });
     await this.updateUserState();
     this.likePending = false;
-  }
+  };
 
-  unlike = async (likeID) => {
+  unlike = async likeID => {
     const options = {
-      method: "DELETE",
-      credentials: "same-origin"
-    }
+      method: 'DELETE',
+      credentials: 'same-origin'
+    };
 
-    const playlist = this.state.playlist
+    const playlist = this.state.playlist;
 
     const response = await fetch(`/api/playlists/${playlist.spotifyID}/likes/${likeID}`, options);
     if (response.status !== 200) {
@@ -288,32 +276,32 @@ class Playlist extends React.Component {
 
     playlist.likes = playlist.likes.filter(l => l.ID !== likeID);
     this.setState({ playlist: playlist });
-  }
+  };
 
   updateUserState = async () => {
     // getting an access token implicitly tells us that the user is logged in
     try {
       await this.props.app.getAccessToken();
     } catch (err) {
-      if (err.message === "Sign in with Spotify Premium to Play Music") {
+      if (err.message === 'Sign in with Spotify Premium to Play Music') {
         this.setState({ user: null });
         return;
       }
     }
 
-    const response = await fetch("/api/users/me");
+    const response = await fetch('/api/users/me');
     if (response.status !== 200) {
       const errorMessage = await response.text();
       throw new Error(`${errorMessage}, ${response.status}, ${response.statusText}`);
     }
     const user = await response.json();
     this.setState({ user: user });
-  }
+  };
 
   updatePlaylistState = async () => {
-    let playlistID = this.props.match.params.playlist
+    let playlistID = this.props.match.params.playlist;
 
-    const response = await fetch(`/api/playlists/${playlistID}`, { credentials: "same-origin" });
+    const response = await fetch(`/api/playlists/${playlistID}`, { credentials: 'same-origin' });
     if (response.status !== 200) {
       const errorMessage = await response.text();
       throw new Error(`${errorMessage}, ${response.status}, ${response.statusText}`);
@@ -338,7 +326,7 @@ class Playlist extends React.Component {
       loading: false,
       playlist: playlist
     });
-  }
+  };
 
   componentDidMount() {
     try {
@@ -348,10 +336,9 @@ class Playlist extends React.Component {
       this.setState({
         loading: false,
         error: err
-      })
+      });
     }
   }
-
 }
 
 export default Playlist;
