@@ -1,6 +1,7 @@
 body {
   /* Margin bottom by footer height plus the margin between other stuff*/
-  margin-bottom: 175px;
+  /* margin-bottom: 175px; */
+  padding-bottom: 175px;
 }
 
 .footer {
