@@ -25,7 +25,7 @@ class UserProfile extends React.Component {
               {this.props.location.pathname === '/profile/shared' && (
                 <div label="Playlists Shared to Stereodose">
                   <h2 id="content-title">Playlists Shared to Stereodose</h2>
-                  <table className="table">
+                  <table className="table shared-playlists-table">
                     <tbody>
                       <tr>
                         <th>Playlist Name</th>
@@ -33,17 +33,15 @@ class UserProfile extends React.Component {
                         <th>Mood</th>
                         <th>Delete?</th>
                       </tr>
-                      {stereodosePlaylists.map(playlist => {
-                        return (
-                          <StereodosePlaylist
-                            key={playlist.spotifyID}
-                            playlist={playlist}
-                            onUpdate={() => {
-                              this.checkPlaylists();
-                            }}
-                          />
-                        );
-                      })}
+                      {stereodosePlaylists.map(playlist => (
+                        <StereodosePlaylist
+                          key={playlist.spotifyID}
+                          playlist={playlist}
+                          onUpdate={() => {
+                            this.checkPlaylists();
+                          }}
+                        />
+                      ))}
                     </tbody>
                   </table>
                 </div>
