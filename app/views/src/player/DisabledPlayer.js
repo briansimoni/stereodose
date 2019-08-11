@@ -23,7 +23,8 @@ export default function DisabledPlayer(props) {
           <div className="arrow-right disabled" />
           <VolumeSlider className="volume-slider disabled" disabled={true} />
         </div>
-        <ProgressBar position={0} duration={100} disabled={true} />
+        {/* onSeek is a callback function that does nothing to prevent errors when the player is disabled*/}
+        <ProgressBar className="disabled" onSeek={() => {}}position={0} duration={100} disabled={true} />
       </div>
     </div>
   );

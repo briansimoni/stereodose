@@ -91,7 +91,7 @@ export default class PickImage extends React.Component {
                 accept=".jpg,.jpeg,.png"
                 onChange={this.onSelectFile}
               />
-              <label class="custom-file-label" for="file-upload" aria-describedby="file-upload">
+              <label className="custom-file-label" htmlFor="file-upload" aria-describedby="file-upload">
                 Choose file
               </label>
             </div>
