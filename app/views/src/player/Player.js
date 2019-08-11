@@ -3,6 +3,7 @@ import './Player.css';
 import WebPlaybackReact from './WebPlaybackReact';
 import Spotify from 'spotify-web-api-js';
 import DisabledPlayer from './DisabledPlayer';
+import GlobalShareButton from '../user/sharing/GlobalShareButton';
 
 import NowPlayingScreen from './NowPlaying';
 
@@ -148,6 +149,7 @@ export default class Player extends Component {
             {!playerSelected && (
               <footer className="footer fixed-bottom">
                 <div className="container-fluid">
+                <GlobalShareButton location={this.props.location}/>
                   <DisabledPlayer />
                 </div>
               </footer>
@@ -156,6 +158,7 @@ export default class Player extends Component {
             {playerLoaded && playerSelected && !playerState && (
               <footer className="footer fixed-bottom">
                 <div className="container-fluid">
+                <GlobalShareButton location={this.props.location}/>
                   <DisabledPlayer />
                 </div>
               </footer>
@@ -164,6 +167,7 @@ export default class Player extends Component {
             {playerLoaded && playerSelected && playerState && (
               <footer className="footer fixed-bottom">
                 <div className="container-fluid">
+                <GlobalShareButton location={this.props.location}/>
                   <Fragment>
                     <NowPlayingScreen
                       playerState={playerState}
