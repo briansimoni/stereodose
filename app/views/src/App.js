@@ -9,6 +9,7 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Profile from './user/Profile';
 import Header from './user/Header';
 import NoMatch from './404';
+import GlobalShareButton from './user/sharing/GlobalShareButton';
 
 // App is the top level component for Stereodose.
 // A reference to itself is passed to child components for an inversion of control.
@@ -54,8 +55,11 @@ class App extends React.Component {
 
               <Route component={NoMatch} />
             </Switch>
+
+            
           </main>
 
+          {/* <Route path="/" render={props => <GlobalShareButton {...props} app={this} />} /> */}
           <Route path="/" render={props => <Player {...props} app={this} />} />
         </div>
       </BrowserRouter>
