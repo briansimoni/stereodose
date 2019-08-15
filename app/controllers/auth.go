@@ -55,7 +55,7 @@ func NewAuthController(db *models.StereoDoseDB, store *sessions.CookieStore, con
 			"user-read-email",
 			"user-read-private",
 			"playlist-read-collaborative",
-			//"playlist-read-private",
+			"playlist-read-private",
 			"user-modify-playback-state",
 		},
 		Endpoint: endpoint.Endpoint,
