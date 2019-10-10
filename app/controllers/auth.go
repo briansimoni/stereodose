@@ -13,7 +13,6 @@ import (
 	"github.com/briansimoni/stereodose/app/models"
 	"github.com/briansimoni/stereodose/app/util"
 	"github.com/briansimoni/stereodose/config"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/zmb3/spotify"
 	"golang.org/x/oauth2"
@@ -338,14 +337,7 @@ func (a *AuthController) saveUserData(token *oauth2.Token, u *spotify.PrivateUse
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
 	}
-	// user.Images = make([]models.UserImage, len(u.Images))
-	// for i, spotifyImage := range u.Images {
-	// 	var image models.UserImage
-	// 	image.Height = spotifyImage.Height
-	// 	image.Width = spotifyImage.Width
-	// 	image.URL = spotifyImage.URL
-	// 	user.Images[i] = image
-	// }
+
 	user, err := a.DB.Users.FirstOrCreate(user, token)
 	if err != nil {
 		return nil, err
@@ -359,10 +351,7 @@ func (a *AuthController) saveUserData(token *oauth2.Token, u *spotify.PrivateUse
 
 	// now we add the user's profile images from spotify
 	// first we make sure that it isn't already saved in the database
-	log.Info("number of images", len(user.Images))
-
 	for _, spotifyImage := range u.Images {
-
 		newImage := true
 		for _, userImage := range user.Images {
 			if spotifyImage.URL == userImage.URL {
@@ -371,7 +360,6 @@ func (a *AuthController) saveUserData(token *oauth2.Token, u *spotify.PrivateUse
 			}
 		}
 		if newImage {
-			log.Info("this is a new image!")
 			var image models.UserImage
 			image.Height = spotifyImage.Height
 			image.Width = spotifyImage.Width

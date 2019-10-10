@@ -10,7 +10,7 @@ var Categories = categories{
 	"weed":    []string{"chill", "groovin", "thug life"},
 	"ecstacy": []string{"dance", "floored", "rolling balls"},
 	"shrooms": []string{"matrix", "shaman", "space"},
-	"lsd":     []string{"calm", "trippy", "fubar", "rockstar"},
+	"lsd":     []string{"calm", "trippy", "rockstar"},
 }
 
 func (c categories) Valid(category, subcategory string) bool {
