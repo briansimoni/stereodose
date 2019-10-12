@@ -50,3 +50,8 @@ span.nav-link {
 .shared-playlists-table {
   color: white;
 }
+
+.ReactCrop {
+    display: flex;
+    flex-direction: column;
+}
