@@ -213,8 +213,8 @@ func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request
 		return err
 	}
 
-	// Deny if greater than 4mb
-	if header.Size > 4000000 {
+	// Deny if greater than 8mb
+	if header.Size > 8000000 {
 		return &statusError{
 			Message: "Image was too large",
 			Code:    http.StatusRequestEntityTooLarge,
