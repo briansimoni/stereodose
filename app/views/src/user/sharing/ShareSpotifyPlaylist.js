@@ -143,7 +143,16 @@ class ShareSpotifyPlaylist extends React.Component {
       return;
     }
     this.setState({ inFlight: true });
-    const { imageURL, thumbnailURL } = await this.uploadImage(this.state.imageBlob);
+    let imageURL, thumbnailURL;
+    try {
+      const uploadReuslt = await this.uploadImage(this.state.imageBlob);
+      imageURL = uploadReuslt.imageURL;
+      thumbnailURL = uploadReuslt.thumbnailURL;
+    } catch (error) {
+      this.setState({ inFlight: false });
+      alert(error.message);
+      return;
+    }
 
     const { selectedPlaylist, selectedMood, selectedDrug } = this.state;
     const resp = await fetch(`/api/playlists/`, {
