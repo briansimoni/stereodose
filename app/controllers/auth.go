@@ -316,13 +316,13 @@ func checkState(r *http.Request, s *sessions.Session) error {
 		return errors.New("Unable to obtain state from URL query params")
 	}
 
-	state := s.Values["State"]
+	sessionState := s.Values["State"]
 	if state == "" {
 		return errors.New("Unable to obtain state from session")
 	}
 
-	if r.URL.Query().Get("state") != state {
-		return errors.New("State from query params did not match session state")
+	if responseState != sessionState {
+		return errors.New(fmt.Sprintf("State mismatch. responseState: %s sessionState: %s", responseState, sessionState))
 	}
 	return nil
 }
