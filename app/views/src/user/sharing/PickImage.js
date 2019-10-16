@@ -11,6 +11,8 @@ export default class PickImage extends React.Component {
     fileInputRef: React.createRef(),
     src: null,
     crop: {
+      unit: "%",
+      width: 40,
       aspect: 1
     }
   };
@@ -40,7 +42,7 @@ export default class PickImage extends React.Component {
     }
   }
 
-  onImageLoaded = (image, pixelCrop) => {
+  onImageLoaded = (image) => {
     this.imageRef = image;
   };
 
