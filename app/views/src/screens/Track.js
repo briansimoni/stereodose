@@ -13,10 +13,11 @@ export default function Track(props) {
     displayTime = `${minutes}:0${seconds}`;
   }
 
+  // added data elements to correlate to events in Google Tag Manager
   return (
     <div className="row">
       <div className="col-2">
-        <button className="track-play-button btn" onClick={onPlay}>
+        <button data-track-id={track.spotifyID} data-track-name={track.name} className="track-play-button btn" onClick={onPlay}>
           play
         </button>
       </div>

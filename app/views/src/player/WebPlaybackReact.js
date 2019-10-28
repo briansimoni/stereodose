@@ -131,7 +131,7 @@ export default class WebPlayback extends Component {
     });
   }
 
-  async componentWillMount() {
+  async componentDidMount() {
     // Notify the player is loading
     this.props.onPlayerLoading();
 

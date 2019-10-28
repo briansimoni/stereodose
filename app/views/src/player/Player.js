@@ -24,7 +24,7 @@ export default class Player extends Component {
     };
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.props.app
       .getAccessToken()
       .then(accessToken => {
