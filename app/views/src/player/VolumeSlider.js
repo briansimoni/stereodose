@@ -1,6 +1,7 @@
 import React from 'react';
 import Slider, { Rail, Handles, Tracks } from 'react-compound-slider';
-import Octicon from 'react-octicon';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faVolumeUp } from '@fortawesome/free-solid-svg-icons';
 import "./VolumeSlider.css"
 
 const defaultValues = [50];
@@ -27,7 +28,7 @@ class VolumeSlider extends React.Component {
 
     return (
       <Slider className={className} domain={[0, 100]} values={values} onChange={this.onChange} disabled={disabled}>
-        <Octicon className="unmute" name="unmute" />
+        <FontAwesomeIcon icon={faVolumeUp} />
         <Rail>
           {(
             { getRailProps } // adding the rail props sets up events on the rail

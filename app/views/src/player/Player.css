@@ -113,14 +113,6 @@ body {
   background-color: #008f0c;
 }
 
-.octicon.unmute {
-  color: green;
-  position: absolute;
-  right: -45px;
-  top: 30px;
-  font-size: 20px;
-}
-
 .slider-handles > div#volume-slider-handle {
   position: 'absolute';
   margin-left: -5.5;

@@ -48,3 +48,12 @@
   background-color: #145814;
   border-radius: 5px;
 }
+
+
+.fa-volume-up {
+  color: green;
+  position: absolute;
+  right: -45px;
+  top: 30px;
+  font-size: 20px;
+}
