@@ -83,8 +83,8 @@ func TestAuthController_Login(t *testing.T) {
 
 			recorder, _ := tt.args.w.(*httptest.ResponseRecorder)
 			response := recorder.Result()
-			if response.StatusCode != http.StatusTemporaryRedirect {
-				t.Errorf("Expected %d, got %d", http.StatusTemporaryRedirect, response.StatusCode)
+			if response.StatusCode != http.StatusFound {
+				t.Errorf("Expected %d, got %d", http.StatusFound, response.StatusCode)
 			}
 
 			location, err := response.Location()
@@ -159,7 +159,7 @@ func generateFakeCookie() (*http.Cookie, error) {
 	if err != nil {
 		return nil, err
 	}
-	sess, err := testStore.Get(req, sessionName)
+	sess, err := testStore.Get(req, sessionKeys.SessionCookieName)
 	if err != nil {
 		return nil, err
 	}
@@ -174,7 +174,7 @@ func generateFakeCookie() (*http.Cookie, error) {
 	log.Println(cookieValue)
 	log.Println(value)
 	c := &http.Cookie{
-		Name:  sessionName,
+		Name:  sessionKeys.SessionCookieName,
 		Value: value,
 	}
 	return c, nil

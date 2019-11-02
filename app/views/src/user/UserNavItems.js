@@ -63,7 +63,7 @@ class UserNavItems extends React.Component {
   }
 
   logIn() {
-    window.location = '/auth/login';
+    window.location = `/auth/login?path=${window.location.pathname}`;
   }
 
   async componentDidMount() {

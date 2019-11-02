@@ -133,7 +133,7 @@ export default class Player extends Component {
             <div className="container-fluid">
               <h2
                 onClick={() => {
-                  window.location = '/auth/login';
+                  window.location = `/auth/login?path=${window.location.pathname}`;
                 }}
                 id="player-message-not-signed-in"
               >

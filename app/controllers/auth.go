@@ -23,16 +23,23 @@ import (
 	"github.com/pkg/errors"
 )
 
-const (
-	spotifyURL = "https://accounts.spotify.com"
+const spotifyURL = "https://accounts.spotify.com"
 
-	// session keys
-	sessionName = "_stereodose-session"
-	token       = "Token"
-	state       = "State"
-	userID      = "User_ID"
-	returnPath  = "return_path"
-)
+var sessionKeys = struct {
+	SessionCookieName   string
+	AuthStateCookieName string
+	State               string
+	Token               string
+	UserID              string
+	ReturnPath          string
+}{
+	SessionCookieName:   "_stereodose-session",
+	AuthStateCookieName: "stereodose_auth_state",
+	State:               "State",
+	Token:               "Token",
+	UserID:              "User_ID",
+	ReturnPath:          "ReturnPath",
+}
 
 // AuthController is a collection of RESTful Handlers for authentication
 type AuthController struct {
@@ -80,7 +87,7 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 
 	// stereodose_auth_state is a separate cookie from the actual session cookie
 	// this allows for the presence of a _stereodose_session cookie to be proof of authentication
-	s, err := a.Store.Get(r, "stereodose_auth_state")
+	authState, err := a.Store.Get(r, sessionKeys.AuthStateCookieName)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -91,8 +98,9 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 		return errors.WithStack(err)
 	}
 	state := base64.StdEncoding.EncodeToString(b)
-	s.Values["State"] = state
-	s.Save(r, w)
+	authState.Values[sessionKeys.ReturnPath] = r.URL.Query().Get("path")
+	authState.Values[sessionKeys.State] = state
+	authState.Save(r, w)
 
 	// If we are behind a proxy, we dynamically grab the port based on the X-Forwarded-Port header
 	// This support more diverse cloud deployments without having to add more configuration
@@ -111,12 +119,12 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 		copiedConfig.RedirectURL = redirect
 
 		redir := copiedConfig.AuthCodeURL(state, oauth2.AccessTypeOnline)
-		http.Redirect(w, r, redir, http.StatusTemporaryRedirect)
+		http.Redirect(w, r, redir, http.StatusFound)
 		return nil
 	}
 
 	redir := a.Config.AuthCodeURL(state, oauth2.AccessTypeOnline)
-	http.Redirect(w, r, redir, http.StatusTemporaryRedirect)
+	http.Redirect(w, r, redir, http.StatusFound)
 	return nil
 }
 
@@ -124,7 +132,7 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 // In this step of authorization, we exchange a code for an access token
 // and we query the user's profile on Spotify to get their identity
 func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error {
-	authState, err := a.Store.Get(r, "stereodose_auth_state")
+	authState, err := a.Store.Get(r, sessionKeys.AuthStateCookieName)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -167,12 +175,12 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error 
 		}
 	}
 
-	s, err := a.Store.Get(r, sessionName)
+	s, err := a.Store.Get(r, sessionKeys.SessionCookieName)
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
-	s.Values[token] = *tok
+	s.Values[sessionKeys.Token] = *tok
 	client := spotify.Authenticator{}.NewClient(tok)
 	currentUser, err := client.CurrentUser()
 	if err != nil {
@@ -190,16 +198,17 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error 
 		return errors.WithStack(err)
 	}
 
-	s.Values[userID] = sdUser.ID
+	s.Values[sessionKeys.UserID] = sdUser.ID
 	err = s.Save(r, w)
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	returnPath, ok := s.Values[returnPath].(string)
-	if !ok {
+	returnPath := authState.Values[sessionKeys.ReturnPath].(string)
+	if returnPath == "" {
 		returnPath = "/"
 	}
-	http.Redirect(w, r, returnPath, http.StatusTemporaryRedirect)
+
+	http.Redirect(w, r, returnPath, http.StatusFound)
 	return nil
 }
 
@@ -207,7 +216,7 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error 
 // It probably would've have been better if I embedded this into a JWT and ditched cookies...
 // TODO: perhaps it is better design to encapsulate the refresh logic here as well
 func (a *AuthController) GetMyAccessToken(w http.ResponseWriter, r *http.Request) error {
-	s, err := a.Store.Get(r, sessionName)
+	s, err := a.Store.Get(r, sessionKeys.SessionCookieName)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -225,7 +234,7 @@ func (a *AuthController) GetMyAccessToken(w http.ResponseWriter, r *http.Request
 // Refresh will update the Spotify API Access Token for the user's session
 // TODO: check the refresh token and save it (it might be a new refresh token)
 func (a *AuthController) Refresh(w http.ResponseWriter, r *http.Request) error {
-	s, err := a.Store.Get(r, sessionName)
+	s, err := a.Store.Get(r, sessionKeys.SessionCookieName)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -268,7 +277,7 @@ func (a *AuthController) Refresh(w http.ResponseWriter, r *http.Request) error {
 // Logout ultimately deletes the user's session
 // Since these sessions are stateless, all we have to do is set the max-age to less than 0
 func (a *AuthController) Logout(w http.ResponseWriter, r *http.Request) error {
-	s, err := a.Store.Get(r, sessionName)
+	s, err := a.Store.Get(r, sessionKeys.SessionCookieName)
 	if err != nil {
 		return err
 	}
@@ -278,7 +287,7 @@ func (a *AuthController) Logout(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, "/", http.StatusFound)
 	return nil
 }
 
@@ -316,10 +325,7 @@ func checkState(r *http.Request, s *sessions.Session) error {
 		return errors.New("Unable to obtain state from URL query params")
 	}
 
-	sessionState := s.Values["State"]
-	if state == "" {
-		return errors.New("Unable to obtain state from session")
-	}
+	sessionState := s.Values[sessionKeys.State]
 
 	if responseState != sessionState {
 		return errors.New(fmt.Sprintf("State mismatch. responseState: %s sessionState: %s", responseState, sessionState))
