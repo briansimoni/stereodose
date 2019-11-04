@@ -16,6 +16,7 @@
         "react-octicon": "^3.0.1",
         "react-router-dom": "^5.1.2",
         "react-scripts": "^3.2.0",
+        "react-test-renderer": "^16.11.0",
         "spotify-web-api-js": "^0.24.0"
     },
     "scripts": {

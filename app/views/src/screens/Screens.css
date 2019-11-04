@@ -73,21 +73,16 @@ ul.drugs li {
   float: right;
 }
 
-.octicon.octicon-heart {
+.fa-heart {
   cursor: pointer;
   color: gray;
-  font-size: 36px;
+  font-size: 28px;
 }
 
-.octicon.octicon-heart.liked {
+.fa-heart.liked {
   cursor: pointer;
-  color: #b00606;
-  font-size: 36px;
-}
-
-.octicon.octicon-heart:hover {
   color: #ff0000;
-  font-size: 36px;
+  font-size: 28px;
 }
 
 .comment-toggle {

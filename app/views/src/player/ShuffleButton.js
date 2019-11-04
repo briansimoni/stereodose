@@ -1,14 +1,15 @@
 import React from 'react';
-import Octicon from 'react-octicon';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faRandom } from '@fortawesome/free-solid-svg-icons';
 
 export default function ShuffleButton(props) {
   if (props.shuffle === true) {
-    return <Octicon onClick={props.onClick} className="shuffle on" name="git-pull-request" />;
+    return <FontAwesomeIcon onClick={props.onClick} icon={faRandom} className="shuffle on"/>;
   }
 
   if (props.shuffle === false) {
-    return <Octicon onClick={props.onClick} className="shuffle off" name="git-pull-request" />;
+    return <FontAwesomeIcon onClick={props.onClick} icon={faRandom} className="shuffle off"/>;
   }
 
-  return <Octicon onClick={props.onClick} className="shuffle disabled" name="git-pull-request" />;
+  return <FontAwesomeIcon onClick={props.onClick} icon={faRandom} className="shuffle disabled"/>;
 }

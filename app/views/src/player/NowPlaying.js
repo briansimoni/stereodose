@@ -4,6 +4,11 @@ import ProgressBar from './ProgressBar';
 import VolumeSlider from './VolumeSlider';
 import RepeatButton from './RepeatButton';
 import ShuffleButton from './ShuffleButton';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlay } from '@fortawesome/free-solid-svg-icons';
+import { faPause } from '@fortawesome/free-solid-svg-icons';
+import { faStepForward } from '@fortawesome/free-solid-svg-icons';
+import { faStepBackward } from '@fortawesome/free-solid-svg-icons';
 
 export default class NowPlaying extends Component {
   render() {
@@ -37,18 +42,14 @@ export default class NowPlaying extends Component {
             </div>
           </div>
           <div className="col-sm-7 col-md-7 col-lg-7 text-center">
-            <br />
+            {/* <br /> */}
             <div className="controls">
               <ShuffleButton shuffle={this.props.playerState.shuffle} onClick={this.props.onShuffle} />
               <RepeatButton onClick={this.props.onChangeRepeat} repeatMode={playerState.repeat_mode} />
-              <div onClick={this.props.onPreviousSong} className="arrow-left" />
-              <div
-                onClick={this.props.onPlayPause}
-                id="play-pause"
-                className={playerState.paused ? 'button play' : 'button pause'}
-                alt="play-pause-button"
-              />
-              <div onClick={this.props.onNextSong} className="arrow-right" />
+              <FontAwesomeIcon onClick={this.props.onPreviousSong} icon={faStepBackward}/>
+              {playerState.paused && <FontAwesomeIcon onClick={this.props.onPlayPause} icon={faPlay} />}
+              {!playerState.paused && <FontAwesomeIcon onClick={this.props.onPlayPause} icon={faPause} />}
+              <FontAwesomeIcon onClick={this.props.onNextSong} icon={faStepForward} />
               <VolumeSlider className="volume-slider" onChangeVolume={this.props.onChangeVolume} disabled={false} />
             </div>
             <ProgressBar onSeek={this.props.onSeek} position={position_ms} duration={duration_ms} disabled={false} />

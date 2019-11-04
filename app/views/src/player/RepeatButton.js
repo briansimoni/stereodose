@@ -1,22 +1,40 @@
 import React from 'react';
-import Octicon from 'react-octicon';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faRedo } from '@fortawesome/free-solid-svg-icons';
 
 export default function RepeatButton(props) {
   const repeatMode = props.repeatMode;
 
   // off
   if (repeatMode === 0) {
-    return <Octicon onClick={props.onClick} className="repeat off" name="sync" />;
+    return (
+      <span className="repeat-track-span">
+        <FontAwesomeIcon onClick={props.onClick} icon={faRedo} className="repeat off" />
+      </span>
+    );
   }
 
   // context
   if (repeatMode === 1) {
-    return <Octicon onClick={props.onClick} className="repeat context" name="sync" />;
+    return (
+      <span className="repeat-track-span">
+        <FontAwesomeIcon onClick={props.onClick} icon={faRedo} className="repeat context" />
+      </span>
+    );
   }
 
   // track
   if (repeatMode === 2) {
-    return <Octicon onClick={props.onClick} className="repeat track" name="sync" />;
+    return (
+      <span className="repeat-track-span">
+        <FontAwesomeIcon onClick={props.onClick} icon={faRedo} className="repeat track" />
+        <span className="repeat-track-number">1</span>
+      </span>
+    );
   }
-  return <Octicon onClick={props.onClick} className="repeat disabled" name="sync" />;
+  return (
+    <span className="repeat-track-span">
+      <FontAwesomeIcon onClick={props.onClick} icon={faRedo} className="repeat disabled" />
+    </span>
+  );
 }

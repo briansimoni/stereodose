@@ -1,5 +1,6 @@
 import React from 'react';
-import Octicon from 'react-octicon';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHeart } from '@fortawesome/free-solid-svg-icons';
 
 export default function Likes(props) {
   const { onLike, user, playlist } = props;
@@ -15,7 +16,7 @@ export default function Likes(props) {
 
   return (
     <span onClick={onLike}>
-      <Octicon className={alreadyLiked ? 'liked' : ''} name="heart" />
+      <FontAwesomeIcon icon={faHeart} className={alreadyLiked ? 'liked' : ''}/>
       {playlist.likes.length}
     </span>
   );
