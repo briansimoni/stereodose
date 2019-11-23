@@ -92,3 +92,26 @@ ul.drugs li {
 .spinner-grow {
   margin: 0 auto;
 }
+
+#visualizer {
+  position: fixed;
+  top: -125px;
+  left: 0;
+  z-index: 2000;
+}
+
+#close-visualzier-button {
+  position: fixed;
+  top: 100px;
+  right: 100px;
+}
+
+.fa-eye {
+  margin-left: 70px;
+  font-size: 30px;
+}
+
+/* .fa-eye::after {
+  content: "Visualizer Alpha";
+  color:white;
+} */

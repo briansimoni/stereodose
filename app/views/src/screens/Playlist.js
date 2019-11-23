@@ -2,6 +2,10 @@ import React from 'react';
 import Track from './Track';
 import Comments from './Comments';
 import Likes from './Likes';
+import Visualizer from './Visualizer';
+import Spotify from 'spotify-web-api-js';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye } from '@fortawesome/free-solid-svg-icons';
 
 // Playlist is the parent component that controls the entire display for a particular playlist.
 // It is a composite of likes, comments, tracks, and playlist image.
@@ -16,6 +20,8 @@ class Playlist extends React.Component {
     super(props);
 
     this.state = {
+      visualizerShown: false,
+      trackAnalysis: null,
       loading: true,
       showComments: false,
       playlist: null,
@@ -42,6 +48,13 @@ class Playlist extends React.Component {
     return (
       <div className="row">
         <div className="col">
+          {this.state.visualizerShown && this.state.trackAnalysis && (
+            <Visualizer
+              app={this.props.app}
+              analysis={this.state.trackAnalysis}
+              toggleVisualizer={this.toggleVisualizer}
+            />
+          )}
           <div id="playlist-heading">
             <h2>{playlist.name}</h2>
             <img src={playlist.bucketImageURL} alt="playlist-artwork" />
@@ -50,6 +63,10 @@ class Playlist extends React.Component {
             {showComments ? 'Show songs' : `Comments (${playlist.comments.length})`}
           </button>
           <Likes onLike={this.like} playlist={playlist} user={this.state.user} />
+          <span>
+            <FontAwesomeIcon onClick={this.toggleVisualizer} icon={faEye} />
+            Visualizer - Alpha
+          </span>
 
           {/* Conditionally render either the comments or playlist tracks */}
           {!showComments ? (
@@ -81,6 +98,26 @@ class Playlist extends React.Component {
       </div>
     );
   }
+
+  toggleVisualizer = async () => {
+    if (!this.state.visualizerShown) {
+      try {
+        const accessToken = await this.props.app.getAccessToken();
+        const SDK = new Spotify();
+        SDK.setAccessToken(accessToken);
+        const playerState = await this.props.app.player.getCurrentState();
+        console.log(playerState);
+        const trackId = playerState.track_window.current_track.id;
+        const analysis = await SDK.getAudioAnalysisForTrack(trackId);
+        this.setState({ trackAnalysis: analysis });
+      } catch (error) {
+        console.error(error);
+        alert(error.message);
+      }
+    }
+    this.setState({ visualizerShown: !this.state.visualizerShown });
+    console.log(this.state.visualizerShown);
+  };
 
   // getContextURIs is designed so that we get an array of track URIs
   // For very large playlists, we need to get just a slice relative to the selected track
