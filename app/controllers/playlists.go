@@ -296,9 +296,13 @@ func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request
 		ThumbNailURL string `json:"thumbnailURL"`
 	}{
 		Status: http.StatusCreated,
-		// TODO: somehow not hardcode this
-		ImageURL:     "https://s3.amazonaws.com/stereodose/" + imageName,
-		ThumbNailURL: "https://s3.amazonaws.com/stereodose/" + thumbNailName,
+		// TODO: somehow not hardcode the base URL
+		// The "images" part of the imageName gets removed here since we want the cloudfront URL
+		// cloudfront base URL starts in the images directory of S3
+		// For example s3.stereodose.com/images/image1 === images.stereodose.app/image1
+		// It is like this because cloudfront wasn't originally part of the architecture
+		ImageURL:     "https://images.stereodose.app/" + strings.Replace(imageName, "images/", "", 1),
+		ThumbNailURL: "https://images.stereodose.app/" + strings.Replace(thumbNailName, "images/", "", 1),
 	}
 
 	w.WriteHeader(http.StatusCreated)
