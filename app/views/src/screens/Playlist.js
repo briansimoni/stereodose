@@ -186,6 +186,12 @@ class Playlist extends React.Component {
         body: JSON.stringify(data)
       });
 
+      // When the user clicks play, it has to be from some kind of playlist
+      // the current path is added to the app component so other components can
+      // create links. In this way, users can come back to the playlist that contains
+      // the currently playing track.
+      this.props.app.setState({ currentPlaylist: this.props.location.pathname });
+
       if (response.status < 200 || response.status >= 300) {
         const errorMessage = await response.text();
         throw new Error(`${errorMessage}, ${response.status}, ${response.statusText}`);

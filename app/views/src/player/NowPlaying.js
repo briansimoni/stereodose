@@ -9,6 +9,7 @@ import { faPlay } from '@fortawesome/free-solid-svg-icons';
 import { faPause } from '@fortawesome/free-solid-svg-icons';
 import { faStepForward } from '@fortawesome/free-solid-svg-icons';
 import { faStepBackward } from '@fortawesome/free-solid-svg-icons';
+import { Link } from 'react-router-dom';
 
 export default class NowPlaying extends Component {
   render() {
@@ -29,14 +30,17 @@ export default class NowPlaying extends Component {
       <Fragment>
         <div className="row">
           <div className="d-none d-md-block col-md-2 col-lg-1">
-            <img id="album-image" src={album_image} alt={track_name} />
+            <Link to={this.props.app.state.currentPlaylist}>
+              <img id="album-image" src={album_image} alt={track_name} />
+            </Link>
           </div>
           <div className="col-sm-3 col-md-2 col-lg-2">
             <div className="row">
               <div className="col text-center">
                 <span>
-                  <span className="greenTrackName">{track_name}</span> by{' '}
-                  <span className="greenTrackName">{artist_name}</span>
+                  <Link to={this.props.app.state.currentPlaylist}>
+                    <span className="greenTrackName">{track_name} by {artist_name}</span>
+                  </Link>
                 </span>
               </div>
             </div>
@@ -46,7 +50,7 @@ export default class NowPlaying extends Component {
             <div className="controls">
               <ShuffleButton shuffle={this.props.playerState.shuffle} onClick={this.props.onShuffle} />
               <RepeatButton onClick={this.props.onChangeRepeat} repeatMode={playerState.repeat_mode} />
-              <FontAwesomeIcon onClick={this.props.onPreviousSong} icon={faStepBackward}/>
+              <FontAwesomeIcon onClick={this.props.onPreviousSong} icon={faStepBackward} />
               {playerState.paused && <FontAwesomeIcon onClick={this.props.onPlayPause} icon={faPlay} />}
               {!playerState.paused && <FontAwesomeIcon onClick={this.props.onPlayPause} icon={faPause} />}
               <FontAwesomeIcon onClick={this.props.onNextSong} icon={faStepForward} />

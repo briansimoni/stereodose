@@ -170,6 +170,7 @@ export default class Player extends Component {
                 <GlobalShareButton location={this.props.location}/>
                   <Fragment>
                     <NowPlayingScreen
+                      app={this.props.app}
                       playerState={playerState}
                       onPlayPause={this.onPlayPause}
                       onNextSong={this.nextSong}
