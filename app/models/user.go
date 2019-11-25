@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
+	_ "github.com/jinzhu/gorm/dialects/postgres" // This enables the postgres driver for gorm
 	"github.com/zmb3/spotify"
 	"golang.org/x/oauth2"
 )

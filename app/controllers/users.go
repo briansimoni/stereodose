@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// UsersController contains methods for reading user data
 type UsersController struct {
 	DB *models.StereoDoseDB
 }
@@ -17,6 +18,7 @@ func NewUsersController(db *models.StereoDoseDB) *UsersController {
 	return &UsersController{DB: db}
 }
 
+// Me returns the requesting and authenticated user's data
 func (u *UsersController) Me(w http.ResponseWriter, r *http.Request) error {
 	user, ok := r.Context().Value("User").(models.User)
 	if !ok {

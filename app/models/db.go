@@ -7,6 +7,8 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// StereoDoseDB is a layer on top of Gorm
+// It allows callers to easily use the structs relevant to the rest of the app
 type StereoDoseDB struct {
 	DB        *gorm.DB
 	store     *sessions.CookieStore

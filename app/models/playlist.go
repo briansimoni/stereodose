@@ -277,8 +277,7 @@ func (s *StereodosePlaylistService) DeleteComment(commentID uint) error {
 // it also adds an entry in the likes table
 // it is the responsibility of the caller to make sure the user has not liked the playlist already
 // this method by itself is effectively Medium's "claps"
-
-// need to refactor this so the Playlist struct "knows" about who owns the likes
+// TODO: need to refactor this so the Playlist struct "knows" about who owns the likes
 // otherwise, if a playlist gets deleted/created again, the likes count can drop to negative numbers
 // comments works like this
 // could be problematic for very large number of likes

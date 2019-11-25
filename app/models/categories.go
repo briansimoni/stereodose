@@ -5,7 +5,7 @@ type categories map[string][]string
 
 // Categories is where the music genres are defined
 // We can use this to validate user input before performing database operations
-// ... we could probably do this step on the database layer, but it works fine here
+// Since there are so few categories, there is no need to have this at the database layer
 var Categories = categories{
 	"weed":    []string{"chill", "groovin", "thug life"},
 	"ecstacy": []string{"dance", "floored", "rolling balls"},
