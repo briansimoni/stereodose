@@ -13,6 +13,7 @@
 
 stereodose
 debug
+__debug_bin
 
 .vscode/launch.json
 gin-bin

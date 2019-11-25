@@ -9,9 +9,7 @@ COPY . /go/src/github.com/briansimoni/stereodose
 
 WORKDIR /go/src/github.com/briansimoni/stereodose
 
-# Only for dev purposes
-#RUN go get github.com/codegangsta/gin
-RUN go get github.com/canthefason/go-watcher
-RUN go install github.com/canthefason/go-watcher/cmd/watcher
+RUN go get github.com/derekparker/delve/cmd/dlv
+RUN GO111MODULE=on go get github.com/cortesi/modd/cmd/modd
 
-CMD ./watcher
+CMD modd

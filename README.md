@@ -49,5 +49,11 @@ It's running a proxy server that comes bundled with React. This enables hot relo
 
 To more closely simulate production builds, run `npm run build` and visit localhost:4000
 
+### Debugging
+There is a vscode launch configuration for debugging inside the docker container. Simply open vscode, set breakpoints, and run the debugger. It works out of the box with dlv listening on port 40000. **However, if you change golang files or restart the server, you must also restart the debugging session or else you'll get nil pointer errors**
+
+
+For React debugging, you can also use the "React" debug launch configuration. It requires the vscode chrome debugger extension. You can also read more and find references with the auto-generated documentation: https://github.com/briansimoni/stereodose/tree/master/app/views#debugging-in-the-editor
+
 ### Windows Users
 In my experience, Docker isn't that great on Windows but sometimes a quick restart of the daemon/VM gets my containers to work. The golang file watcher does not work at all from inside a container. I recommend running the db from it's own container and then using native golang.

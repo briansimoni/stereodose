@@ -1,3 +1,5 @@
+# For development purposes only.
+
 version: "3"
 
 services:
@@ -10,8 +12,11 @@ services:
     working_dir: /go/src/github.com/briansimoni/stereodose/
     ports: 
       - "4000:4000"
+      - "40000:40000" # dlv debug server port
     depends_on: 
       - db
+    security_opt:
+      - seccomp:unconfined
     environment:
       - STEREODOSE_CLIENT_ID=${STEREODOSE_CLIENT_ID}
       - STEREODOSE_CLIENT_SECRET=${STEREODOSE_CLIENT_SECRET}
@@ -20,7 +25,7 @@ services:
       - STEREODOSE_AUTH_KEY=${STEREODOSE_AUTH_KEY}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-    command: watcher
+    command: modd
 
 
   db:
