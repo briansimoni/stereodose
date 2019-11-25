@@ -54,7 +54,11 @@ ul.drugs li {
 
 .track-play-button {
   background-color: #008f0c;
+}
+
+.track-play-button > .fa-play {
   color: white;
+  font-size: 15px;
 }
 
 .playlist {
@@ -114,7 +118,7 @@ ul.drugs li {
 }
 
 .fa-eye:hover {
-  color: #2550d9
+  color: #2550d9;
 }
 
 #visualizer-loading-spinner {

@@ -73,8 +73,8 @@ class Playlist extends React.Component {
             )}
 
             {this.state.visualizerLoading && (
-              <div id="visualizer-loading-spinner" class="spinner-border spinner-border-md text-info" role="status">
-                <span class="sr-only">Loading...</span>
+              <div id="visualizer-loading-spinner" className="spinner-border spinner-border-md text-info" role="status">
+                <span className="sr-only">Loading...</span>
               </div>
             )}
           </span>
