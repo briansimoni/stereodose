@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Golang Server",
+      "type": "go",
+      "request": "attach",
+      "mode": "remote",
+      "remotePath": "/go/src/github.com/briansimoni/stereodose",
+      "port": 40000,
+      "host": "127.0.0.1",
+      "showLog": true
+    },
+    {
+      "name": "React",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceRoot}/app/views/src",
+      "sourceMapPathOverrides": {
+        "webpack:///src/*": "${webRoot}/*"
+      }
+    }
+  ]
+}
