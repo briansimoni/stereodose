@@ -8,7 +8,7 @@ import (
 )
 
 type StereoDoseDB struct {
-	db        *gorm.DB
+	DB        *gorm.DB
 	store     *sessions.CookieStore
 	Users     UserService
 	Playlists PlaylistService
@@ -25,7 +25,7 @@ func NewStereodoseDB(db *gorm.DB, s *sessions.CookieStore) *StereoDoseDB {
 		log.Fatal(err.Error())
 	}
 	database := &StereoDoseDB{}
-	database.db = db
+	database.DB = db
 	database.store = s
 	database.Users = &StereodoseUserService{db: db}
 	database.Playlists = &StereodosePlaylistService{db: db}

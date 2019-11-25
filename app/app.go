@@ -61,7 +61,7 @@ func createRouter(c *config.Config) *util.AppRouter {
 	users := controllers.NewUsersController(stereoDoseDB)
 	playlists := controllers.NewPlaylistsController(stereoDoseDB, cloudBucket)
 	auth := controllers.NewAuthController(stereoDoseDB, store, c)
-	health := controllers.NewHealthController()
+	health := controllers.NewHealthController(stereoDoseDB)
 
 	// Serve all of the static files
 	fs := http.StripPrefix("/public/", http.FileServer(http.Dir("app/views/build/")))
