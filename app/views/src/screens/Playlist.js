@@ -20,6 +20,7 @@ class Playlist extends React.Component {
     super(props);
 
     this.state = {
+      visualizerLoading: false,
       visualizerShown: false,
       trackAnalysis: null,
       loading: true,
@@ -64,8 +65,18 @@ class Playlist extends React.Component {
           </button>
           <Likes onLike={this.like} playlist={playlist} user={this.state.user} />
           <span>
-            <FontAwesomeIcon onClick={this.toggleVisualizer} icon={faEye} />
-            Visualizer - Alpha
+            {!this.state.visualizerLoading && (
+              <span>
+                <FontAwesomeIcon onClick={this.toggleVisualizer} icon={faEye} />
+                Visualizer - Alpha
+              </span>
+            )}
+
+            {this.state.visualizerLoading && (
+              <div id="visualizer-loading-spinner" class="spinner-border spinner-border-md text-info" role="status">
+                <span class="sr-only">Loading...</span>
+              </div>
+            )}
           </span>
 
           {/* Conditionally render either the comments or playlist tracks */}
@@ -102,6 +113,7 @@ class Playlist extends React.Component {
   toggleVisualizer = async () => {
     if (!this.state.visualizerShown) {
       try {
+        this.setState({ visualizerLoading: true });
         const accessToken = await this.props.app.getAccessToken();
         const SDK = new Spotify();
         SDK.setAccessToken(accessToken);
@@ -109,7 +121,7 @@ class Playlist extends React.Component {
         console.log(playerState);
         const trackId = playerState.track_window.current_track.id;
         const analysis = await SDK.getAudioAnalysisForTrack(trackId);
-        this.setState({ trackAnalysis: analysis });
+        this.setState({ trackAnalysis: analysis, visualizerLoading: false });
       } catch (error) {
         console.error(error);
         alert(error.message);

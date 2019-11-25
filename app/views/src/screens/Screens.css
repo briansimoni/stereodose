@@ -102,16 +102,21 @@ ul.drugs li {
 
 #close-visualzier-button {
   position: fixed;
-  top: 100px;
-  right: 100px;
+  top: 5%;
+  right: 5%;
 }
 
 .fa-eye {
   margin-left: 15px;
   font-size: 30px;
+  transition: color 0.5s ease;
+  cursor: pointer;
 }
 
-/* .fa-eye::after {
-  content: "Visualizer Alpha";
-  color:white;
-} */
+.fa-eye:hover {
+  color: #2550d9
+}
+
+#visualizer-loading-spinner {
+  margin-left: 15px;
+}
