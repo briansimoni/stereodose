@@ -124,7 +124,15 @@ export default class Player extends Component {
       onPlayerDeviceSelected: () => this.setState({ playerSelected: true }),
       onPlayerStateChange: playerState => {
         this.setState({ playerState: playerState });
-        if(this.props.app.state.currentTrack !== playerState.track_window.current_track) {
+        // we check the id string because if we checked the object, it will reference different places in memory
+        // i.e. they will never be equal
+        // so it will always setState() which will always re-render, which means it re-renders at least once a second
+        // which means the performance will be absolutely terrible
+        let appTrackID = '';
+        if (this.props.app.state.currentTrack) {
+          appTrackID = this.props.app.state.currentTrack.id;
+        }
+        if(appTrackID !== playerState.track_window.current_track.id) {
           this.props.app.setState({ currentTrack: playerState.track_window.current_track })
         }
       },

@@ -84,7 +84,6 @@ class Playlist extends React.Component {
             <ul className="list-group playlist">
               {playlist.tracks &&
                 playlist.tracks.map(track => {
-                  console.log(playlist.tracks.length);
                   return (
                     <li className="list-group-item" key={track.spotifyID}>
                       <Track
@@ -175,7 +174,6 @@ class Playlist extends React.Component {
   // playSong makes an API call directly to Spotify
   // playlist can simply be the playlist object from component state
   async playSong(playlist, selectedTrack) {
-    console.log(selectedTrack);
     const uris = this.getContextURIs(playlist, selectedTrack);
     let data = {
       uris: uris,
