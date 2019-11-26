@@ -24,6 +24,9 @@ class App extends React.Component {
   player = null;
 
   state = {
+    // added currentTrack because the Visualizer ultimately needs it
+    // The Player Component should setState({ currentTrack }) if the track ever changes
+    currentTrack: null,
     categories: null
   };
 
@@ -55,10 +58,8 @@ class App extends React.Component {
               <Route component={NoMatch} />
             </Switch>
 
-            
           </main>
 
-          {/* <Route path="/" render={props => <GlobalShareButton {...props} app={this} />} /> */}
           <Route path="/" render={props => <Player {...props} app={this} />} />
         </div>
       </BrowserRouter>

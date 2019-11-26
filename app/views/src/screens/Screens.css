@@ -61,6 +61,11 @@ ul.drugs li {
   font-size: 15px;
 }
 
+.track-play-button > .fa-pause {
+  color: white;
+  font-size: 15px;
+}
+
 .playlist {
   margin-top: 25px;
 }

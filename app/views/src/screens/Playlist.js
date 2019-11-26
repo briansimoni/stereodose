@@ -87,6 +87,7 @@ class Playlist extends React.Component {
                   return (
                     <li className="list-group-item" key={track.spotifyID}>
                       <Track
+                        currentlyPlayingTrack={this.props.app.state.currentTrack}
                         track={track}
                         playlist={playlist}
                         onPlay={() => {
@@ -118,7 +119,6 @@ class Playlist extends React.Component {
         const SDK = new Spotify();
         SDK.setAccessToken(accessToken);
         const playerState = await this.props.app.player.getCurrentState();
-        console.log(playerState);
         const trackId = playerState.track_window.current_track.id;
         const analysis = await SDK.getAudioAnalysisForTrack(trackId);
         this.setState({ trackAnalysis: analysis, visualizerLoading: false });

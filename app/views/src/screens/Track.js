@@ -1,48 +1,44 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay } from '@fortawesome/free-solid-svg-icons';
+import { faPause } from '@fortawesome/free-solid-svg-icons';
 
 // Many Tracks make up a Playlist component
-export default class Track extends React.Component {
-  constructor(props) {
-    super(props);
+export default function Track(props) {
+  const { track, onPlay } = props;
+
+  // some math to get the track duration in minutes:seconds
+  const duration = track.duration / 1000;
+  const minutes = Math.floor(duration / 60);
+  const seconds = Math.round(duration % 60);
+  let displayTime = `${minutes}:${seconds}`;
+  if (displayTime.split(':')[1].length === 1) {
+    displayTime = `${minutes}:0${seconds}`;
   }
 
-  // added data elements to correlate to events in Google Tag Manager
-  render() {
-    const { track, onPlay } = this.props;
-
-    // some math to get the track duration in minutes:seconds
-    const duration = track.duration / 1000;
-    const minutes = Math.floor(duration / 60);
-    const seconds = Math.round(duration % 60);
-    let displayTime = `${minutes}:${seconds}`;
-    if (displayTime.split(':')[1].length === 1) {
-      displayTime = `${minutes}:0${seconds}`;
-    }
-
-    return (
-      <div className="row">
-        <div className="col-2">
-          <button
-            data-track-id={track.spotifyID}
-            data-track-name={track.name}
-            className="track-play-button btn"
-            onClick={onPlay}
-          >
-            <FontAwesomeIcon icon={faPlay} />
-          </button>
-        </div>
-
-        <div className="col-8">
-          <h5 className="track-name">{track.name}</h5>
-          <h6 className="artists">{track.artists}</h6>
-        </div>
-
-        <div className="col-2">
-          <h6 className="track-duration">{displayTime}</h6>
-        </div>
+  return (
+    <div className="row">
+      <div className="col-2">
+        <button
+          // added data elements to correlate to events in Google Tag Manager
+          data-track-id={track.spotifyID}
+          data-track-name={track.name}
+          className="track-play-button btn"
+          onClick={onPlay}
+        >
+          {props.currentlyPlayingTrack === track.spotifyID && <FontAwesomeIcon icon={faPause} />}
+          {props.currentlyPlayingTrack !== track.spotifyID && <FontAwesomeIcon icon={faPlay} />}
+        </button>
       </div>
-    );
-  }
+
+      <div className="col-8">
+        <h5 className="track-name">{track.name}</h5>
+        <h6 className="artists">{track.artists}</h6>
+      </div>
+
+      <div className="col-2">
+        <h6 className="track-duration">{displayTime}</h6>
+      </div>
+    </div>
+  );
 }

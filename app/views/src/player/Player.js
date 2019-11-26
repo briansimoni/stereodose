@@ -122,7 +122,12 @@ export default class Player extends Component {
         this.props.app.setState({ deviceID: data.device_id });
       },
       onPlayerDeviceSelected: () => this.setState({ playerSelected: true }),
-      onPlayerStateChange: playerState => this.setState({ playerState: playerState }),
+      onPlayerStateChange: playerState => {
+        this.setState({ playerState: playerState });
+        if(this.props.app.state.currentTrack !== playerState.track_window.current_track.id) {
+          this.props.app.setState({ currentTrack: playerState.track_window.current_track.id })
+        }
+      },
       onPlayerError: playerError => alert(playerError)
     };
 
