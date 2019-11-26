@@ -16,6 +16,13 @@ export default function Track(props) {
     displayTime = `${minutes}:0${seconds}`;
   }
 
+  // Apparently the Spotify ID from the web API doesn't necessarilly match the ID in the web player
+  // Somteimtes there is linked_from object that contains the ID that you would find in the web API
+  let currentTrackId;
+  if (props.currentlyPlayingTrack) {
+    currentTrackId = props.currentlyPlayingTrack.linked_from.id || props.currentlyPlayingTrack.id;
+  }
+
   return (
     <div className="row">
       <div className="col-2">
@@ -26,8 +33,8 @@ export default function Track(props) {
           className="track-play-button btn"
           onClick={onPlay}
         >
-          {props.currentlyPlayingTrack === track.spotifyID && <FontAwesomeIcon icon={faPause} />}
-          {props.currentlyPlayingTrack !== track.spotifyID && <FontAwesomeIcon icon={faPlay} />}
+          {currentTrackId === track.spotifyID && <FontAwesomeIcon icon={faPause} />}
+          {currentTrackId !== track.spotifyID && <FontAwesomeIcon icon={faPlay} />}
         </button>
       </div>
 
