@@ -38,8 +38,10 @@ export default class NowPlaying extends Component {
             <div className="row">
               <div className="col text-center">
                 <span>
-                  <Link to={this.props.app.state.currentPlaylist}>
-                    <span className="greenTrackName">{track_name} by {artist_name}</span>
+                  <Link id="current-track-link" to={this.props.app.state.currentPlaylist}>
+                    <span>{track_name}</span>
+                    <span id="current-track-link-separator"> by </span>
+                    <span>{artist_name}</span>
                   </Link>
                 </span>
               </div>

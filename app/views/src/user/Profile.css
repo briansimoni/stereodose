@@ -43,6 +43,10 @@ span.nav-link {
   width: 100%;
 }
 
+#profile-picture-row {
+  margin-bottom: 20px;
+}
+
 .profile-main ul {
   list-style: none;
 }
@@ -52,6 +56,11 @@ span.nav-link {
 }
 
 .ReactCrop {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
+}
+
+.profile ul {
+  text-align: left;
+  padding-left: 35%;
 }

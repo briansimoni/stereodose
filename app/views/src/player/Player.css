@@ -165,6 +165,10 @@ body {
   color: green;
 }
 
-.greenTrackName {
-  color: green;
+#current-track-link > span{
+  color: #0056b3;
+}
+
+#current-track-link > #current-track-link-separator {
+  color: white;
 }
