@@ -92,7 +92,7 @@ class UserProfile extends React.Component {
 
               <div className="row">
                 <div className="col-md-12">
-                  <Link className="nav-link" to="/profile/available">
+                  <Link className="nav-link" to="/profile/shared">
                     <button className="btn btn-danger">Delete Playlists</button>
                   </Link>
                 </div>
