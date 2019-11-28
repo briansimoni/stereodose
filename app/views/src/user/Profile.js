@@ -46,14 +46,18 @@ class UserProfile extends React.Component {
           )}
 
           {this.props.location.pathname === '/profile/available' && (
-            <div label="Playlists Available">
-              <ShareSpotifyPlaylist
-                playlists={spotifyPlaylists}
-                categories={categories}
-                onUpdate={() => {
-                  this.checkPlaylists();
-                }}
-              />
+            <div label="Playlists Available" className="container">
+              <div className="row justify-content-md-center">
+                <div className="col col-md-auto">
+                  <ShareSpotifyPlaylist
+                    playlists={spotifyPlaylists}
+                    categories={categories}
+                    onUpdate={() => {
+                      this.checkPlaylists();
+                    }}
+                  />
+                </div>
+              </div>
             </div>
           )}
 
