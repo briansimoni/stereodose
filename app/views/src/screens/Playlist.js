@@ -90,6 +90,7 @@ class Playlist extends React.Component {
                         currentlyPlayingTrack={this.props.app.state.currentTrack}
                         track={track}
                         playlist={playlist}
+                        paused={this.props.app.state.paused}
                         onPlay={() => {
                           this.playSong(playlist, track.URI);
                         }}
@@ -99,13 +100,13 @@ class Playlist extends React.Component {
                 })}
             </ul>
           ) : (
-            <Comments
-              comments={playlist.comments}
-              onSubmitComment={this.submitComment}
-              onDeleteComment={this.deleteComment}
-              user={this.state.user}
-            />
-          )}
+              <Comments
+                comments={playlist.comments}
+                onSubmitComment={this.submitComment}
+                onDeleteComment={this.deleteComment}
+                user={this.state.user}
+              />
+            )}
         </div>
       </div>
     );
@@ -174,6 +175,17 @@ class Playlist extends React.Component {
   // playSong makes an API call directly to Spotify
   // playlist can simply be the playlist object from component state
   async playSong(playlist, selectedTrack) {
+    // first, if the selectedTrack is currently playing, we actually need to pause instead
+    if (this.props.app.state.currentTrack) {
+      const currentTrackId = this.props.app.state.currentTrack.linked_from.id || this.props.app.state.currentTrack.id;
+      if (
+        selectedTrack.includes(currentTrackId)
+      ) {
+        await this.props.app.player.togglePlay();
+        return;
+      }
+    }
+
     const uris = this.getContextURIs(playlist, selectedTrack);
     let data = {
       uris: uris,

@@ -132,8 +132,13 @@ export default class Player extends Component {
         if (this.props.app.state.currentTrack) {
           appTrackID = this.props.app.state.currentTrack.id;
         }
-        if(appTrackID !== playerState.track_window.current_track.id) {
-          this.props.app.setState({ currentTrack: playerState.track_window.current_track })
+        if (appTrackID !== playerState.track_window.current_track.id) {
+          this.props.app.setState({
+            currentTrack: playerState.track_window.current_track,
+          });
+        }
+        if (playerState.paused !== this.props.app.state.paused) {
+          this.props.app.setState({ paused: playerState.paused });
         }
       },
       onPlayerError: playerError => alert(playerError)
@@ -162,7 +167,7 @@ export default class Player extends Component {
             {!playerSelected && (
               <footer className="footer fixed-bottom">
                 <div className="container-fluid">
-                <GlobalShareButton location={this.props.location}/>
+                  <GlobalShareButton location={this.props.location} />
                   <DisabledPlayer />
                 </div>
               </footer>
@@ -171,7 +176,7 @@ export default class Player extends Component {
             {playerLoaded && playerSelected && !playerState && (
               <footer className="footer fixed-bottom">
                 <div className="container-fluid">
-                <GlobalShareButton location={this.props.location}/>
+                  <GlobalShareButton location={this.props.location} />
                   <DisabledPlayer />
                 </div>
               </footer>
@@ -180,7 +185,7 @@ export default class Player extends Component {
             {playerLoaded && playerSelected && playerState && (
               <footer className="footer fixed-bottom">
                 <div className="container-fluid">
-                <GlobalShareButton location={this.props.location}/>
+                  <GlobalShareButton location={this.props.location} />
                   <Fragment>
                     <NowPlayingScreen
                       app={this.props.app}

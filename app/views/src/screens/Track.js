@@ -33,8 +33,8 @@ export default function Track(props) {
           className="track-play-button btn"
           onClick={onPlay}
         >
-          {currentTrackId === track.spotifyID && <FontAwesomeIcon icon={faPause} />}
-          {currentTrackId !== track.spotifyID && <FontAwesomeIcon icon={faPlay} />}
+          {currentTrackId === track.spotifyID && !props.paused && <FontAwesomeIcon icon={faPause} />}
+          {((currentTrackId !== track.spotifyID) || props.paused) && <FontAwesomeIcon icon={faPlay} />}
         </button>
       </div>
 

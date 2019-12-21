@@ -27,6 +27,7 @@ class App extends React.Component {
     // added currentTrack because the Visualizer ultimately needs it
     // The Player Component should setState({ currentTrack }) if the track ever changes
     currentTrack: null,
+    paused: false,
     categories: null
   };
 
