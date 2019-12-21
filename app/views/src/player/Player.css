@@ -165,8 +165,14 @@ body {
   color: green;
 }
 
-#current-track-link > span{
+#current-track-link > span {
   color: #0056b3;
+}
+
+@media only screen and (max-width: 767.98px) {
+  #current-track-link > span {
+    color: green;
+  }
 }
 
 #current-track-link > #current-track-link-separator {
