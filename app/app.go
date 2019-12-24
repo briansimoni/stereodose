@@ -101,6 +101,7 @@ func createRouter(c *config.Config) *util.AppRouter {
 		Methods(http.MethodGet)
 
 	authPlaylistsRouter.AppHandler("/me", playlists.GetMyPlaylists).Methods(http.MethodGet)
+	authPlaylistsRouter.AppHandler("/random", playlists.GetRandomPlaylist).Methods(http.MethodGet)
 	playlistsRouter.AppHandler("/{id}", playlists.GetPlaylistByID).Methods(http.MethodGet)
 	authPlaylistsRouter.AppHandler("/", playlists.CreatePlaylist).Methods(http.MethodPost)
 	authPlaylistsRouter.AppHandler("/{id}/image", playlists.UploadImage).Methods(http.MethodPost)

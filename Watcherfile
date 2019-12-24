@@ -5,6 +5,8 @@
 
 FROM golang:1.12
 
+RUN apt-get update -y && apt-get install psmisc
+
 COPY . /go/src/github.com/briansimoni/stereodose
 
 WORKDIR /go/src/github.com/briansimoni/stereodose

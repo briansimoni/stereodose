@@ -19,6 +19,7 @@ type PlaylistService interface {
 	GetPlaylists(offset, limit, category, subcategory string) ([]Playlist, error)
 	GetByID(ID string) (*Playlist, error)
 	GetMyPlaylists(user User) ([]Playlist, error)
+	GetRandomPlaylist(category, subcategory string) ([]Playlist, error)
 	// TODO: refactor this to take a Playlist struct instead of a ton of strings
 	CreatePlaylistBySpotifyID(user User, playlistID, category, subCategory, image, thumbnail string) (*Playlist, error)
 	DeletePlaylist(spotifyID string) error
@@ -105,13 +106,29 @@ func (s *StereodosePlaylistService) GetMyPlaylists(user User) ([]Playlist, error
 	return playlists, nil
 }
 
-func (s *StereodosePlaylistService) GetRandomPlaylist(category, subcategory string) (*Playlist, error) {
-	var playlist *Playlist
-	err := s.db.Where("category = ? AND sub_category = ?", category, subcategory).Order(gorm.Expr("random()")).Find(playlist).Error
+// GetRandomPlaylist does something
+func (s *StereodosePlaylistService) GetRandomPlaylist(category, subcategory string) ([]Playlist, error) {
+	playlists := []Playlist{}
+	s.db = s.db.Debug()
+	err := s.db.Where("category = ? AND sub_category = ?", category, subcategory).Order(gorm.Expr("random()")).Find(&playlists).Error
 	if err != nil {
 		return nil, err
 	}
-	return playlist, nil
+	return playlists, nil
+	// return nil, errors.New("lol")
+	// playlists := []Playlist{}
+
+	// err := s.db.
+	// 	Offset("0").
+	// 	Limit("10").
+	// 	Where("category = ? AND sub_category = ?", category, subcategory).
+	// 	Order("likes_count desc").
+	// 	Find(&playlists).Error
+
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// return playlists, nil
 }
 
 // CreatePlaylistBySpotifyID is given a user and playlistID
