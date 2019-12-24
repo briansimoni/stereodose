@@ -3,7 +3,11 @@ package main
 import (
 	"encoding/gob"
 	"net/http"
+	"os/signal"
+	"syscall"
 	"os"
+	"context"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 
@@ -50,17 +54,49 @@ func main() {
 	}
 
 	stereodose := app.InitApp(c, db)
+	server := http.Server{
+		Addr: ":"+port,
+		Handler: stereodose,
+	}
 
 	log.WithFields(log.Fields{
 		"Type": "AppLog",
 	}).Info("Starting Stereodose on port: " + port)
 
-	err = http.ListenAndServe(":"+port, stereodose)
-	if err != nil {
+	go func() {
+		err = http.ListenAndServe(":"+port, stereodose)
+		if err != nil && err != http.ErrServerClosed {
+			log.WithFields(log.Fields{
+				"Type": "AppLog",
+			}).Fatal("The server encountered a fatal error", err.Error())
+		}
+	}()
+
+	// Wait for interrupt signal to gracefully shutdown the server with
+	// a timeout of 5 seconds.
+	quit := make(chan os.Signal, 1)
+	// kill (no param) default send syscall.SIGTERM
+	// kill -2 is syscall.SIGINT
+	// kill -9 is syscall.SIGKILL but can't be catch, so don't need add it
+	// 1 is SIGHUP (hangup)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+	<-quit
+	log.WithFields(log.Fields{
+		"Type": "AppLog",
+	}).Info("Shutdown Signal received")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
 		log.WithFields(log.Fields{
 			"Type": "AppLog",
-		}).Fatal("The server encountered a fatal error", err.Error())
+		}).Fatal("Server shutdown", err.Error())
 	}
+
+	log.WithFields(log.Fields{
+		"Type": "AppLog",
+	}).Info("process exiting without error")
 }
 
 // Register the oauth2.Token type so we can store it in sessions later
