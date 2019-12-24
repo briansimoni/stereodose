@@ -105,6 +105,15 @@ func (s *StereodosePlaylistService) GetMyPlaylists(user User) ([]Playlist, error
 	return playlists, nil
 }
 
+func (s *StereodosePlaylistService) GetRandomPlaylist(category, subcategory string) (*Playlist, error) {
+	var playlist *Playlist
+	err := s.db.Where("category = ? AND sub_category = ?", category, subcategory).Order(gorm.Expr("random()")).Find(playlist).Error
+	if err != nil {
+		return nil, err
+	}
+	return playlist, nil
+}
+
 // CreatePlaylistBySpotifyID is given a user and playlistID
 // It uses the information to call the Spotify API and save the information to the local db
 func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlistID, category, subCategory, image, thumbnail string) (*Playlist, error) {
