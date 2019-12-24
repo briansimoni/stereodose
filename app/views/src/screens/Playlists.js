@@ -1,7 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './Screens.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import Pagination from './Pagination';
+import './Screens.css';
 
 // Playlists renders the playlists that correspond to a particular drug + mood
 class Playlists extends React.Component {
@@ -54,7 +56,10 @@ class Playlists extends React.Component {
 
       return (
         <div className="playlists">
-          <h2 id="choose-a-playlist">Choose A Playlist</h2>
+          <h2 id="choose-a-playlist">
+            <Link to={`/${this.props.match.params.drug}`}><FontAwesomeIcon icon={faArrowLeft} /></Link>
+            Choose A Playlist
+          </h2>
 
           {rows.map((row, index) => {
             return (

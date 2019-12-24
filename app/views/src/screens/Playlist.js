@@ -6,6 +6,8 @@ import Visualizer from './Visualizer';
 import Spotify from 'spotify-web-api-js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { Link } from 'react-router-dom';
 
 // Playlist is the parent component that controls the entire display for a particular playlist.
 // It is a composite of likes, comments, tracks, and playlist image.
@@ -57,7 +59,11 @@ class Playlist extends React.Component {
             />
           )}
           <div id="playlist-heading">
-            <h2>{playlist.name}</h2>
+            <h2>
+              {/* The header contains the playlist name and a back button*/}
+              <Link to={`/${this.props.match.params.drug}/${this.props.match.params.subcategory}`}><FontAwesomeIcon icon={faArrowLeft} /></Link>
+              {playlist.name}
+            </h2>
             <img src={playlist.bucketImageURL} alt="playlist-artwork" />
           </div>
           <button className="btn btn-warning comment-toggle" onClick={this.toggleComments}>

@@ -11,6 +11,7 @@ export default class Visualizer extends React.Component {
     this.camera = new Three.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
     const renderer = new Three.WebGLRenderer();
+    Three.Vector3()
     renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer = renderer;
 
@@ -27,7 +28,7 @@ export default class Visualizer extends React.Component {
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.resize, true);
-    cancelAnimationFrame( this.animationFrameId );
+    cancelAnimationFrame(this.animationFrameId);
   }
 
   resize = event => {
@@ -40,7 +41,7 @@ export default class Visualizer extends React.Component {
     this.camera.aspect = window.innerWidth / window.innerHeight;
 
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    
+
     return (
       <div
         id="visualizer"
@@ -60,21 +61,29 @@ export default class Visualizer extends React.Component {
     const position = playerState.position;
     const segmentLength = analysis.segments.length;
     const songDuration = playerState.track_window.current_track.duration_ms;
-    const segmentIndex= Math.floor((segmentLength / songDuration) * position);
+    const segmentIndex = Math.floor((segmentLength / songDuration) * position);
+    if (segmentIndex !== this.segmentIndex) {
+      console.log(segmentIndex);
+    }
+    this.segmentIndex = segmentIndex;
 
     const segment = analysis.segments[segmentIndex];
 
     const animationFrameId = requestAnimationFrame(this.animate);
     this.animationFrameId = animationFrameId;
-    this.cube.rotation.x += 0.01;
-    this.cube.rotation.y += 0.01;
+    // this.cube.translateY(0.01);
+    // console.log(this.cube.scale);
+    if (this.currentSegmentLoudness === Math.abs(segment.loudness_max)) {
+      this.cube.scale.y -= 0.01;
+    } else {
+      this.cube.scale.y = Math.abs(segment.loudness_max / 10);
+    }
+    this.currentSegmentLoudness = Math.abs(segment.loudness_max);
+
+    // console.log(this.cube.geometry);
+    // this.cube.rotation.x += 0.01;
+    // this.cube.rotation.y += 0.01;
     // this.cube.rotation.y = Math.abs(segment.loudness_max + Math.random());
     this.renderer.render(this.scene, this.camera);
   };
 }
-
-// function CloseVisualizerButton(props) {
-//   return(
-//     <button onClick={}id="close-visualzier-button" className="btn btn-danger">CLOSE</button>
-//   )
-// }

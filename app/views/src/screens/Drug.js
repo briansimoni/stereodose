@@ -1,8 +1,11 @@
 import React from 'react';
+import Fragment from 'react';
 import { Link } from 'react-router-dom';
-import './Screens.css';
 import NoMatch from '../404';
 import { Route } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import './Screens.css';
 
 // Drug renders the mood choices for the chosen Drug
 // Weed -> Chill, Groovin, Thug Life
@@ -17,18 +20,27 @@ export default function Drug(props) {
 
   if (categories !== null) {
     return (
-      <div className="row">
-        <div className="col">
-          <h2 className="mood-choice-header">Choose Your Mood</h2>
-          <ul id="moods" className="moods">
-            {categories[drug].map((category, index) => (
-              <li key={index}>
-                <h3>
-                  <Link to={`${match.url}/${category}`}>{category}</Link>
-                </h3>
-              </li>
-            ))}
-          </ul>
+      <div>
+        <div className="row">
+          <div className="col">
+            <h2 className="mood-choice-header">
+              <Link to="/"><FontAwesomeIcon icon={faArrowLeft} /></Link>
+              Choose Your Mood
+            </h2>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col">
+            <ul id="moods" className="moods">
+              {categories[drug].map((category, index) => (
+                <li key={index}>
+                  <h3>
+                    <Link to={`${match.url}/${category}`}>{category}</Link>
+                  </h3>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     );

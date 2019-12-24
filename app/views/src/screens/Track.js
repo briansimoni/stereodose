@@ -39,7 +39,7 @@ export default function Track(props) {
       </div>
 
       <div className="col-8">
-        <h5 className="track-name">{track.name}</h5>
+        <h5 onClick={onPlay} className="track-name">{track.name}</h5>
         <h6 className="artists">{track.artists}</h6>
       </div>
 

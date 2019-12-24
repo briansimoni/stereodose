@@ -66,6 +66,10 @@ ul.drugs li {
   font-size: 15px;
 }
 
+.track-name {
+  cursor: pointer;
+}
+
 .playlist {
   margin-top: 25px;
 }
@@ -128,4 +132,9 @@ ul.drugs li {
 
 #visualizer-loading-spinner {
   margin-left: 15px;
+}
+
+.fa-arrow-left {
+  margin-right: 10px;
+  font-size: 25px;
 }
