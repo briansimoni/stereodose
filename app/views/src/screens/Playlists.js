@@ -57,7 +57,7 @@ class Playlists extends React.Component {
       return (
         <div className="playlists">
           <h2 id="choose-a-playlist">
-            <Link to={`/${this.props.match.params.drug}`}><FontAwesomeIcon icon={faArrowLeft} /></Link>
+            <Link to={`/${this.props.match.params.drug}/${this.props.match.params.subcategory}/type`}><FontAwesomeIcon icon={faArrowLeft} /></Link>
             Choose A Playlist
           </h2>
 

@@ -9,6 +9,8 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Profile from './user/Profile';
 import Header from './user/Header';
 import NoMatch from './404';
+import ChoosePlaylistType from './screens/ChoosePlaylistType';
+import RandomPlaylist from './screens/RandomPlaylist';
 
 // App is the top level component for Stereodose.
 // A reference to itself is passed to child components for an inversion of control.
@@ -53,6 +55,10 @@ class App extends React.Component {
               <Route exact path="/:drug" render={props => <Drug {...props} app={this} />} />
 
               <Route exact path="/:drug/:subcategory" component={Playlists} />
+
+              <Route exact path="/:drug/:subcategory/type" render={props => <ChoosePlaylistType {...props} app={this} />} />
+
+              <Route exact path="/:drug/:subcategory/random" render={props => <RandomPlaylist {...props} app={this} />} />
 
               <Route exact path="/:drug/:subcategory/:playlist" render={props => <Playlist {...props} app={this} />} />
 

@@ -103,8 +103,8 @@ func createRouter(c *config.Config) *util.AppRouter {
 	authPlaylistsRouter.AppHandler("/me", playlists.GetMyPlaylists).Methods(http.MethodGet)
 	authPlaylistsRouter.AppHandler("/random", playlists.GetRandomPlaylist).
 	Queries(
-		"category", "{category:[a-zA-Z]+}",
-		"subcategory", "{subcategory:[a-zA-Z]+}",
+		"category", "{category:.+}",
+		"subcategory", "{subcategory:.+}",
 	).Methods(http.MethodGet)
 	playlistsRouter.AppHandler("/{id}", playlists.GetPlaylistByID).Methods(http.MethodGet)
 	authPlaylistsRouter.AppHandler("/", playlists.CreatePlaylist).Methods(http.MethodPost)

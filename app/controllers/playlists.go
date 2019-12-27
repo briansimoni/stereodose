@@ -103,16 +103,19 @@ func (p *PlaylistsController) GetRandomPlaylist(w http.ResponseWriter, r *http.R
 	queryValues := r.URL.Query()
 	category := queryValues.Get("category")
 	subcategory := queryValues.Get("subcategory")
+
 	if !models.Categories.Valid(category, subcategory) {
 		return &statusError{
 			Message: fmt.Sprintf("Category: %s Subcategory: %s is invalid", category, subcategory),
 			Code:    http.StatusBadRequest,
 		}
 	}
+
 	playlist, err := p.DB.Playlists.GetRandomPlaylist(category, subcategory)
 	if err != nil {
 		return err
 	}
+
 	err = util.JSON(w, playlist)
 	if err != nil {
 		return err

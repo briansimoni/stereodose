@@ -110,9 +110,10 @@ func (s *StereodosePlaylistService) GetMyPlaylists(user User) ([]Playlist, error
 // GetRandomPlaylist tells the database to grab a random set of playlists from the selected category
 // then a random set of tracks is selected across those playlists to get a completely new playlist
 // made up of randomly selected tracks
+// Using the gorm.Expr somewhat breaks the compatibility with other databases
+// as the random() function is supported in Postgres but it's rand() in MySQL
 func (s *StereodosePlaylistService) GetRandomPlaylist(category, subcategory string) (*Playlist, error) {
 	playlists := []Playlist{}
-	s.db = s.db.Debug()
 	err := s.db.Where("category = ? AND sub_category = ?", category, subcategory).Preload("Tracks").Order(gorm.Expr("random()")).Limit(10).Find(&playlists).Error
 	if err != nil {
 		return nil, err
