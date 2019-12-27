@@ -97,6 +97,32 @@ func (p *PlaylistsController) GetMyPlaylists(w http.ResponseWriter, r *http.Requ
 	return nil
 }
 
+// GetRandomPlaylist will inspect the category and subcategory query parameters
+// and return a Playlist filled with randomly selected tracks
+func (p *PlaylistsController) GetRandomPlaylist(w http.ResponseWriter, r *http.Request) error {
+	queryValues := r.URL.Query()
+	category := queryValues.Get("category")
+	subcategory := queryValues.Get("subcategory")
+
+	if !models.Categories.Valid(category, subcategory) {
+		return &statusError{
+			Message: fmt.Sprintf("Category: %s Subcategory: %s is invalid", category, subcategory),
+			Code:    http.StatusBadRequest,
+		}
+	}
+
+	playlist, err := p.DB.Playlists.GetRandomPlaylist(category, subcategory)
+	if err != nil {
+		return err
+	}
+
+	err = util.JSON(w, playlist)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // CreatePlaylist reads the SpotifyID from the POST body
 // It then calls the spotify API to get the full info and store in the local DB
 // TODO: return 409 conflict instead of 500 error if playlist already exists

@@ -79,6 +79,7 @@ func (f *fakePlaylistService) GetPlaylists(offset, limit, category, subcategory 
 	}
 	return nil, nil
 }
+
 func (f *fakePlaylistService) GetByID(ID string) (*models.Playlist, error) {
 	if ID == "" {
 		return nil, errors.New("Playlist with empty string does not exist")
@@ -124,6 +125,11 @@ func (f *fakePlaylistService) GetMyPlaylists(user models.User) ([]models.Playlis
 	}
 	return nil, nil
 }
+
+func (f *fakePlaylistService) GetRandomPlaylist(category, subcategory string) (*models.Playlist, error) {
+	return nil, nil
+}
+
 func (f *fakePlaylistService) DeletePlaylist(id string) error {
 	return nil
 }

@@ -6,12 +6,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import './Screens.css';
 
-// Drug renders the mood choices for the chosen Drug
-// Weed -> Chill, Groovin, Thug Life
-export default function Drug(props) {
+// ChoosePlaylist type renders a simple interface which presents the user with two options
+// randomly selected playlist or a user-created playlist
+export default function ChoosePlaylistType(props) {
   const drug = props.match.params.drug;
-  const match = props.match;
   const categories = props.app.state.categories;
+  const subcategory = props.match.params.subcategory;
 
   if (categories !== null && !(drug in categories)) {
     return <Route component={NoMatch} />;
@@ -23,22 +23,13 @@ export default function Drug(props) {
         <div className="row">
           <div className="col">
             <h2 className="mood-choice-header">
-              <Link to="/"><FontAwesomeIcon icon={faArrowLeft} /></Link>
-              Choose Your Mood
+              <Link to={`/${drug}`}>
+                <FontAwesomeIcon icon={faArrowLeft} />
+              </Link>
+              {`${drug}: ${subcategory}`}
             </h2>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col">
-            <ul id="moods" className="moods">
-              {categories[drug].map((category, index) => (
-                <li key={index}>
-                  <h3>
-                    <Link to={`${match.url}/${category}/type`}>{category}</Link>
-                  </h3>
-                </li>
-              ))}
-            </ul>
+            <h2 className="text-center"><Link to={`/${drug}/${subcategory}`}>User Created</Link></h2>
+            <h2 className="text-center"><Link to={`/${drug}/${subcategory}/random`}>Random</Link></h2>
           </div>
         </div>
       </div>

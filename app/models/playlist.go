@@ -6,6 +6,7 @@ import (
 	"log"
 	"strings"
 	"time"
+	"math/rand"
 
 	"github.com/jinzhu/gorm"
 	"github.com/zmb3/spotify"
@@ -19,6 +20,7 @@ type PlaylistService interface {
 	GetPlaylists(offset, limit, category, subcategory string) ([]Playlist, error)
 	GetByID(ID string) (*Playlist, error)
 	GetMyPlaylists(user User) ([]Playlist, error)
+	GetRandomPlaylist(category, subcategory string) (*Playlist, error)
 	// TODO: refactor this to take a Playlist struct instead of a ton of strings
 	CreatePlaylistBySpotifyID(user User, playlistID, category, subCategory, image, thumbnail string) (*Playlist, error)
 	DeletePlaylist(spotifyID string) error
@@ -103,6 +105,41 @@ func (s *StereodosePlaylistService) GetMyPlaylists(user User) ([]Playlist, error
 		return nil, err
 	}
 	return playlists, nil
+}
+
+// GetRandomPlaylist tells the database to grab a random set of playlists from the selected category
+// then a random set of tracks is selected across those playlists to get a completely new playlist
+// made up of randomly selected tracks
+// Using the gorm.Expr somewhat breaks the compatibility with other databases
+// as the random() function is supported in Postgres but it's rand() in MySQL
+func (s *StereodosePlaylistService) GetRandomPlaylist(category, subcategory string) (*Playlist, error) {
+	playlists := []Playlist{}
+	err := s.db.Where("category = ? AND sub_category = ?", category, subcategory).Preload("Tracks").Order(gorm.Expr("random()")).Limit(10).Find(&playlists).Error
+	if err != nil {
+		return nil, err
+	}
+	if len(playlists) == 0 {
+		return nil, fmt.Errorf("Unable to create random playlist. No results were found for %s %s", category, subcategory)
+	}
+
+	randomPlaylist := new(Playlist)
+	randomPlaylist.Tracks = make([]Track, 0)
+	i := 0
+	for len(randomPlaylist.Tracks) < 20 {
+		playlist := playlists[i]
+		if (len(playlist.Tracks) == 0) {
+			i++
+			continue
+		}
+		trackIndex := rand.Intn(len(playlist.Tracks)-1)
+		randomPlaylist.Tracks = append(randomPlaylist.Tracks, playlist.Tracks[trackIndex])
+		if (i + 1) == len(playlists) {
+			i = 0
+		} else {
+			i++
+		}
+	}
+	return randomPlaylist, nil
 }
 
 // CreatePlaylistBySpotifyID is given a user and playlistID
