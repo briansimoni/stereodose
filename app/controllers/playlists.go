@@ -100,7 +100,16 @@ func (p *PlaylistsController) GetMyPlaylists(w http.ResponseWriter, r *http.Requ
 // GetRandomPlaylist will inspect the category and subcategory query parameters
 // and return a Playlist filled with randomly selected tracks
 func (p *PlaylistsController) GetRandomPlaylist(w http.ResponseWriter, r *http.Request) error {
-	playlist, err := p.DB.Playlists.GetRandomPlaylist("weed", "chill")
+	queryValues := r.URL.Query()
+	category := queryValues.Get("category")
+	subcategory := queryValues.Get("subcategory")
+	if !models.Categories.Valid(category, subcategory) {
+		return &statusError{
+			Message: fmt.Sprintf("Category: %s Subcategory: %s is invalid", category, subcategory),
+			Code:    http.StatusBadRequest,
+		}
+	}
+	playlist, err := p.DB.Playlists.GetRandomPlaylist(category, subcategory)
 	if err != nil {
 		return err
 	}

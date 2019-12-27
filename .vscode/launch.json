@@ -2,6 +2,14 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Golang local debug (no docker)",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceRoot}/main.go",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
       "name": "Golang Server",
       "type": "go",
       "request": "attach",
