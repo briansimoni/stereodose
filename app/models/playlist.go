@@ -127,7 +127,8 @@ func (s *StereodosePlaylistService) GetRandomPlaylist(category, subcategory stri
 	i := 0
 	for len(randomPlaylist.Tracks) < 20 {
 		playlist := playlists[i]
-		if (len(playlist.Tracks) == 0) {
+		// if the playlist is empty for whatever reason, skip to the next one
+		if (len(playlist.Tracks) <= 1) {
 			i++
 			continue
 		}

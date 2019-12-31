@@ -138,3 +138,12 @@ ul.drugs li {
   margin-right: 10px;
   font-size: 25px;
 }
+
+.pagination .page-item.active .page-link {
+  background-color: green;
+  border-color: green;
+}
+
+.pagination .page-link {
+  color: green;
+}
