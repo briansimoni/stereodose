@@ -42,9 +42,9 @@ class RandomPlaylist extends React.Component {
     }
 
     const { drug, subcategory } = this.props.match.params;
-    let albumImageUrl = 'https://via.placeholder.com/300';
+    let albumImageUrl = null;
     if (this.props.app.state.currentTrack) {
-      albumImageUrl = this.props.app.state.currentTrack.album.images[0].url || 'https://via.placeholder.com/300';
+      albumImageUrl = this.props.app.state.currentTrack.album.images[0].url || null;
     }
 
     return (
@@ -63,7 +63,8 @@ class RandomPlaylist extends React.Component {
               <Link to={`/${this.props.match.params.drug}/${this.props.match.params.subcategory}/type`}><FontAwesomeIcon icon={faArrowLeft} /></Link>
               {`${drug}: ${subcategory}`}
             </h2>
-            <img src={albumImageUrl} alt="playlist-artwork" />
+            {albumImageUrl && <img src={albumImageUrl} alt="playlist-artwork" />}
+            {!albumImageUrl && <div id="random-playlist-image-placeholder" alt="playlist-artwork" />}
           </div>
           <span>
             {!this.state.visualizerLoading && (
@@ -80,24 +81,24 @@ class RandomPlaylist extends React.Component {
             )}
           </span>
 
-            <ul className="list-group playlist">
-              {playlist.tracks &&
-                playlist.tracks.map((track, index) => {
-                  return (
-                    <li className="list-group-item" key={index}>
-                      <Track
-                        currentlyPlayingTrack={this.props.app.state.currentTrack}
-                        track={track}
-                        playlist={playlist}
-                        paused={this.props.app.state.paused}
-                        onPlay={() => {
-                          this.playSong(playlist, track.URI);
-                        }}
-                      />
-                    </li>
-                  );
-                })}
-            </ul>
+          <ul className="list-group playlist">
+            {playlist.tracks &&
+              playlist.tracks.map((track, index) => {
+                return (
+                  <li className="list-group-item" key={index}>
+                    <Track
+                      currentlyPlayingTrack={this.props.app.state.currentTrack}
+                      track={track}
+                      playlist={playlist}
+                      paused={this.props.app.state.paused}
+                      onPlay={() => {
+                        this.playSong(playlist, track.URI);
+                      }}
+                    />
+                  </li>
+                );
+              })}
+          </ul>
         </div>
       </div>
     );
@@ -228,7 +229,7 @@ class RandomPlaylist extends React.Component {
           playlist: this.props.app.state.randomPlaylistData.playlist
         });
         return;
-      } 
+      }
     }
     const response = await fetch(`/api/playlists/random?category=${drug}&subcategory=${subcategory}`, { credentials: 'same-origin' });
     if (response.status !== 200) {
@@ -239,7 +240,7 @@ class RandomPlaylist extends React.Component {
     const playlist = await response.json();
 
     this.props.app.setState({
-      randomPlaylistData : {
+      randomPlaylistData: {
         drug,
         subcategory,
         playlist: playlist

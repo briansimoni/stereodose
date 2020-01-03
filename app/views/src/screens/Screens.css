@@ -52,6 +52,14 @@ ul.drugs li {
   height: 40vh;
 }
 
+#random-playlist-image-placeholder {
+  /* max-width: 300px; */
+  width: 40vh;
+  height: 40vh;
+  margin: 0 auto;
+  background-color: black;
+}
+
 .track-play-button {
   background-color: #008f0c;
 }
