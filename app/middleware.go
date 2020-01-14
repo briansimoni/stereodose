@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const sessionName = "_stereodose-session"
+const sessionName = "stereodose_session"
 
 // StatusError is handy for when you want to return something other than 500 internal server error
 type statusError struct {

@@ -3,7 +3,8 @@ package models
 import (
 	"errors"
 	"fmt"
-	"log"
+	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"strings"
 	"time"
 	"math/rand"
@@ -189,6 +190,17 @@ func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlis
 	}
 	for _, trk := range tracks {
 		track := trk.Track
+
+		if string(track.ID) == "" {
+			// TODO: add transactionID to this log statement
+			log.WithFields(logrus.Fields{
+				"User": user.ID,
+				"PlaylistID": playlist.SpotifyID,
+				"TrackID": string(track.ID),
+				"TrackName": track.Name,
+			}).Warn("This track was skipped during playlist creation")
+			continue
+		}
 		trackToAdd := Track{
 			SpotifyID:   string(track.ID),
 			Name:        track.Name,
@@ -373,7 +385,6 @@ func (s *StereodosePlaylistService) Unlike(playlistID string, likeID uint) error
 
 	authorized := false
 	for _, like := range playlist.Likes {
-		log.Println(playlist.Likes)
 		if like.PlaylistID == playlistID {
 			authorized = true
 			break

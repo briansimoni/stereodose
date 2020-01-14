@@ -155,7 +155,7 @@ class App extends React.Component {
       return decodeURI(dc.substring(begin + prefix.length, end));
     }
 
-    let cookie = getCookie('_stereodose-session');
+    let cookie = getCookie('stereodose_session');
     if (!cookie) {
       return false;
     }

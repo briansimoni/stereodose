@@ -33,7 +33,7 @@ var sessionKeys = struct {
 	UserID              string
 	ReturnPath          string
 }{
-	SessionCookieName:   "_stereodose-session",
+	SessionCookieName:   "stereodose_session",
 	AuthStateCookieName: "stereodose_auth_state",
 	State:               "State",
 	Token:               "Token",
@@ -86,7 +86,7 @@ type refreshTokenResponse struct {
 func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 
 	// stereodose_auth_state is a separate cookie from the actual session cookie
-	// this allows for the presence of a _stereodose_session cookie to be proof of authentication
+	// this allows for the presence of a stereodose_session cookie to be proof of authentication
 	authState, err := a.Store.Get(r, sessionKeys.AuthStateCookieName)
 	if err != nil {
 		return errors.WithStack(err)
