@@ -191,6 +191,9 @@ func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlis
 	for _, trk := range tracks {
 		track := trk.Track
 
+		// Apparently there are very rare cases where some tracks obtained through
+		// the Spotify API don't have an ID. This is required by my database
+		// so we just skip the ones that would've otherwise violated this constraint.
 		if string(track.ID) == "" {
 			// TODO: add transactionID to this log statement
 			log.WithFields(logrus.Fields{
