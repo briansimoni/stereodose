@@ -68,7 +68,7 @@ type PlaylistOptions struct {
 	// in the Spotify default language (American English).
 	Locale *string
 	// A timestamp in ISO 8601 format (yyyy-MM-ddTHH:mm:ss).
-	// use this paramter to specify the user's local time to
+	// use this parameter to specify the user's local time to
 	// get results tailored for that specific date and time
 	// in the day.  If not provided, the response defaults to
 	// the current UTC time.
@@ -177,7 +177,7 @@ func (c *Client) GetPlaylistsForUser(userID string) (*SimplePlaylistPage, error)
 	return c.GetPlaylistsForUserOpt(userID, nil)
 }
 
-// GetPlaylistsForUserOpt is like PlaylistsForUser, but it accepts optional paramters
+// GetPlaylistsForUserOpt is like PlaylistsForUser, but it accepts optional parameters
 // for filtering the results.
 func (c *Client) GetPlaylistsForUserOpt(userID string, opt *Options) (*SimplePlaylistPage, error) {
 	spotifyURL := c.baseURL + "users/" + userID + "/playlists"
@@ -281,6 +281,9 @@ func (c *Client) GetPlaylistTracksOpt(playlistID ID,
 		}
 		if opt.Offset != nil {
 			v.Set("offset", strconv.Itoa(*opt.Offset))
+		}
+		if opt.Country != nil {
+			v.Set("market", *opt.Country)
 		}
 	}
 	if params := v.Encode(); params != "" {
@@ -529,7 +532,7 @@ func (c *Client) removeTracksFromPlaylist(playlistID ID,
 }
 
 // ReplacePlaylistTracks replaces all of the tracks in a playlist, overwriting its
-// exising tracks  This can be useful for replacing or reordering tracks, or for
+// existing tracks  This can be useful for replacing or reordering tracks, or for
 // clearing a playlist.
 //
 // Modifying a public playlist requires that the user has authorized the

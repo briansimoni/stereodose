@@ -52,8 +52,6 @@ const (
 	ScopeUserReadPrivate = "user-read-private"
 	// ScopeUserReadEmail seeks read access to a user's email address.
 	ScopeUserReadEmail = "user-read-email"
-	// ScopeUserReadBirthdate seeks read access to a user's birthdate.
-	ScopeUserReadBirthdate = "user-read-birthdate"
 	// ScopeUserReadCurrentlyPlaying seeks read access to a user's currently playing track
 	ScopeUserReadCurrentlyPlaying = "user-read-currently-playing"
 	// ScopeUserReadPlaybackState seeks read access to the user's current playback state
@@ -64,6 +62,8 @@ const (
 	ScopeUserReadRecentlyPlayed = "user-read-recently-played"
 	// ScopeUserTopRead seeks read access to a user's top tracks and artists
 	ScopeUserTopRead = "user-top-read"
+	// ScopeStreaming seeks permission to play music and control playback on your other devices.
+	ScopeStreaming = "streaming"
 )
 
 // Authenticator provides convenience functions for implementing the OAuth2 flow.
@@ -129,6 +129,11 @@ func (a *Authenticator) SetAuthInfo(clientID, secretKey string) {
 // http://tools.ietf.org/html/rfc6749#section-10.12.
 func (a Authenticator) AuthURL(state string) string {
 	return a.config.AuthCodeURL(state)
+}
+
+// AuthURLWithDialog returns the same URL as AuthURL, but sets show_dialog to true
+func (a Authenticator) AuthURLWithDialog(state string) string {
+	return a.config.AuthCodeURL(state, oauth2.SetAuthURLParam("show_dialog", "true"))
 }
 
 // Token pulls an authorization code from an HTTP request and attempts to exchange
