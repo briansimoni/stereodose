@@ -123,17 +123,39 @@ func (s *StereodosePlaylistService) GetRandomPlaylist(category, subcategory stri
 		return nil, fmt.Errorf("Unable to create random playlist. No results were found for %s %s", category, subcategory)
 	}
 
+	// create a random playlist of length 20
+	randomPlaylist := randomPlaylistFromSet(playlists, 20)
+	return randomPlaylist, nil
+}
+
+// randomPlaylistFromSet can be given a list of playlists
+// it will iterate through the list and select a random track to append to a new playlist
+// the length parameter is how many tracks you want in the random playlist
+// Since this function doesn't make any calls on outside resources, it is easy to unit test
+func randomPlaylistFromSet(playlists []Playlist, length int) *Playlist {
 	randomPlaylist := new(Playlist)
 	randomPlaylist.Tracks = make([]Track, 0)
 	i := 0
-	for len(randomPlaylist.Tracks) < 20 {
+	for len(randomPlaylist.Tracks) < length {
+		if i > len(playlists) - 1 {
+			i = 0
+		}
 		playlist := playlists[i]
 		// if the playlist is empty for whatever reason, skip to the next one
-		if (len(playlist.Tracks) <= 1) {
+		if (len(playlist.Tracks) == 0) {
 			i++
 			continue
 		}
-		trackIndex := rand.Intn(len(playlist.Tracks)-1)
+
+		// if the length of the playlist is only 1, then the only song to pick is the first one
+		var trackIndex int
+		if len(playlist.Tracks) == 1 {
+			trackIndex = 0
+		} else {
+			// otherwise, we randomly grab a track from the playlist
+			trackIndex = rand.Intn(len(playlist.Tracks))
+		}
+
 		randomPlaylist.Tracks = append(randomPlaylist.Tracks, playlist.Tracks[trackIndex])
 		if (i + 1) == len(playlists) {
 			i = 0
@@ -141,7 +163,7 @@ func (s *StereodosePlaylistService) GetRandomPlaylist(category, subcategory stri
 			i++
 		}
 	}
-	return randomPlaylist, nil
+	return randomPlaylist
 }
 
 // CreatePlaylistBySpotifyID is given a user and playlistID

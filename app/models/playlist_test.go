@@ -1,102 +1,11 @@
 package models
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/zmb3/spotify"
 )
-
-func TestStereodosePlaylistService_CreatePlaylistBySpotifyID(t *testing.T) {
-
-	// connectionString := "postgresql://postgres:development@127.0.0.1:5432/stereodose?sslmode=disable"
-	// db, err := gorm.Open("postgres", connectionString)
-	// if err != nil {
-	// 	t.Fatal(err.Error())
-	// }
-	// db.Debug().DropTable(User{}, Playlist{}, UserImage{}, PlaylistImage{}, Track{})
-	// db.AutoMigrate(User{}, Playlist{}, UserImage{}, PlaylistImage{}, Track{})
-	// // var store = sessions.NewCookieStore([]byte("something-very-secret"))
-	// // DB := NewStereodoseDB(db, store)
-
-	// playlist := &Playlist{
-	// 	Name:      "playlist1",
-	// 	SpotifyID: "1",
-	// 	Tracks: []Track{
-	// 		Track{
-	// 			Name:      "track1",
-	// 			SpotifyID: "asdf",
-	// 		},
-	// 		Track{
-	// 			Name:      "track2",
-	// 			SpotifyID: "qwer",
-	// 		},
-	// 	},
-	// }
-
-	// playlist2 := &Playlist{
-	// 	Name:      "playlist2",
-	// 	SpotifyID: "2",
-	// 	Tracks: []Track{
-	// 		Track{
-	// 			Name:      "track3",
-	// 			SpotifyID: "asdf2",
-	// 		},
-	// 		Track{
-	// 			Name:      "track4",
-	// 			SpotifyID: "qwer2",
-	// 		},
-	// 	},
-	// }
-
-	// playlist3 := &Playlist{
-	// 	Name:      "playlist3",
-	// 	SpotifyID: "3",
-	// 	Tracks: []Track{
-	// 		Track{
-	// 			Name:      "track1",
-	// 			SpotifyID: "asdf",
-	// 		},
-	// 	},
-	// }
-
-	// err = db.Debug().Save(playlist).Error
-	// if err != nil {
-	// 	t.Fatal(err.Error())
-	// }
-
-	// err = db.Debug().Save(playlist2).Error
-	// if err != nil {
-	// 	t.Fatal(err.Error())
-	// }
-
-	// err = db.Debug().Save(playlist3).Error
-	// if err != nil {
-	// 	t.Fatal(err.Error())
-	// }
-
-	// playlists := []Playlist{}
-	// err = db.Debug().Preload("Tracks").Offset("0").Limit("10").Find(&playlists).Error
-	// if err != nil {
-	// 	t.Error(err.Error())
-	// }
-	// if len(playlists) == 0 {
-	// 	t.Error("playlists length 0")
-	// }
-	// log.Println(playlists[0].Name)
-	// if playlists[0].Tracks[0].SpotifyID != "asdf" {
-	// 	t.Error("Expected playlist id to be asdf, got:" + playlists[0].Tracks[0].SpotifyID)
-	// }
-
-	// err = db.Debug().(playlist).Error
-	// if err != nil {
-	// 	t.Error(err.Error())
-	// }
-
-	// err = db.Debug().Save(playlist).Error
-	// if err != nil {
-	// 	t.Fatal(err.Error())
-	// }
-}
 
 func Test_simpleArtistsToString(t *testing.T) {
 	parkwayDrive := spotify.SimpleArtist{
@@ -122,6 +31,43 @@ func Test_simpleArtistsToString(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := simpleArtistsToString(tt.artists); got != tt.want {
 				t.Errorf("simpleArtistToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_randomPlaylistFromSet(t *testing.T) {
+
+	playlist1 := Playlist{
+		Tracks: []Track{
+			Track{ SpotifyID: "asdf" },
+		},
+	}
+
+	wantedPlaylist := &Playlist{
+		Tracks: []Track{
+			Track{ SpotifyID: "asdf" },
+			Track{ SpotifyID: "asdf" },
+			Track{ SpotifyID: "asdf" },
+			Track{ SpotifyID: "asdf" },
+			Track{ SpotifyID: "asdf" },
+		},
+	}
+	type args struct {
+		playlists []Playlist
+		length    int
+	}
+	tests := []struct {
+		name string
+		args args
+		want *Playlist
+	}{
+		{ name: "One playlist. One Track", args: args{[]Playlist{playlist1}, 5}, want: wantedPlaylist },
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := randomPlaylistFromSet(tt.args.playlists, tt.args.length); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("randomPlaylistFromSet() = %v, want %v", got, tt.want)
 			}
 		})
 	}
