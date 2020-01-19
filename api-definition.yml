@@ -1,0 +1,546 @@
+openapi: 3.0.0
+info:
+  description: |
+    This is the Stereodose API
+    [https://github.com/briansimoni/stereodose](https://github.com/briansimoni/stereodose)
+  version: '1.0.0'
+  title: Stereodose API
+  license:
+    name: GPL 3.0
+    url: 'https://github.com/briansimoni/stereodose/blob/master/LICENSE'
+servers:
+  - url: 'https://stereodose.app'
+
+paths:
+  '/auth/login':
+    get:
+      tags:
+        - auth
+      responses:
+        302:
+          description: sends you to SpotifyAPI auth URL
+          headers:
+            Set-Cookie:
+              description: temporary auth state cookie which is required for the /callback endpoint
+              schema:
+                type: string
+                example: stereodose_auth_state=abcde12345; Path=/;
+
+  '/auth/logout':
+    get:
+      tags:
+        - auth
+      responses:
+        200:
+          description: attempts to delete cookie
+
+  '/auth/callback':
+    get:
+      tags:
+        - auth
+      parameters:
+        - in: cookie
+          name: stereodose_auth_state
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: code
+          description: the authorization code returned from Spotify
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: state
+          description: CSRF token returned from spotify
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successfully logged in, setting cookie
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: stereodose_session=abcde12345; Path=/;
+
+  '/auth/refresh':
+    get:
+      security:
+        - cookieAuth: []
+      tags:
+        - auth
+      responses:
+        200:
+          description: refreshes access token (notice this is different than /token)
+          content:
+            application/json:
+              schema:
+                properties:
+                  access_token:
+                    type: string
+                  token_type:
+                    type: string
+                  expires_in:
+                    type: string
+                  scope:
+                    type: string
+
+  '/auth/token':
+    get:
+      security:
+        - cookieAuth: []
+      tags:
+        - auth
+      responses:
+        200:
+          description: returns the current access token (notice this is differentthan /refresh)
+          content:
+            application/json:
+              schema:
+                properties:
+                  access_token:
+                    type: string
+                  token_type:
+                    type: string
+                  refresh_token:
+                    type: string
+                  expiry:
+                    type: string
+
+  '/api/users/me':
+    get:
+      tags:
+        - users
+      summary: get information about the current user
+      security:
+        - cookieAuth: []
+      responses:
+        200:
+          description: JSON data about the currently logged in user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  '/api/playlists/':
+    get:
+      tags:
+        - playlists
+      summary: get a set of playlists
+      parameters:
+        - in: query
+          name: offset
+          schema:
+            type: integer
+          description: The number of items to skip before starting to collect the result set
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          description: Limit the of items to return
+        - in: query
+          name: category
+          schema:
+            type: string
+          description: The overal category of playlist
+        - in: query
+          name: subcategory
+          schema:
+            type: string
+          description: The subcategory of playlist
+      responses:
+        200:
+          description: A JSON array of playlists
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Playlist'
+
+    post:
+      tags:
+        - playlists
+      summary: create a playlist
+      security:
+        - cookieAuth: []
+      requestBody:
+        description: Create a new Stereodose playlist
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                SpotifyID:
+                  type: string
+                Category:
+                  type: string
+                ImageURL:
+                  type: string
+                ThumbnailURL:
+                  type: string
+      responses:
+        201:
+          description: successfully created playlist
+
+  '/api/playlists/{id}':
+    get:
+      tags:
+        - playlists
+      summary: get a playlist
+      parameters:
+        - in: path
+          name: id # Note the name is the same as in the path
+          required: true
+          schema:
+            type: string
+          description: The playlist ID
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Playlist'
+
+    delete:
+      tags:
+        - playlists
+      summary: delete a playlist
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The playlist ID
+      responses:
+        204:
+          description: no content indicates success
+
+  '/api/playlists/{id}/image':
+    post:
+      tags:
+        - playlists
+      summary: create an image and thumbnail for a new playlist
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: id # Note the name is the same as in the path
+          required: true
+          schema:
+            type: string
+          description: The playlist ID
+      requestBody:
+        description: >
+          content-type header should be multipart/form-data
+          and the filename parameter should always be "playlist-image".
+          The playlist-image parameter should be the binary that makes up the image.
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                filename:
+                  type: string
+                playlist-image:
+                  type: string
+      responses:
+        201:
+          description: returns JSON useful for creating a Stereodose playlist
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: integer
+                  imageURL:
+                    type: string
+                  thumbnailURL:
+                    type: string
+
+  '/api/playlists/{id}/comments':
+    post:
+      tags:
+        - playlists
+      summary: comment on a playlist
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: id # Note the name is the same as in the path
+          required: true
+          schema:
+            type: string
+          description: The playlist ID
+      responses:
+        201:
+          description: returns the new Comment object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+
+  '/api/playlists/{id}/comments/{commentId}':
+    delete:
+      tags:
+        - playlists
+      summary: remove a comment from a playlist
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: id # Note the name is the same as in the path
+          required: true
+          schema:
+            type: string
+          description: The playlist ID
+        - in: path
+          name: commentId # Note the name is the same as in the path
+          required: true
+          schema:
+            type: string
+          description: The comment ID
+      responses:
+        200:
+          description: successfully deleted comment
+
+  '/api/playlists/{id}/likes':
+    post:
+      tags:
+        - playlists
+      summary: like a playlist
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: id # Note the name is the same as in the path
+          required: true
+          schema:
+            type: string
+          description: The playlist ID
+      responses:
+        201:
+          description: successfully liked the playlist
+
+  '/api/playlists/{id}/likes/{likeId}':
+    delete:
+      tags:
+        - playlists
+      summary: remove a comment from a playlist
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: id # Note the name is the same as in the path
+          required: true
+          schema:
+            type: string
+          description: The playlist ID
+        - in: path
+          name: likeId # Note the name is the same as in the path
+          required: true
+          schema:
+            type: string
+          description: The like ID
+      responses:
+        200:
+          description: successfully deleted like
+
+  '/api/playlists/me':
+    get:
+      tags:
+        - playlists
+      summary: get the playlists that belong to the current user
+      security:
+        - cookieAuth: []
+      responses:
+        200:
+          description: A JSON array of playlists
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Playlist'
+
+externalDocs:
+  description: Find out more about Swagger
+  url: 'http://swagger.io'
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        ID:
+          type: integer
+        CreatedAt:
+          type: string
+        UpdatedAt:
+          type: string
+        birthDate:
+          type: string
+        email:
+          type: string
+        spotifyID:
+          type: string
+        accessToken:
+          type: string
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserImage'
+        playlists:
+          type: array
+          items:
+            $ref: '#/components/schemas/Playlist'
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+        likes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Like'
+        product:
+          type: string
+
+    UserImage:
+      type: object
+      properties:
+        ID:
+          type: integer
+        CreatedAt:
+          type: string
+        UpdatedAt:
+          type: string
+        DeletedAt:
+          type: string
+        height:
+          type: integer
+        width:
+          type: integer
+        url:
+          type: string
+
+    Playlist:
+      type: object
+      properties:
+        spotifyID:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        category:
+          type: string
+        subCategory:
+          type: string
+        collaborative:
+          type: boolean
+        href:
+          type: string
+        name:
+          type: string
+        public:
+          type: boolean
+        snapshot_id:
+          type: string
+        tracks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Track'
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+        likes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Like'
+        likesCount:
+          type: integer
+        URI:
+          type: string
+        userId:
+          type: integer
+        bucketImageURL:
+          type: string
+        bucketThumbnailURL:
+          type: string
+        permalink:
+          type: string
+
+    Track:
+      type: object
+      properties:
+        spotifyID:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        name:
+          type: string
+        duration:
+          type: integer
+        previewURL:
+          type: string
+        trackNumber:
+          type: string
+        URI:
+          type: string
+        artists:
+          type: string
+
+    Comment:
+      type: object
+      properties:
+        ID:
+          type: integer
+        CreatedAt:
+          type: string
+        UpdatedAt:
+          type: string
+        DeletedAt:
+          type: string
+        content:
+          type: string
+        PlaylistID:
+          type: string
+        displayName:
+          type: string
+        permalink:
+          type: string
+
+    Like:
+      type: object
+      properties:
+        ID:
+          type: string
+        CreatedAt:
+          type: string
+        UpdatedAt:
+          type: string
+        userID:
+          type: integer
+        playlistID:
+          type: string
+        playlistName:
+          type: string
+        permalink:
+          type: string
+
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: stereodose_session
