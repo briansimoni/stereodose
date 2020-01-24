@@ -14,6 +14,7 @@ import (
 	"github.com/briansimoni/stereodose/app/util"
 	"github.com/briansimoni/stereodose/config"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/zmb3/spotify"
 	"golang.org/x/oauth2"
 	endpoint "golang.org/x/oauth2/spotify"
@@ -140,6 +141,8 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error 
 	if err != nil {
 		return err
 	}
+
+	log.Printf("%+v\n", r.URL.Query())
 
 	// per documentation, delete the session by setting Max Age less than 0
 	authState.Options.MaxAge = -1
