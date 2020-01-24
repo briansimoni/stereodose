@@ -133,6 +133,13 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 // In this step of authorization, we exchange a code for an access token
 // and we query the user's profile on Spotify to get their identity
 func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error {
+	log.Printf("%+v\n", r.URL.Query())
+	thing := r.URL.Query()
+	transactionID := r.Context().Value("TransactionID")
+	log.WithFields(log.Fields{
+		"TransactionID": transactionID,
+		"Params":        thing,
+	})
 	authState, err := a.Store.Get(r, sessionKeys.AuthStateCookieName)
 	if err != nil {
 		return errors.WithStack(err)
@@ -141,8 +148,6 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error 
 	if err != nil {
 		return err
 	}
-
-	log.Printf("%+v\n", r.URL.Query())
 
 	// per documentation, delete the session by setting Max Age less than 0
 	authState.Options.MaxAge = -1
