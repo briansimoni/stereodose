@@ -12,6 +12,7 @@ import (
 // Useful for mocks/fakes when unit testing
 type UserService interface {
 	ByID(ID uint) (*User, error)
+	BySpotifyID(ID string) (*User, error)
 	FirstOrCreate(user *User, tok *oauth2.Token) (*User, error)
 	Update(user *User) error
 }
@@ -54,6 +55,16 @@ type StereodoseUserService struct {
 func (u *StereodoseUserService) ByID(ID uint) (*User, error) {
 	user := &User{}
 	err := u.db.Preload("Images").Preload("Playlists").Preload("Comments").Preload("Likes").Find(user, "id = ?", ID).Error
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+// BySpotifyID searches by the SpotifyID and returns a User
+func (u *StereodoseUserService) BySpotifyID(ID string) (*User, error) {
+	user := &User{}
+	err := u.db.Preload("Images").Preload("Playlists").Preload("Comments").Preload("Likes").Find(user, "spotify_id = ?", ID).Error
 	if err != nil {
 		return nil, err
 	}
