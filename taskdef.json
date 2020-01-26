@@ -59,6 +59,10 @@
           "name": "STEREODOSE_REDIRECT_URL"
         },
         {
+          "valueFrom": "STEREODOSE_IOS_REDIRECT_URL",
+          "name": "STEREODOSE_IOS_REDIRECT_URL"
+        },
+        {
           "valueFrom": "CLOUD_ACCESS_KEY_ID",
           "name": "AWS_ACCESS_KEY_ID"
         },
