@@ -44,9 +44,10 @@ var sessionKeys = struct {
 
 // AuthController is a collection of RESTful Handlers for authentication
 type AuthController struct {
-	DB     *models.StereoDoseDB
-	Store  *sessions.CookieStore
-	Config *oauth2.Config
+	DB               *models.StereoDoseDB
+	Store            *sessions.CookieStore
+	Config           *oauth2.Config
+	StereodoseConfig *config.Config
 }
 
 // NewAuthController takes a StereodoseDB, CookieStore, and App Config
@@ -73,6 +74,7 @@ func NewAuthController(db *models.StereoDoseDB, store *sessions.CookieStore, con
 		Store:  store,
 		Config: oauthConfig,
 	}
+	a.StereodoseConfig = config
 	return a
 }
 
@@ -139,7 +141,7 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error 
 	log.WithFields(log.Fields{
 		"TransactionID": transactionID,
 		"Params":        thing,
-	})
+	}).Info("query parameters from Callback URL")
 	authState, err := a.Store.Get(r, sessionKeys.AuthStateCookieName)
 	if err != nil {
 		return errors.WithStack(err)
@@ -220,6 +222,121 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error 
 	return nil
 }
 
+// TokenSwap was created to support the iOS app.
+// The Spotify iOS documentation refers to a "token swap" API endpoint which is essentially
+// the same as the OAuth callback or redirect URL.
+// The difference here is that instead of 302 redirecting on the callback,
+// we simply return a 200 response with the JSON returned from the Spotify code exchange
+func (a *AuthController) TokenSwap(w http.ResponseWriter, r *http.Request) error {
+	code := r.URL.Query().Get("code")
+	data := url.Values{}
+	data.Set("grant_type", "authorization_code")
+	data.Set("redirect_uri", a.StereodoseConfig.IOSRedirectURL)
+	data.Set("code", code)
+	body := strings.NewReader(data.Encode())
+	request, err := http.NewRequest(http.MethodPost, a.Config.Endpoint.TokenURL, body)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	request.SetBasicAuth(a.Config.ClientID, a.Config.ClientSecret)
+	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	type TokenSet struct {
+		AccessToken  string `json:"access_token"`
+		TokenType    string `json:"token_type"`
+		Scope        string `json:"scope"`
+		ExpiresIn    int    `json:"expires_in"`
+		RefreshToken string `json:"refresh_token"`
+	}
+	tokenSet := new(TokenSet)
+	defer response.Body.Close()
+	err = json.NewDecoder(response.Body).Decode(tokenSet)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	s, err := a.Store.Get(r, sessionKeys.SessionCookieName)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	oauth2Token := &oauth2.Token{
+		AccessToken: tokenSet.AccessToken,
+		TokenType: "Bearer",
+		RefreshToken: tokenSet.RefreshToken,
+		Expiry: time.Now().Add(time.Duration(tokenSet.ExpiresIn) * time.Second),
+	}
+	s.Values[sessionKeys.Token] = *oauth2Token
+	client := spotify.Authenticator{}.NewClient(oauth2Token)
+	currentUser, err := client.CurrentUser()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	sdUser, err := a.saveUserData(oauth2Token, currentUser)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	// saveUserData doesn't do updates. This call makes sure that
+	// the database has an up-to-date AccessToken
+	sdUser.AccessToken = oauth2Token.AccessToken
+	err = a.DB.Users.Update(sdUser)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	util.JSON(w, tokenSet)
+	return nil
+}
+
+// MobileLogin is here to support the iOS app.
+// Because Spotify basically constrains iOS developers to using only their SDK
+// and not the WebAPI for authentication, we have to create this seperate endpoint
+// It will take a Spotify access token, and then create a Stereodose session.
+// The response is simply a 200 and a set-cookie header
+func (a *AuthController) MobileLogin(w http.ResponseWriter, r *http.Request) error {
+	type TokenBody struct {
+		AccessToken string `json:"access_token"`
+	}
+	tokenBody := new(TokenBody)
+	defer r.Body.Close()
+	err := json.NewDecoder(r.Body).Decode(tokenBody)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	oauth2Token := &oauth2.Token{
+		AccessToken: tokenBody.AccessToken,
+	}
+
+	s, err := a.Store.Get(r, sessionKeys.SessionCookieName)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	client := spotify.Authenticator{}.NewClient(oauth2Token)
+	currentUser, err := client.CurrentUser()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	sdUser, err := a.DB.Users.BySpotifyID(currentUser.ID)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	
+	oauth2Token.RefreshToken = sdUser.RefreshToken
+
+	s.Values[sessionKeys.Token] = *oauth2Token
+	s.Values[sessionKeys.UserID] = sdUser.ID
+	err = s.Save(r, w)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	return nil
+}
+
 // GetMyAccessToken will return the Spotify Access token associated with the user's current session
 // It probably would've have been better if I embedded this into a JWT and ditched cookies...
 // TODO: perhaps it is better design to encapsulate the refresh logic here as well
@@ -234,7 +351,7 @@ func (a *AuthController) GetMyAccessToken(w http.ResponseWriter, r *http.Request
 	}
 	err = util.JSON(w, tok)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	return nil
 }

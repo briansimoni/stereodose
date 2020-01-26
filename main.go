@@ -34,11 +34,12 @@ func main() {
 	defer db.Close()
 
 	c := &config.Config{
-		ClientID:      os.Getenv("STEREODOSE_CLIENT_ID"),
-		ClientSecret:  os.Getenv("STEREODOSE_CLIENT_SECRET"),
-		AuthKey:       os.Getenv("STEREODOSE_AUTH_KEY"),
-		RedirectURL:   os.Getenv("STEREODOSE_REDIRECT_URL"),
-		EncryptionKey: os.Getenv("STEREODOSE_ENCRYPTION_KEY"),
+		ClientID:       os.Getenv("STEREODOSE_CLIENT_ID"),
+		ClientSecret:   os.Getenv("STEREODOSE_CLIENT_SECRET"),
+		AuthKey:        os.Getenv("STEREODOSE_AUTH_KEY"),
+		RedirectURL:    os.Getenv("STEREODOSE_REDIRECT_URL"),
+		IOSRedirectURL: os.Getenv("STEREODOSE_IOS_REDIRECT_URL"),
+		EncryptionKey:  os.Getenv("STEREODOSE_ENCRYPTION_KEY"),
 	}
 	err = c.Verify()
 
