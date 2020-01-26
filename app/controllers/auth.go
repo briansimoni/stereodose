@@ -44,9 +44,10 @@ var sessionKeys = struct {
 
 // AuthController is a collection of RESTful Handlers for authentication
 type AuthController struct {
-	DB     *models.StereoDoseDB
-	Store  *sessions.CookieStore
-	Config *oauth2.Config
+	DB               *models.StereoDoseDB
+	Store            *sessions.CookieStore
+	Config           *oauth2.Config
+	StereodoseConfig *config.Config
 }
 
 // NewAuthController takes a StereodoseDB, CookieStore, and App Config
@@ -73,6 +74,7 @@ func NewAuthController(db *models.StereoDoseDB, store *sessions.CookieStore, con
 		Store:  store,
 		Config: oauthConfig,
 	}
+	a.StereodoseConfig = config
 	return a
 }
 
@@ -125,10 +127,7 @@ func (a *AuthController) Login(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	redir := a.Config.AuthCodeURL(state, oauth2.AccessTypeOnline)
-	log.Println(redir)
-	// temp
-	tempRedir := "https://accounts.spotify.com/authorize?response_type=code&client_id=56d708386314468a84948c2fa9e4b5d2&redirect_uri=http%3A%2F%2Flocalhost%3A4000%2Fauth%2Ftoken-swap&scope=user-read-email"
-	http.Redirect(w, r, tempRedir, http.StatusFound)
+	http.Redirect(w, r, redir, http.StatusFound)
 	return nil
 }
 
@@ -232,18 +231,18 @@ func (a *AuthController) TokenSwap(w http.ResponseWriter, r *http.Request) error
 	code := r.URL.Query().Get("code")
 	data := url.Values{}
 	data.Set("grant_type", "authorization_code")
-	data.Set("redirect_uri", "http://localhost:4000/auth/token-swap")
+	data.Set("redirect_uri", a.StereodoseConfig.IOSRedirectURL)
 	data.Set("code", code)
 	body := strings.NewReader(data.Encode())
 	request, err := http.NewRequest(http.MethodPost, a.Config.Endpoint.TokenURL, body)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	request.SetBasicAuth(a.Config.ClientID, a.Config.ClientSecret)
 	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	response, err := http.DefaultClient.Do(request)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	type TokenSet struct {
 		AccessToken  string `json:"access_token"`
@@ -256,7 +255,7 @@ func (a *AuthController) TokenSwap(w http.ResponseWriter, r *http.Request) error
 	defer response.Body.Close()
 	err = json.NewDecoder(response.Body).Decode(tokenSet)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	s, err := a.Store.Get(r, sessionKeys.SessionCookieName)
@@ -352,7 +351,7 @@ func (a *AuthController) GetMyAccessToken(w http.ResponseWriter, r *http.Request
 	}
 	err = util.JSON(w, tok)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	return nil
 }
