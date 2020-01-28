@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -229,6 +230,12 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error 
 // we simply return a 200 response with the JSON returned from the Spotify code exchange
 func (a *AuthController) TokenSwap(w http.ResponseWriter, r *http.Request) error {
 	code := r.URL.Query().Get("code")
+	if code == "" {
+		return &statusError{
+			Code:    http.StatusBadRequest,
+			Message: "missing 'code' in query param",
+		}
+	}
 	data := url.Values{}
 	data.Set("grant_type", "authorization_code")
 	data.Set("redirect_uri", a.StereodoseConfig.IOSRedirectURL)
@@ -244,10 +251,12 @@ func (a *AuthController) TokenSwap(w http.ResponseWriter, r *http.Request) error
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	defer response.Body.Close()
 	if response.StatusCode != http.StatusOK {
+		errorBody, _ := ioutil.ReadAll(response.Body)
 		return &statusError{
 			Code:    response.StatusCode,
-			Message: "Error exchanging token with Spotify: " + response.Status,
+			Message: "Error exchanging token with Spotify: " + string(errorBody),
 		}
 	}
 	type TokenSet struct {
@@ -258,7 +267,6 @@ func (a *AuthController) TokenSwap(w http.ResponseWriter, r *http.Request) error
 		RefreshToken string `json:"refresh_token"`
 	}
 	tokenSet := new(TokenSet)
-	defer response.Body.Close()
 	err = json.NewDecoder(response.Body).Decode(tokenSet)
 	if err != nil {
 		return errors.WithStack(err)
