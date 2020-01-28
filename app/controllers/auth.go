@@ -237,7 +237,7 @@ func (a *AuthController) TokenSwap(w http.ResponseWriter, r *http.Request) error
 	if code == "" {
 		return &statusError{
 			Code:    http.StatusBadRequest,
-			Message: "missing 'code' in query param",
+			Message: "missing 'code' in form data",
 		}
 	}
 	data := url.Values{}

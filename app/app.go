@@ -79,8 +79,8 @@ func createRouter(c *config.Config) *util.AppRouter {
 	authRouter.AppHandler("/logout", auth.Logout).Methods(http.MethodGet)
 	authRouter.AppHandler("/callback", auth.Callback).Methods(http.MethodGet)
 	authRouter.AppHandler("/refresh", auth.Refresh).Methods(http.MethodGet)
-	authRouter.AppHandler("/token", auth.GetMyAccessToken).Methods(http.MethodPost)
-	authRouter.AppHandler("/token-swap", auth.TokenSwap).Methods(http.MethodGet)
+	authRouter.AppHandler("/token", auth.GetMyAccessToken).Methods(http.MethodGet)
+	authRouter.AppHandler("/token-swap", auth.TokenSwap).Methods(http.MethodPost)
 	authRouter.AppHandler("/mobile-login", auth.MobileLogin).Methods(http.MethodPost)
 
 	usersRouter := util.AppRouter{Router: app.PathPrefix("/api/users/").Subrouter()}
