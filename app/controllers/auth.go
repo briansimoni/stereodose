@@ -244,6 +244,9 @@ func (a *AuthController) TokenSwap(w http.ResponseWriter, r *http.Request) error
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	if response.StatusCode != http.StatusOK {
+		return errors.New("Error exchanging token " + response.Status)
+	}
 	type TokenSet struct {
 		AccessToken  string `json:"access_token"`
 		TokenType    string `json:"token_type"`
