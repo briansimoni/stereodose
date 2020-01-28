@@ -229,7 +229,11 @@ func (a *AuthController) Callback(w http.ResponseWriter, r *http.Request) error 
 // The difference here is that instead of 302 redirecting on the callback,
 // we simply return a 200 response with the JSON returned from the Spotify code exchange
 func (a *AuthController) TokenSwap(w http.ResponseWriter, r *http.Request) error {
-	code := r.URL.Query().Get("code")
+	err := r.ParseForm()
+	if err != nil {
+		return errors.New("unable to parse form data")
+	}
+	code := r.Form.Get("code")
 	if code == "" {
 		return &statusError{
 			Code:    http.StatusBadRequest,

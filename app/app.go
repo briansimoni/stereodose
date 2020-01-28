@@ -79,7 +79,7 @@ func createRouter(c *config.Config) *util.AppRouter {
 	authRouter.AppHandler("/logout", auth.Logout).Methods(http.MethodGet)
 	authRouter.AppHandler("/callback", auth.Callback).Methods(http.MethodGet)
 	authRouter.AppHandler("/refresh", auth.Refresh).Methods(http.MethodGet)
-	authRouter.AppHandler("/token", auth.GetMyAccessToken).Methods(http.MethodGet)
+	authRouter.AppHandler("/token", auth.GetMyAccessToken).Methods(http.MethodPost)
 	authRouter.AppHandler("/token-swap", auth.TokenSwap).Methods(http.MethodGet)
 	authRouter.AppHandler("/mobile-login", auth.MobileLogin).Methods(http.MethodPost)
 
@@ -104,10 +104,10 @@ func createRouter(c *config.Config) *util.AppRouter {
 
 	authPlaylistsRouter.AppHandler("/me", playlists.GetMyPlaylists).Methods(http.MethodGet)
 	authPlaylistsRouter.AppHandler("/random", playlists.GetRandomPlaylist).
-	Queries(
-		"category", "{category:.+}",
-		"subcategory", "{subcategory:.+}",
-	).Methods(http.MethodGet)
+		Queries(
+			"category", "{category:.+}",
+			"subcategory", "{subcategory:.+}",
+		).Methods(http.MethodGet)
 	playlistsRouter.AppHandler("/{id}", playlists.GetPlaylistByID).Methods(http.MethodGet)
 	authPlaylistsRouter.AppHandler("/", playlists.CreatePlaylist).Methods(http.MethodPost)
 	authPlaylistsRouter.AppHandler("/{id}/image", playlists.UploadImage).Methods(http.MethodPost)
