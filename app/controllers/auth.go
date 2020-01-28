@@ -261,8 +261,6 @@ func (a *AuthController) TokenSwap(w http.ResponseWriter, r *http.Request) error
 	}
 	type TokenSet struct {
 		AccessToken  string `json:"access_token"`
-		TokenType    string `json:"token_type"`
-		Scope        string `json:"scope"`
 		ExpiresIn    int    `json:"expires_in"`
 		RefreshToken string `json:"refresh_token"`
 	}
