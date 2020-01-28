@@ -264,11 +264,12 @@ func (a *AuthController) TokenSwap(w http.ResponseWriter, r *http.Request) error
 	}
 
 	oauth2Token := &oauth2.Token{
-		AccessToken: tokenSet.AccessToken,
-		TokenType: "Bearer",
+		AccessToken:  tokenSet.AccessToken,
 		RefreshToken: tokenSet.RefreshToken,
-		Expiry: time.Now().Add(time.Duration(tokenSet.ExpiresIn) * time.Second),
+		// Expiry: time.Now().Add(time.Duration(tokenSet.ExpiresIn) * time.Second),
 	}
+	log.Info("The token value: " + oauth2Token.AccessToken)
+
 	s.Values[sessionKeys.Token] = *oauth2Token
 	client := spotify.Authenticator{}.NewClient(oauth2Token)
 	currentUser, err := client.CurrentUser()
@@ -325,7 +326,7 @@ func (a *AuthController) MobileLogin(w http.ResponseWriter, r *http.Request) err
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	
+
 	oauth2Token.RefreshToken = sdUser.RefreshToken
 
 	s.Values[sessionKeys.Token] = *oauth2Token
