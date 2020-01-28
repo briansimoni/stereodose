@@ -245,7 +245,10 @@ func (a *AuthController) TokenSwap(w http.ResponseWriter, r *http.Request) error
 		return errors.WithStack(err)
 	}
 	if response.StatusCode != http.StatusOK {
-		return errors.New("Error exchanging token " + response.Status)
+		return &statusError{
+			Code:    response.StatusCode,
+			Message: "Error exchanging token with Spotify: " + response.Status,
+		}
 	}
 	type TokenSet struct {
 		AccessToken  string `json:"access_token"`
