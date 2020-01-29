@@ -40,6 +40,10 @@ func (f *fakeUserService) ByID(ID uint) (*models.User, error) {
 	return nil, nil
 }
 
+func (f *fakeUserService) BySpotifyID(ID string) (*models.User, error) {
+	return nil, nil
+}
+
 func (f *fakeUserService) FirstOrCreate(user *models.User, tok *oauth2.Token) (*models.User, error) {
 	return nil, nil
 }

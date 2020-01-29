@@ -13,11 +13,12 @@ export default function Drug(props) {
   const match = props.match;
   const categories = props.app.state.categories;
 
-  if (categories !== null && !(drug in categories)) {
+  if (categories !== null && !categories.find(category => category.name === drug)) {
     return <Route component={NoMatch} />;
   }
 
   if (categories !== null) {
+    let subCategories = categories.find(category => category.name === drug).subcategories;
     return (
       <div>
         <div className="row">
@@ -31,10 +32,10 @@ export default function Drug(props) {
         <div className="row">
           <div className="col">
             <ul id="moods" className="moods">
-              {categories[drug].map((category, index) => (
+              {subCategories.map((subCategory, index) => (
                 <li key={index}>
                   <h3>
-                    <Link to={`${match.url}/${category}/type`}>{category}</Link>
+                    <Link to={`${match.url}/${subCategory}/type`}>{subCategory}</Link>
                   </h3>
                 </li>
               ))}

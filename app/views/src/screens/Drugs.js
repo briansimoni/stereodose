@@ -7,7 +7,7 @@ import './Screens.css';
 export default function Drugs(props) {
   const categories = props.app.state.categories;
   if (categories) {
-    let drugNames = Object.keys(categories);
+    let drugNames = categories.map(drug => drug.name);
 
     return (
       <div className="row">
