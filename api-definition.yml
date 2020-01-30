@@ -181,6 +181,8 @@ paths:
                     type: string
                   expiry:
                     type: string
+                    
+                    
 
   '/api/users/me':
     get:
@@ -196,6 +198,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+                
+  '/api/categories/':
+    get:
+      tags:
+        - categories
+      responses:
+        200:
+          description: returns an object that contains all of the categories/subcategories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+                      
+                  
+      
 
   '/api/playlists/':
     get:
@@ -217,7 +236,7 @@ paths:
           name: category
           schema:
             type: string
-          description: The overal category of playlist
+          description: The overall category of playlist
         - in: query
           name: subcategory
           schema:
@@ -611,6 +630,16 @@ components:
           type: string
         permalink:
           type: string
+          
+    Category:
+      type: object
+      properties:
+        name:
+          type: string
+        subcategories:
+          type: array
+          items:
+            type: string
 
   securitySchemes:
     cookieAuth:
