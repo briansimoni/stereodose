@@ -725,6 +725,20 @@
     }
   }
 };
+            defs.Category = {
+  "type" : "object",
+  "properties" : {
+    "name" : {
+      "type" : "string"
+    },
+    "subcategories" : {
+      "type" : "array",
+      "items" : {
+        "type" : "string"
+      }
+    }
+  }
+};
             defs.Comment = {
   "type" : "object",
   "properties" : {
@@ -803,34 +817,6 @@
     },
     "expiry" : {
       "type" : "string"
-    }
-  }
-};
-            defs.inline_response_200_3 = {
-  "properties" : {
-    "ecstacy" : {
-      "type" : "array",
-      "items" : {
-        "type" : "string"
-      }
-    },
-    "lsd" : {
-      "type" : "array",
-      "items" : {
-        "type" : "string"
-      }
-    },
-    "shrooms" : {
-      "type" : "array",
-      "items" : {
-        "type" : "string"
-      }
-    },
-    "weed" : {
-      "type" : "array",
-      "items" : {
-        "type" : "string"
-      }
     }
   }
 };
@@ -3113,7 +3099,7 @@ public class CategoriesApiExample {
         
         CategoriesApi apiInstance = new CategoriesApi();
         try {
-            inline_response_200_3 result = apiInstance.apiCategoriesGet();
+            array[Category] result = apiInstance.apiCategoriesGet();
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling CategoriesApi#apiCategoriesGet");
@@ -3131,7 +3117,7 @@ public class CategoriesApiExample {
     public static void main(String[] args) {
         CategoriesApi apiInstance = new CategoriesApi();
         try {
-            inline_response_200_3 result = apiInstance.apiCategoriesGet();
+            array[Category] result = apiInstance.apiCategoriesGet();
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling CategoriesApi#apiCategoriesGet");
@@ -3149,7 +3135,7 @@ public class CategoriesApiExample {
 CategoriesApi *apiInstance = [[CategoriesApi alloc] init];
 
 [apiInstance apiCategoriesGetWithCompletionHandler: 
-              ^(inline_response_200_3 output, NSError* error) {
+              ^(array[Category] output, NSError* error) {
                             if (output) {
                                 NSLog(@"%@", output);
                             }
@@ -3196,7 +3182,7 @@ namespace Example
 
             try
             {
-                inline_response_200_3 result = apiInstance.apiCategoriesGet();
+                array[Category] result = apiInstance.apiCategoriesGet();
                 Debug.WriteLine(result);
             }
             catch (Exception e)
@@ -3285,7 +3271,11 @@ except ApiException as e:
   "content" : {
     "application/json" : {
       "schema" : {
-        "$ref" : "#/components/schemas/inline_response_200_3"
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/Category"
+        },
+        "x-content-type" : "application/json"
       }
     }
   }
@@ -3370,7 +3360,7 @@ public class PlaylistsApiExample {
         PlaylistsApi apiInstance = new PlaylistsApi();
         Integer offset = 56; // Integer | The number of items to skip before starting to collect the result set
         Integer limit = 56; // Integer | Limit the of items to return
-        String category = category_example; // String | The overal category of playlist
+        String category = category_example; // String | The overall category of playlist
         String subcategory = subcategory_example; // String | The subcategory of playlist
         try {
             array[Playlist] result = apiInstance.apiPlaylistsGet(offset, limit, category, subcategory);
@@ -3392,7 +3382,7 @@ public class PlaylistsApiExample {
         PlaylistsApi apiInstance = new PlaylistsApi();
         Integer offset = 56; // Integer | The number of items to skip before starting to collect the result set
         Integer limit = 56; // Integer | Limit the of items to return
-        String category = category_example; // String | The overal category of playlist
+        String category = category_example; // String | The overall category of playlist
         String subcategory = subcategory_example; // String | The subcategory of playlist
         try {
             array[Playlist] result = apiInstance.apiPlaylistsGet(offset, limit, category, subcategory);
@@ -3411,7 +3401,7 @@ public class PlaylistsApiExample {
                             <div class="tab-pane" id="examples-Playlists-apiPlaylistsGet-0-objc">
                               <pre class="prettyprint"><code class="language-cpp">Integer *offset = 56; // The number of items to skip before starting to collect the result set (optional)
 Integer *limit = 56; // Limit the of items to return (optional)
-String *category = category_example; // The overal category of playlist (optional)
+String *category = category_example; // The overall category of playlist (optional)
 String *subcategory = subcategory_example; // The subcategory of playlist (optional)
 
 PlaylistsApi *apiInstance = [[PlaylistsApi alloc] init];
@@ -3439,7 +3429,7 @@ var api = new StereodoseApi.PlaylistsApi()
 var opts = { 
   'offset': 56, // {{Integer}} The number of items to skip before starting to collect the result set
   'limit': 56, // {{Integer}} Limit the of items to return
-  'category': category_example, // {{String}} The overal category of playlist
+  'category': category_example, // {{String}} The overall category of playlist
   'subcategory': subcategory_example // {{String}} The subcategory of playlist
 };
 var callback = function(error, data, response) {
@@ -3473,7 +3463,7 @@ namespace Example
             var apiInstance = new PlaylistsApi();
             var offset = 56;  // Integer | The number of items to skip before starting to collect the result set (optional) 
             var limit = 56;  // Integer | Limit the of items to return (optional) 
-            var category = category_example;  // String | The overal category of playlist (optional) 
+            var category = category_example;  // String | The overall category of playlist (optional) 
             var subcategory = subcategory_example;  // String | The subcategory of playlist (optional) 
 
             try
@@ -3499,7 +3489,7 @@ require_once(__DIR__ . '/vendor/autoload.php');
 $api_instance = new Swagger\Client\ApiPlaylistsApi();
 $offset = 56; // Integer | The number of items to skip before starting to collect the result set
 $limit = 56; // Integer | Limit the of items to return
-$category = category_example; // String | The overal category of playlist
+$category = category_example; // String | The overall category of playlist
 $subcategory = subcategory_example; // String | The subcategory of playlist
 
 try {
@@ -3519,7 +3509,7 @@ use WWW::SwaggerClient::PlaylistsApi;
 my $api_instance = WWW::SwaggerClient::PlaylistsApi->new();
 my $offset = 56; # Integer | The number of items to skip before starting to collect the result set
 my $limit = 56; # Integer | Limit the of items to return
-my $category = category_example; # String | The overal category of playlist
+my $category = category_example; # String | The overall category of playlist
 my $subcategory = subcategory_example; # String | The subcategory of playlist
 
 eval { 
@@ -3542,7 +3532,7 @@ from pprint import pprint
 api_instance = swagger_client.PlaylistsApi()
 offset = 56 # Integer | The number of items to skip before starting to collect the result set (optional)
 limit = 56 # Integer | Limit the of items to return (optional)
-category = category_example # String | The overal category of playlist (optional)
+category = category_example # String | The overall category of playlist (optional)
 subcategory = subcategory_example # String | The subcategory of playlist (optional)
 
 try: 
@@ -3616,7 +3606,7 @@ except ApiException as e:
                                                 </span>
                                 
                                                     <div class="inner description">
-                                                        The overal category of playlist
+                                                        The overall category of playlist
                                                     </div>
                                             </div>
                                         </div>

@@ -13,7 +13,7 @@ export default function ChoosePlaylistType(props) {
   const categories = props.app.state.categories;
   const subcategory = props.match.params.subcategory;
 
-  if (categories !== null && !(drug in categories)) {
+  if (categories !== null && !categories.find(category => category.name === drug)) {
     return <Route component={NoMatch} />;
   }
 

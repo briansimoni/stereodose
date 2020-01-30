@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function PickDrug(props) {
   const { onSelectDrug, categories, playlist } = props;
-  const drugs = Object.keys(categories);
+  const drugs = categories.map(category => category.name);
   return (
     <div>
       <h2 id="content-title">Choose Drug for {playlist.name}</h2>
