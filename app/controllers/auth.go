@@ -351,7 +351,7 @@ func (a *AuthController) MobileLogin(w http.ResponseWriter, r *http.Request) err
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	cookie := r.Header.Get("Set-Cookie")
+	cookie := w.Header().Get("Set-Cookie")
 	type CookieResponse struct {
 		Cookie string `json:"cookie"`
 	}
