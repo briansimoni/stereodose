@@ -66,7 +66,7 @@ paths:
                 example: stereodose_session=abcde12345; Path=/;
                 
   '/auth/token-swap':
-    get:
+    post:
       description: >
         TokenSwap was created to support the iOS app.
         The Spotify iOS documentation refers to a "token swap" API endpoint which is essentially
@@ -75,12 +75,16 @@ paths:
         we simply return a 200 response with the JSON returned from the Spotify code exchange
       tags:
         - auth
-      parameters: 
-        - in: query
-          name: code
-          required: true
-          schema:
-            type: string
+      requestBody:
+        description: the authorization code from spotify
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
       responses:
         200:
           description: successfully exchanged authorization code for access tokens
@@ -189,6 +193,29 @@ paths:
       tags:
         - users
       summary: get information about the current user
+      security:
+        - cookieAuth: []
+      responses:
+        200:
+          description: JSON data about the currently logged in user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+                
+  '/api/users/{id}':
+    get:
+      tags:
+        - users
+      summary: get information about a user
+      description: This endpoint returns user information. Note that it does not include access tokens.
+      parameters: 
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        
       security:
         - cookieAuth: []
       responses:
