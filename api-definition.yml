@@ -64,7 +64,7 @@ paths:
               schema:
                 type: string
                 example: stereodose_session=abcde12345; Path=/;
-                
+
   '/auth/token-swap':
     get:
       description: >
@@ -75,7 +75,7 @@ paths:
         we simply return a 200 response with the JSON returned from the Spotify code exchange
       tags:
         - auth
-      parameters: 
+      parameters:
         - in: query
           name: code
           required: true
@@ -104,7 +104,7 @@ paths:
                     type: string
                   refresh_token:
                     type: string
-                    
+
   '/auth/mobile-login':
     post:
       description: >
@@ -133,10 +133,6 @@ paths:
               schema:
                 type: string
                 example: stereodose_session=abcde12345; Path=/;
-              
-      
-                    
-                  
 
   '/auth/refresh':
     get:
@@ -181,8 +177,6 @@ paths:
                     type: string
                   expiry:
                     type: string
-                    
-                    
 
   '/api/users/me':
     get:
@@ -198,7 +192,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-                
+
   '/api/categories/':
     get:
       tags:
@@ -212,9 +206,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Category'
-                      
-                  
-      
 
   '/api/playlists/':
     get:
@@ -277,6 +268,32 @@ paths:
       responses:
         201:
           description: successfully created playlist
+
+  '/api/playlists/random':
+    get:
+      tags:
+        - playlists
+      summary: get a random playlist
+      parameters:
+        - in: query
+          name: category
+          schema:
+            type: string
+          description: The overall category of playlist
+        - in: query
+          name: subcategory
+          schema:
+            type: string
+          description: The subcategory of playlist
+      responses:
+        200:
+          description: A JSON array of playlists
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Playlist'
 
   '/api/playlists/{id}':
     get:
@@ -478,6 +495,8 @@ components:
           type: string
         UpdatedAt:
           type: string
+        displayName:
+          type: string
         birthDate:
           type: string
         email:
@@ -630,7 +649,7 @@ components:
           type: string
         permalink:
           type: string
-          
+
     Category:
       type: object
       properties:
