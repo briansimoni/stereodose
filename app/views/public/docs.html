@@ -3359,7 +3359,7 @@ except ApiException as e:
 
                         <div class="tab-content">
                           <div class="tab-pane active" id="examples-Playlists-apiPlaylistsGet-0-curl">
-                            <pre class="prettyprint"><code class="language-bsh">curl -X GET "https://stereodose.app/api/playlists/?offset=&limit=&category=&subcategory="</code></pre>
+                            <pre class="prettyprint"><code class="language-bsh">curl -X GET "https://stereodose.app/api/playlists/?offset=&limit=&category=&subcategory=&sort-key=&order="</code></pre>
                           </div>
                           <div class="tab-pane" id="examples-Playlists-apiPlaylistsGet-0-java">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
@@ -3379,8 +3379,10 @@ public class PlaylistsApiExample {
         Integer limit = 56; // Integer | Limit the of items to return
         String category = category_example; // String | The overall category of playlist
         String subcategory = subcategory_example; // String | The subcategory of playlist
+        String sortKey = sortKey_example; // String | Can be one of the following defaulting to likes_count: created_at, updated_at, name, likes_count
+        String order = order_example; // String | Can be one of the following defaulting to desc: asc, desc
         try {
-            array[Playlist] result = apiInstance.apiPlaylistsGet(offset, limit, category, subcategory);
+            array[Playlist] result = apiInstance.apiPlaylistsGet(offset, limit, category, subcategory, sortKey, order);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling PlaylistsApi#apiPlaylistsGet");
@@ -3401,8 +3403,10 @@ public class PlaylistsApiExample {
         Integer limit = 56; // Integer | Limit the of items to return
         String category = category_example; // String | The overall category of playlist
         String subcategory = subcategory_example; // String | The subcategory of playlist
+        String sortKey = sortKey_example; // String | Can be one of the following defaulting to likes_count: created_at, updated_at, name, likes_count
+        String order = order_example; // String | Can be one of the following defaulting to desc: asc, desc
         try {
-            array[Playlist] result = apiInstance.apiPlaylistsGet(offset, limit, category, subcategory);
+            array[Playlist] result = apiInstance.apiPlaylistsGet(offset, limit, category, subcategory, sortKey, order);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling PlaylistsApi#apiPlaylistsGet");
@@ -3420,6 +3424,8 @@ public class PlaylistsApiExample {
 Integer *limit = 56; // Limit the of items to return (optional)
 String *category = category_example; // The overall category of playlist (optional)
 String *subcategory = subcategory_example; // The subcategory of playlist (optional)
+String *sortKey = sortKey_example; // Can be one of the following defaulting to likes_count: created_at, updated_at, name, likes_count (optional)
+String *order = order_example; // Can be one of the following defaulting to desc: asc, desc (optional)
 
 PlaylistsApi *apiInstance = [[PlaylistsApi alloc] init];
 
@@ -3428,6 +3434,8 @@ PlaylistsApi *apiInstance = [[PlaylistsApi alloc] init];
     limit:limit
     category:category
     subcategory:subcategory
+    sortKey:sortKey
+    order:order
               completionHandler: ^(array[Playlist] output, NSError* error) {
                             if (output) {
                                 NSLog(@"%@", output);
@@ -3447,7 +3455,9 @@ var opts = {
   'offset': 56, // {{Integer}} The number of items to skip before starting to collect the result set
   'limit': 56, // {{Integer}} Limit the of items to return
   'category': category_example, // {{String}} The overall category of playlist
-  'subcategory': subcategory_example // {{String}} The subcategory of playlist
+  'subcategory': subcategory_example, // {{String}} The subcategory of playlist
+  'sortKey': sortKey_example, // {{String}} Can be one of the following defaulting to likes_count: created_at, updated_at, name, likes_count
+  'order': order_example // {{String}} Can be one of the following defaulting to desc: asc, desc
 };
 var callback = function(error, data, response) {
   if (error) {
@@ -3482,11 +3492,13 @@ namespace Example
             var limit = 56;  // Integer | Limit the of items to return (optional) 
             var category = category_example;  // String | The overall category of playlist (optional) 
             var subcategory = subcategory_example;  // String | The subcategory of playlist (optional) 
+            var sortKey = sortKey_example;  // String | Can be one of the following defaulting to likes_count: created_at, updated_at, name, likes_count (optional) 
+            var order = order_example;  // String | Can be one of the following defaulting to desc: asc, desc (optional) 
 
             try
             {
                 // get a set of playlists
-                array[Playlist] result = apiInstance.apiPlaylistsGet(offset, limit, category, subcategory);
+                array[Playlist] result = apiInstance.apiPlaylistsGet(offset, limit, category, subcategory, sortKey, order);
                 Debug.WriteLine(result);
             }
             catch (Exception e)
@@ -3508,9 +3520,11 @@ $offset = 56; // Integer | The number of items to skip before starting to collec
 $limit = 56; // Integer | Limit the of items to return
 $category = category_example; // String | The overall category of playlist
 $subcategory = subcategory_example; // String | The subcategory of playlist
+$sortKey = sortKey_example; // String | Can be one of the following defaulting to likes_count: created_at, updated_at, name, likes_count
+$order = order_example; // String | Can be one of the following defaulting to desc: asc, desc
 
 try {
-    $result = $api_instance->apiPlaylistsGet($offset, $limit, $category, $subcategory);
+    $result = $api_instance->apiPlaylistsGet($offset, $limit, $category, $subcategory, $sortKey, $order);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling PlaylistsApi->apiPlaylistsGet: ', $e->getMessage(), PHP_EOL;
@@ -3528,9 +3542,11 @@ my $offset = 56; # Integer | The number of items to skip before starting to coll
 my $limit = 56; # Integer | Limit the of items to return
 my $category = category_example; # String | The overall category of playlist
 my $subcategory = subcategory_example; # String | The subcategory of playlist
+my $sortKey = sortKey_example; # String | Can be one of the following defaulting to likes_count: created_at, updated_at, name, likes_count
+my $order = order_example; # String | Can be one of the following defaulting to desc: asc, desc
 
 eval { 
-    my $result = $api_instance->apiPlaylistsGet(offset => $offset, limit => $limit, category => $category, subcategory => $subcategory);
+    my $result = $api_instance->apiPlaylistsGet(offset => $offset, limit => $limit, category => $category, subcategory => $subcategory, sortKey => $sortKey, order => $order);
     print Dumper($result);
 };
 if ($@) {
@@ -3551,10 +3567,12 @@ offset = 56 # Integer | The number of items to skip before starting to collect t
 limit = 56 # Integer | Limit the of items to return (optional)
 category = category_example # String | The overall category of playlist (optional)
 subcategory = subcategory_example # String | The subcategory of playlist (optional)
+sortKey = sortKey_example # String | Can be one of the following defaulting to likes_count: created_at, updated_at, name, likes_count (optional)
+order = order_example # String | Can be one of the following defaulting to desc: asc, desc (optional)
 
 try: 
     # get a set of playlists
-    api_response = api_instance.api_playlists_get(offset=offset, limit=limit, category=category, subcategory=subcategory)
+    api_response = api_instance.api_playlists_get(offset=offset, limit=limit, category=category, subcategory=subcategory, sortKey=sortKey, order=order)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling PlaylistsApi->apiPlaylistsGet: %s\n" % e)</code></pre>
@@ -3643,6 +3661,44 @@ except ApiException as e:
                                 
                                                     <div class="inner description">
                                                         The subcategory of playlist
+                                                    </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                </tr>
+                                <tr><td style="width:150px;">sort-key</td>
+                                <td>
+                                
+                                
+                                    <div id="d2e199_apiPlaylistsGet_sortKey">
+                                        <div class="json-schema-view">
+                                            <div class="primitive">
+                                                <span class="type">
+                                                    String
+                                                </span>
+                                
+                                                    <div class="inner description">
+                                                        Can be one of the following defaulting to likes_count: created_at, updated_at, name, likes_count
+                                                    </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                </tr>
+                                <tr><td style="width:150px;">order</td>
+                                <td>
+                                
+                                
+                                    <div id="d2e199_apiPlaylistsGet_order">
+                                        <div class="json-schema-view">
+                                            <div class="primitive">
+                                                <span class="type">
+                                                    String
+                                                </span>
+                                
+                                                    <div class="inner description">
+                                                        Can be one of the following defaulting to desc: asc, desc
                                                     </div>
                                             </div>
                                         </div>

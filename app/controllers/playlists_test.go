@@ -14,10 +14,9 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"strconv"
 	"testing"
-
-	log "github.com/sirupsen/logrus"
 
 	"github.com/briansimoni/stereodose/app/models"
 	"github.com/briansimoni/stereodose/app/util"
@@ -25,6 +24,7 @@ import (
 	"github.com/google/go-cloud/blob/driver"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 )
 
 // io.Reader that always errors
@@ -71,9 +71,9 @@ func (f fakeBucket) WriteAll(ctx context.Context, key string, data []byte, optio
 type fakePlaylistService struct {
 }
 
-func (f *fakePlaylistService) GetPlaylists(offset, limit, category, subcategory string) ([]models.Playlist, error) {
-	off, _ := strconv.Atoi(offset)
-	lim, _ := strconv.Atoi(limit)
+func (f *fakePlaylistService) GetPlaylists(params *models.PlaylistSearchParams) ([]models.Playlist, error) {
+	off, _ := strconv.Atoi(params.Offset)
+	lim, _ := strconv.Atoi(params.Limit)
 	if off < 0 || lim < 0 {
 		return nil, errors.New("Negative offset or limit")
 	}
@@ -706,4 +706,44 @@ func Test_getImageKey(t *testing.T) {
 
 func init() {
 	log.SetOutput(ioutil.Discard)
+}
+
+func Test_createSearchParamsFromRequest(t *testing.T) {
+	request1, _ := http.NewRequest(http.MethodGet, "https://stereodose.app/api/playlists/?category=weed&sort-key=created_at&order=asc", nil)
+	request2, _ := http.NewRequest(http.MethodGet, "https://stereodose.app/api/playlists/?category=weed&sort-key=created_at&order=fart", nil)
+	request3, _ := http.NewRequest(http.MethodGet, "https://stereodose.app/api/playlists/?category=weed&sort-key=poop&order=desc", nil)
+
+	expected1 := &models.PlaylistSearchParams{
+		Offset: "0",
+		Limit: "10",
+		Category: "weed",
+		Subcategory: "",
+		SortKey: "created_at",
+		Order: "asc",
+	}
+	type args struct {
+		r *http.Request
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *models.PlaylistSearchParams
+		wantErr bool
+	}{
+		{name: "Valid request", args: args{request1}, want: expected1, wantErr: false,},
+		{name: "Bad order value", args: args{request2}, want: nil, wantErr: true,},
+		{name: "Bad sort key", args: args{request3}, want: nil, wantErr: true,},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := createSearchParamsFromRequest(tt.args.r)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("createSearchParamsFromRequest() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("createSearchParamsFromRequest() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

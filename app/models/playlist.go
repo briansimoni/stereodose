@@ -3,11 +3,11 @@ package models
 import (
 	"errors"
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
+	"math/rand"
 	"strings"
 	"time"
-	"math/rand"
 
 	"github.com/jinzhu/gorm"
 	"github.com/zmb3/spotify"
@@ -18,7 +18,7 @@ import (
 // of some kind of service that a "Playlist Service" should offer
 // Useful for mocks/fakes when unit testing
 type PlaylistService interface {
-	GetPlaylists(offset, limit, category, subcategory string) ([]Playlist, error)
+	GetPlaylists(params *PlaylistSearchParams) ([]Playlist, error)
 	GetByID(ID string) (*Playlist, error)
 	GetMyPlaylists(user User) ([]Playlist, error)
 	GetRandomPlaylist(category, subcategory string) (*Playlist, error)
@@ -55,7 +55,16 @@ type Playlist struct {
 	BucketImageURL     string          `json:"bucketImageURL"`
 	BucketThumbnailURL string          `json:"bucketThumbnailURL"`
 	Permalink          string          `json:"permalink"`
-	TotalTracks 	   int 		   	   `json:"totalTracks"`
+	TotalTracks        int             `json:"totalTracks"`
+}
+
+type PlaylistSearchParams struct {
+	Offset      string
+	Limit       string
+	Category    string
+	Subcategory string
+	SortKey     string
+	Order       string
 }
 
 // PlaylistImage should contain a URL or reference to an image
@@ -73,15 +82,20 @@ type StereodosePlaylistService struct {
 }
 
 // GetPlaylists takes search parameters and returns a subset of playlists
-func (s *StereodosePlaylistService) GetPlaylists(offset, limit, category, subcategory string) ([]Playlist, error) {
+func (s *StereodosePlaylistService) GetPlaylists(params *PlaylistSearchParams) ([]Playlist, error) {
 	playlists := []Playlist{}
 
-	err := s.db.
-		Offset(offset).
-		Limit(limit).
-		Where("category = ? AND sub_category = ?", category, subcategory).
-		Order("likes_count desc").
-		Find(&playlists).Error
+	db := s.db.
+		Offset(params.Offset).
+		Limit(params.Limit)
+
+	if params.Subcategory == "" {
+		db = db.Where("category = ?", params.Category)
+	} else {
+		db = db.Where("category = ? AND sub_category = ?", params.Category, params.Subcategory)
+	}
+	
+	err := db.Order(fmt.Sprintf("%s %s", params.SortKey, params.Order)).Find(&playlists).Error
 
 	if err != nil {
 		return nil, err
@@ -138,12 +152,12 @@ func randomPlaylistFromSet(playlists []Playlist, length int) *Playlist {
 	randomPlaylist.Tracks = make([]Track, 0)
 	i := 0
 	for len(randomPlaylist.Tracks) < length {
-		if i > len(playlists) - 1 {
+		if i > len(playlists)-1 {
 			i = 0
 		}
 		playlist := playlists[i]
 		// if the playlist is empty for whatever reason, skip to the next one
-		if (len(playlist.Tracks) == 0) {
+		if len(playlist.Tracks) == 0 {
 			i++
 			continue
 		}
@@ -222,10 +236,10 @@ func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlis
 		if string(track.ID) == "" {
 			// TODO: add transactionID to this log statement
 			log.WithFields(logrus.Fields{
-				"User": user.ID,
+				"User":       user.ID,
 				"PlaylistID": playlist.SpotifyID,
-				"TrackID": string(track.ID),
-				"TrackName": track.Name,
+				"TrackID":    string(track.ID),
+				"TrackName":  track.Name,
 			}).Warn("This track was skipped during playlist creation")
 			continue
 		}

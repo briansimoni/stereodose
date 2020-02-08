@@ -38,31 +38,86 @@ func NewPlaylistsController(db *models.StereoDoseDB, b *blob.Bucket) *PlaylistsC
 	return &PlaylistsController{DB: db, Bucket: b}
 }
 
-// GetPlaylists will return a subset of all the playlists in the DB
-// if offset is not provided, it is set to 0 by default
-// if limit is not provided, it is set to 10 by default
+// GetPlaylists will return a subset of all the playlists in the DB based on query parameters
 func (p *PlaylistsController) GetPlaylists(w http.ResponseWriter, r *http.Request) error {
+	params, err := createSearchParamsFromRequest(r)
+	if err != nil {
+		return &statusError{
+			Code: http.StatusBadRequest,
+			Message: err.Error(),
+		}
+	}
+
+	playlists, err := p.DB.Playlists.GetPlaylists(params)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	util.JSON(w, playlists)
+	return nil
+}
+
+func createSearchParamsFromRequest(r *http.Request) (*models.PlaylistSearchParams, error) {
 	queryValues := r.URL.Query()
+
 	offset := queryValues.Get("offset")
 	limit := queryValues.Get("limit")
 	category := queryValues.Get("category")
 	subcategory := queryValues.Get("subcategory")
+	sortKey := queryValues.Get("sort-key")
+	order := queryValues.Get("order")
+
 	if offset == "" {
 		offset = "0"
 	}
 	if limit == "" {
 		limit = "10"
 	}
+	if sortKey == "" {
+		sortKey = "likes_count"
+	}
+	if order == "" {
+		order = "desc"
+	}
 
-	playlists, err := p.DB.Playlists.GetPlaylists(offset, limit, category, subcategory)
-	if err != nil {
-		return errors.WithStack(err)
+
+	sortKeyAllowed := false
+	for _, allowedSortKey := range []string{
+		"created_at",
+		"updated_at",
+		"name",
+		"likes_count",
+	}{
+		if sortKey == allowedSortKey {
+			sortKeyAllowed = true
+			break
+		}
 	}
-	err = util.JSON(w, playlists)
-	if err != nil {
-		return errors.WithStack(err)
+	if !sortKeyAllowed {
+		return nil, errors.Errorf("sort key: '%s' is not allowed", sortKey)
 	}
-	return nil
+
+	orderValueAllowed := false
+	for _, allowedOrderValue := range []string{
+		"desc",
+		"asc",
+	} {
+		if order == allowedOrderValue {
+			orderValueAllowed = true
+			break
+		}
+	}
+	if !orderValueAllowed {
+		return nil, errors.Errorf("order value: '%s' is not allowed", order)
+	}
+
+	return &models.PlaylistSearchParams{
+		Category: category,
+		Subcategory: subcategory,
+		Offset: offset,
+		Limit: limit,
+		SortKey: sortKey,
+		Order: order,
+	}, nil
 }
 
 // GetPlaylistByID reads the id variable from the url path and sends a JSON response
