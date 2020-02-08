@@ -692,12 +692,20 @@
             defs.body = {
   "type" : "object",
   "properties" : {
-    "access_token" : {
+    "code" : {
       "type" : "string"
     }
   }
 };
             defs.body_1 = {
+  "type" : "object",
+  "properties" : {
+    "access_token" : {
+      "type" : "string"
+    }
+  }
+};
+            defs.body_2 = {
   "type" : "object",
   "properties" : {
     "SpotifyID" : {
@@ -714,7 +722,7 @@
     }
   }
 };
-            defs.body_2 = {
+            defs.body_3 = {
   "type" : "object",
   "properties" : {
     "filename" : {
@@ -927,6 +935,9 @@
     },
     "permalink" : {
       "type" : "string"
+    },
+    "totalTracks" : {
+      "type" : "integer"
     }
   }
 };
@@ -1079,8 +1090,8 @@
                     <li data-group="Auth" data-name="authTokenGet" class="">
                       <a href="#api-Auth-authTokenGet">authTokenGet</a>
                     </li>
-                    <li data-group="Auth" data-name="authTokenSwapGet" class="">
-                      <a href="#api-Auth-authTokenSwapGet">authTokenSwapGet</a>
+                    <li data-group="Auth" data-name="authTokenSwapPost" class="">
+                      <a href="#api-Auth-authTokenSwapPost">authTokenSwapPost</a>
                     </li>
                   <li class="nav-header" data-group="Categories"><a href="#api-Categories">API Methods - Categories</a></li>
                     <li data-group="Categories" data-name="apiCategoriesGet" class="">
@@ -1121,6 +1132,9 @@
                       <a href="#api-Playlists-apiPlaylistsRandomGet">apiPlaylistsRandomGet</a>
                     </li>
                   <li class="nav-header" data-group="Users"><a href="#api-Users">API Methods - Users</a></li>
+                    <li data-group="Users" data-name="apiUsersIdGet" class="">
+                      <a href="#api-Users-apiUsersIdGet">apiUsersIdGet</a>
+                    </li>
                     <li data-group="Users" data-name="apiUsersMeGet" class="">
                       <a href="#api-Users-apiUsersMeGet">apiUsersMeGet</a>
                     </li>
@@ -1923,7 +1937,7 @@ public class AuthApiExample {
     public static void main(String[] args) {
         
         AuthApi apiInstance = new AuthApi();
-        Body body = ; // Body | Create a new Stereodose playlist
+        Body_1 body = ; // Body_1 | Create a new Stereodose playlist
         try {
             apiInstance.authMobileLoginPost(body);
         } catch (ApiException e) {
@@ -1941,7 +1955,7 @@ public class AuthApiExample {
 
     public static void main(String[] args) {
         AuthApi apiInstance = new AuthApi();
-        Body body = ; // Body | Create a new Stereodose playlist
+        Body_1 body = ; // Body_1 | Create a new Stereodose playlist
         try {
             apiInstance.authMobileLoginPost(body);
         } catch (ApiException e) {
@@ -1956,7 +1970,7 @@ public class AuthApiExample {
   <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
   </div> -->
                             <div class="tab-pane" id="examples-Auth-authMobileLoginPost-0-objc">
-                              <pre class="prettyprint"><code class="language-cpp">Body *body = ; // Create a new Stereodose playlist
+                              <pre class="prettyprint"><code class="language-cpp">Body_1 *body = ; // Create a new Stereodose playlist
 
 AuthApi *apiInstance = [[AuthApi alloc] init];
 
@@ -1973,7 +1987,7 @@ AuthApi *apiInstance = [[AuthApi alloc] init];
                               <pre class="prettyprint"><code class="language-js">var StereodoseApi = require('stereodose_api');
 
 var api = new StereodoseApi.AuthApi()
-var body = ; // {{Body}} Create a new Stereodose playlist
+var body = ; // {{Body_1}} Create a new Stereodose playlist
 
 var callback = function(error, data, response) {
   if (error) {
@@ -2004,7 +2018,7 @@ namespace Example
         {
 
             var apiInstance = new AuthApi();
-            var body = new Body(); // Body | Create a new Stereodose playlist
+            var body = new Body_1(); // Body_1 | Create a new Stereodose playlist
 
             try
             {
@@ -2025,7 +2039,7 @@ namespace Example
 require_once(__DIR__ . '/vendor/autoload.php');
 
 $api_instance = new Swagger\Client\ApiAuthApi();
-$body = ; // Body | Create a new Stereodose playlist
+$body = ; // Body_1 | Create a new Stereodose playlist
 
 try {
     $api_instance->authMobileLoginPost($body);
@@ -2041,7 +2055,7 @@ use WWW::SwaggerClient::Configuration;
 use WWW::SwaggerClient::AuthApi;
 
 my $api_instance = WWW::SwaggerClient::AuthApi->new();
-my $body = WWW::SwaggerClient::Object::Body->new(); # Body | Create a new Stereodose playlist
+my $body = WWW::SwaggerClient::Object::Body_1->new(); # Body_1 | Create a new Stereodose playlist
 
 eval { 
     $api_instance->authMobileLoginPost(body => $body);
@@ -2060,7 +2074,7 @@ from pprint import pprint
 
 # create an instance of the API class
 api_instance = swagger_client.AuthApi()
-body =  # Body | Create a new Stereodose playlist
+body =  # Body_1 | Create a new Stereodose playlist
 
 try: 
     api_instance.auth_mobile_login_post(body)
@@ -2090,7 +2104,7 @@ except ApiException as e:
   "content" : {
     "application/json" : {
       "schema" : {
-        "$ref" : "#/components/schemas/body"
+        "$ref" : "#/components/schemas/body_1"
       }
     }
   },
@@ -2735,10 +2749,10 @@ except ApiException as e:
                         </article>
                       </div>
                       <hr>
-                    <div id="api-Auth-authTokenSwapGet">
-                      <article id="api-Auth-authTokenSwapGet-0" data-group="User" data-name="authTokenSwapGet" data-version="0">
+                    <div id="api-Auth-authTokenSwapPost">
+                      <article id="api-Auth-authTokenSwapPost-0" data-group="User" data-name="authTokenSwapPost" data-version="0">
                         <div class="pull-left">
-                          <h1>authTokenSwapGet</h1>
+                          <h1>authTokenSwapPost</h1>
                           <p></p>
                         </div>
                         <div class="pull-right"></div>
@@ -2748,29 +2762,29 @@ except ApiException as e:
 </p>
                         <p></p>
                         <br />
-                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/auth/token-swap</span></code></pre>
+                        <pre class="prettyprint language-html prettyprinted" data-type="post"><code><span class="pln">/auth/token-swap</span></code></pre>
                         <p>
                           <h3>Usage and SDK Samples</h3>
                         </p>
                         <ul class="nav nav-tabs nav-tabs-examples">
-                          <li class="active"><a href="#examples-Auth-authTokenSwapGet-0-curl">Curl</a></li>
-                          <li class=""><a href="#examples-Auth-authTokenSwapGet-0-java">Java</a></li>
-                          <li class=""><a href="#examples-Auth-authTokenSwapGet-0-android">Android</a></li>
-                          <!--<li class=""><a href="#examples-Auth-authTokenSwapGet-0-groovy">Groovy</a></li>-->
-                          <li class=""><a href="#examples-Auth-authTokenSwapGet-0-objc">Obj-C</a></li>
-                          <li class=""><a href="#examples-Auth-authTokenSwapGet-0-javascript">JavaScript</a></li>
-                          <!--<li class=""><a href="#examples-Auth-authTokenSwapGet-0-angular">Angular</a></li>-->
-                          <li class=""><a href="#examples-Auth-authTokenSwapGet-0-csharp">C#</a></li>
-                          <li class=""><a href="#examples-Auth-authTokenSwapGet-0-php">PHP</a></li>
-                          <li class=""><a href="#examples-Auth-authTokenSwapGet-0-perl">Perl</a></li>
-                          <li class=""><a href="#examples-Auth-authTokenSwapGet-0-python">Python</a></li>
+                          <li class="active"><a href="#examples-Auth-authTokenSwapPost-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Auth-authTokenSwapPost-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Auth-authTokenSwapPost-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Auth-authTokenSwapPost-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Auth-authTokenSwapPost-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Auth-authTokenSwapPost-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Auth-authTokenSwapPost-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Auth-authTokenSwapPost-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Auth-authTokenSwapPost-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Auth-authTokenSwapPost-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Auth-authTokenSwapPost-0-python">Python</a></li>
                         </ul>
 
                         <div class="tab-content">
-                          <div class="tab-pane active" id="examples-Auth-authTokenSwapGet-0-curl">
-                            <pre class="prettyprint"><code class="language-bsh">curl -X GET "https://stereodose.app/auth/token-swap?code="</code></pre>
+                          <div class="tab-pane active" id="examples-Auth-authTokenSwapPost-0-curl">
+                            <pre class="prettyprint"><code class="language-bsh">curl -X POST "https://stereodose.app/auth/token-swap"</code></pre>
                           </div>
-                          <div class="tab-pane" id="examples-Auth-authTokenSwapGet-0-java">
+                          <div class="tab-pane" id="examples-Auth-authTokenSwapPost-0-java">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
 import io.swagger.client.auth.*;
 import io.swagger.client.model.*;
@@ -2786,17 +2800,17 @@ public class AuthApiExample {
         AuthApi apiInstance = new AuthApi();
         String code = code_example; // String | 
         try {
-            inline_response_200 result = apiInstance.authTokenSwapGet(code);
+            inline_response_200 result = apiInstance.authTokenSwapPost(code);
             System.out.println(result);
         } catch (ApiException e) {
-            System.err.println("Exception when calling AuthApi#authTokenSwapGet");
+            System.err.println("Exception when calling AuthApi#authTokenSwapPost");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
 
-                          <div class="tab-pane" id="examples-Auth-authTokenSwapGet-0-android">
+                          <div class="tab-pane" id="examples-Auth-authTokenSwapPost-0-android">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.AuthApi;
 
 public class AuthApiExample {
@@ -2805,25 +2819,25 @@ public class AuthApiExample {
         AuthApi apiInstance = new AuthApi();
         String code = code_example; // String | 
         try {
-            inline_response_200 result = apiInstance.authTokenSwapGet(code);
+            inline_response_200 result = apiInstance.authTokenSwapPost(code);
             System.out.println(result);
         } catch (ApiException e) {
-            System.err.println("Exception when calling AuthApi#authTokenSwapGet");
+            System.err.println("Exception when calling AuthApi#authTokenSwapPost");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
   <!--
-  <div class="tab-pane" id="examples-Auth-authTokenSwapGet-0-groovy">
+  <div class="tab-pane" id="examples-Auth-authTokenSwapPost-0-groovy">
   <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
   </div> -->
-                            <div class="tab-pane" id="examples-Auth-authTokenSwapGet-0-objc">
+                            <div class="tab-pane" id="examples-Auth-authTokenSwapPost-0-objc">
                               <pre class="prettyprint"><code class="language-cpp">String *code = code_example; // 
 
 AuthApi *apiInstance = [[AuthApi alloc] init];
 
-[apiInstance authTokenSwapGetWith:code
+[apiInstance authTokenSwapPostWith:code
               completionHandler: ^(inline_response_200 output, NSError* error) {
                             if (output) {
                                 NSLog(@"%@", output);
@@ -2835,7 +2849,7 @@ AuthApi *apiInstance = [[AuthApi alloc] init];
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Auth-authTokenSwapGet-0-javascript">
+                            <div class="tab-pane" id="examples-Auth-authTokenSwapPost-0-javascript">
                               <pre class="prettyprint"><code class="language-js">var StereodoseApi = require('stereodose_api');
 
 var api = new StereodoseApi.AuthApi()
@@ -2848,14 +2862,14 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-api.authTokenSwapGet(code, callback);
+api.authTokenSwapPost(code, callback);
 </code></pre>
                             </div>
 
-                            <!--<div class="tab-pane" id="examples-Auth-authTokenSwapGet-0-angular">
+                            <!--<div class="tab-pane" id="examples-Auth-authTokenSwapPost-0-angular">
               <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
             </div>-->
-                            <div class="tab-pane" id="examples-Auth-authTokenSwapGet-0-csharp">
+                            <div class="tab-pane" id="examples-Auth-authTokenSwapPost-0-csharp">
                               <pre class="prettyprint"><code class="language-cs">using System;
 using System.Diagnostics;
 using IO.Swagger.Api;
@@ -2864,7 +2878,7 @@ using IO.Swagger.Model;
 
 namespace Example
 {
-    public class authTokenSwapGetExample
+    public class authTokenSwapPostExample
     {
         public void main()
         {
@@ -2874,12 +2888,12 @@ namespace Example
 
             try
             {
-                inline_response_200 result = apiInstance.authTokenSwapGet(code);
+                inline_response_200 result = apiInstance.authTokenSwapPost(code);
                 Debug.WriteLine(result);
             }
             catch (Exception e)
             {
-                Debug.Print("Exception when calling AuthApi.authTokenSwapGet: " + e.Message );
+                Debug.Print("Exception when calling AuthApi.authTokenSwapPost: " + e.Message );
             }
         }
     }
@@ -2887,7 +2901,7 @@ namespace Example
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Auth-authTokenSwapGet-0-php">
+                            <div class="tab-pane" id="examples-Auth-authTokenSwapPost-0-php">
                               <pre class="prettyprint"><code class="language-php"><&#63;php
 require_once(__DIR__ . '/vendor/autoload.php');
 
@@ -2895,15 +2909,15 @@ $api_instance = new Swagger\Client\ApiAuthApi();
 $code = code_example; // String | 
 
 try {
-    $result = $api_instance->authTokenSwapGet($code);
+    $result = $api_instance->authTokenSwapPost($code);
     print_r($result);
 } catch (Exception $e) {
-    echo 'Exception when calling AuthApi->authTokenSwapGet: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling AuthApi->authTokenSwapPost: ', $e->getMessage(), PHP_EOL;
 }
 ?></code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Auth-authTokenSwapGet-0-perl">
+                            <div class="tab-pane" id="examples-Auth-authTokenSwapPost-0-perl">
                               <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
 use WWW::SwaggerClient::Configuration;
 use WWW::SwaggerClient::AuthApi;
@@ -2912,15 +2926,15 @@ my $api_instance = WWW::SwaggerClient::AuthApi->new();
 my $code = code_example; # String | 
 
 eval { 
-    my $result = $api_instance->authTokenSwapGet(code => $code);
+    my $result = $api_instance->authTokenSwapPost(code => $code);
     print Dumper($result);
 };
 if ($@) {
-    warn "Exception when calling AuthApi->authTokenSwapGet: $@\n";
+    warn "Exception when calling AuthApi->authTokenSwapPost: $@\n";
 }</code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Auth-authTokenSwapGet-0-python">
+                            <div class="tab-pane" id="examples-Auth-authTokenSwapPost-0-python">
                               <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
 import time
 import swagger_client
@@ -2932,10 +2946,10 @@ api_instance = swagger_client.AuthApi()
 code = code_example # String | 
 
 try: 
-    api_response = api_instance.auth_token_swap_get(code)
+    api_response = api_instance.auth_token_swap_post(code)
     pprint(api_response)
 except ApiException as e:
-    print("Exception when calling AuthApi->authTokenSwapGet: %s\n" % e)</code></pre>
+    print("Exception when calling AuthApi->authTokenSwapPost: %s\n" % e)</code></pre>
                             </div>
                           </div>
 
@@ -2944,50 +2958,50 @@ except ApiException as e:
 
 
 
-
-                            <div class="methodsubtabletitle">Query parameters</div>
+                            <div class="methodsubtabletitle">Form parameters</div>
                             <table id="methodsubtable">
                               <tr>
                                 <th width="150px">Name</th>
                                 <th>Description</th>
                               </tr>
-                                <tr><td style="width:150px;">code*</td>
-                                <td>
-                                
-                                
-                                    <div id="d2e199_authTokenSwapGet_code">
-                                        <div class="json-schema-view">
-                                            <div class="primitive">
-                                                <span class="type">
-                                                    String
-                                                </span>
-                                
-                                            </div>
-                                                <div class="inner required">
-                                                    Required
-                                                </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                </tr>
+                                  <tr><td style="width:150px;">code*</td>
+                                  <td>
+                                  
+                                  
+                                      <div id="d2e199_authTokenSwapPost_code">
+                                          <div class="json-schema-view">
+                                              <div class="primitive">
+                                                  <span class="type">
+                                                      String
+                                                  </span>
+                                  
+                                              </div>
+                                                  <div class="inner required">
+                                                      Required
+                                                  </div>
+                                          </div>
+                                      </div>
+                                  </td>
+                                  </tr>
                             </table>
+
 
                           <h2>Responses</h2>
                             <h3> Status: 200 - successfully exchanged authorization code for access tokens </h3>
 
                             <ul class="nav nav-tabs nav-tabs-examples" >
                                 <li class="active">
-                                  <a data-toggle="tab" href="#responses-authTokenSwapGet-200-schema">Schema</a>
+                                  <a data-toggle="tab" href="#responses-authTokenSwapPost-200-schema">Schema</a>
                                 </li>
 
                                 <li class="">
-                                  <a data-toggle="tab" href="#responses-authTokenSwapGet-200-headers">Headers</a>
+                                  <a data-toggle="tab" href="#responses-authTokenSwapPost-200-headers">Headers</a>
                                 </li>
                             </ul>
 
                             <div class="tab-content" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-authTokenSwapGet-200-schema">
-                                  <div id='responses-authTokenSwapGet-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                <div class="tab-pane active" id="responses-authTokenSwapPost-200-schema">
+                                  <div id='responses-authTokenSwapPost-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
@@ -3023,16 +3037,16 @@ except ApiException as e:
 
                                         //console.log(JSON.stringify(schema));
                                         var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-authTokenSwapGet-200-schema-data').val(stringify(schema));
-                                        var result = $('#responses-authTokenSwapGet-200-schema-200');
+                                        $('#responses-authTokenSwapPost-200-schema-data').val(stringify(schema));
+                                        var result = $('#responses-authTokenSwapPost-200-schema-200');
                                         result.empty();
                                         result.append(view.render());
                                       });
                                     </script>
                                   </div>
-                                  <input id='responses-authTokenSwapGet-200-schema-data' type='hidden' value=''></input>
+                                  <input id='responses-authTokenSwapPost-200-schema-data' type='hidden' value=''></input>
                                 </div>
-                                <div class="tab-pane" id="responses-authTokenSwapGet-200-headers">
+                                <div class="tab-pane" id="responses-authTokenSwapPost-200-headers">
                                     <table>
                                         <tr>
                                             <th width="150px">Name</th>
@@ -3325,7 +3339,8 @@ except ApiException as e:
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked"></p>
+                        <p class="marked">It is important to note that his endpoint will not return tracks, likes, and comments
+</p>
                         <p></p>
                         <br />
                         <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/api/playlists/</span></code></pre>
@@ -6271,7 +6286,7 @@ public class PlaylistsApiExample {
         //cookieAuth.setApiKeyPrefix("Token");
 
         PlaylistsApi apiInstance = new PlaylistsApi();
-        Body_1 body = ; // Body_1 | Create a new Stereodose playlist
+        Body_2 body = ; // Body_2 | Create a new Stereodose playlist
         try {
             apiInstance.apiPlaylistsPost(body);
         } catch (ApiException e) {
@@ -6289,7 +6304,7 @@ public class PlaylistsApiExample {
 
     public static void main(String[] args) {
         PlaylistsApi apiInstance = new PlaylistsApi();
-        Body_1 body = ; // Body_1 | Create a new Stereodose playlist
+        Body_2 body = ; // Body_2 | Create a new Stereodose playlist
         try {
             apiInstance.apiPlaylistsPost(body);
         } catch (ApiException e) {
@@ -6309,7 +6324,7 @@ public class PlaylistsApiExample {
 [apiConfig setApiKey:@"YOUR_API_KEY" forApiKeyIdentifier:@"stereodose_session"];
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
 //[apiConfig setApiKeyPrefix:@"Bearer" forApiKeyIdentifier:@"stereodose_session"];
-Body_1 *body = ; // Create a new Stereodose playlist
+Body_2 *body = ; // Create a new Stereodose playlist
 
 PlaylistsApi *apiInstance = [[PlaylistsApi alloc] init];
 
@@ -6334,7 +6349,7 @@ cookieAuth.apiKey = "YOUR API KEY"
 //cookieAuth.apiKeyPrefix['stereodose_session'] = "Token"
 
 var api = new StereodoseApi.PlaylistsApi()
-var body = ; // {{Body_1}} Create a new Stereodose playlist
+var body = ; // {{Body_2}} Create a new Stereodose playlist
 
 var callback = function(error, data, response) {
   if (error) {
@@ -6370,7 +6385,7 @@ namespace Example
             // Configuration.Default.ApiKeyPrefix.Add("stereodose_session", "Bearer");
 
             var apiInstance = new PlaylistsApi();
-            var body = new Body_1(); // Body_1 | Create a new Stereodose playlist
+            var body = new Body_2(); // Body_2 | Create a new Stereodose playlist
 
             try
             {
@@ -6397,7 +6412,7 @@ Swagger\Client\Configuration::getDefaultConfiguration()->setApiKey('stereodose_s
 // Swagger\Client\Configuration::getDefaultConfiguration()->setApiKeyPrefix('stereodose_session', 'Bearer');
 
 $api_instance = new Swagger\Client\ApiPlaylistsApi();
-$body = ; // Body_1 | Create a new Stereodose playlist
+$body = ; // Body_2 | Create a new Stereodose playlist
 
 try {
     $api_instance->apiPlaylistsPost($body);
@@ -6418,7 +6433,7 @@ $WWW::SwaggerClient::Configuration::api_key->{'stereodose_session'} = 'YOUR_API_
 #$WWW::SwaggerClient::Configuration::api_key_prefix->{'stereodose_session'} = "Bearer";
 
 my $api_instance = WWW::SwaggerClient::PlaylistsApi->new();
-my $body = WWW::SwaggerClient::Object::Body_1->new(); # Body_1 | Create a new Stereodose playlist
+my $body = WWW::SwaggerClient::Object::Body_2->new(); # Body_2 | Create a new Stereodose playlist
 
 eval { 
     $api_instance->apiPlaylistsPost(body => $body);
@@ -6442,7 +6457,7 @@ swagger_client.configuration.api_key['stereodose_session'] = 'YOUR_API_KEY'
 
 # create an instance of the API class
 api_instance = swagger_client.PlaylistsApi()
-body =  # Body_1 | Create a new Stereodose playlist
+body =  # Body_2 | Create a new Stereodose playlist
 
 try: 
     # create a playlist
@@ -6473,7 +6488,7 @@ except ApiException as e:
   "content" : {
     "application/json" : {
       "schema" : {
-        "$ref" : "#/components/schemas/body_1"
+        "$ref" : "#/components/schemas/body_2"
       }
     }
   },
@@ -6842,6 +6857,336 @@ except ApiException as e:
                   </section>
                 <section id="api-Users">
                   <h1>Users</h1>
+                    <div id="api-Users-apiUsersIdGet">
+                      <article id="api-Users-apiUsersIdGet-0" data-group="User" data-name="apiUsersIdGet" data-version="0">
+                        <div class="pull-left">
+                          <h1>apiUsersIdGet</h1>
+                          <p>get information about a user</p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked">This endpoint returns user information. Note that it does not include access tokens.</p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/api/users/{id}</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-Users-apiUsersIdGet-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Users-apiUsersIdGet-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Users-apiUsersIdGet-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Users-apiUsersIdGet-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Users-apiUsersIdGet-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Users-apiUsersIdGet-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Users-apiUsersIdGet-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Users-apiUsersIdGet-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Users-apiUsersIdGet-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Users-apiUsersIdGet-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Users-apiUsersIdGet-0-python">Python</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-Users-apiUsersIdGet-0-curl">
+                            <pre class="prettyprint"><code class="language-bsh">curl -X GET "https://stereodose.app/api/users/{id}"</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-Users-apiUsersIdGet-0-java">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
+import io.swagger.client.auth.*;
+import io.swagger.client.model.*;
+import io.swagger.client.api.UsersApi;
+
+import java.io.File;
+import java.util.*;
+
+public class UsersApiExample {
+
+    public static void main(String[] args) {
+        ApiClient defaultClient = Configuration.getDefaultApiClient();
+
+        // Configure API key authorization: cookieAuth
+        ApiKeyAuth cookieAuth = (ApiKeyAuth) defaultClient.getAuthentication("cookieAuth");
+        cookieAuth.setApiKey("YOUR API KEY");
+        // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
+        //cookieAuth.setApiKeyPrefix("Token");
+
+        UsersApi apiInstance = new UsersApi();
+        String id = id_example; // String | 
+        try {
+            User result = apiInstance.apiUsersIdGet(id);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling UsersApi#apiUsersIdGet");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-Users-apiUsersIdGet-0-android">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.UsersApi;
+
+public class UsersApiExample {
+
+    public static void main(String[] args) {
+        UsersApi apiInstance = new UsersApi();
+        String id = id_example; // String | 
+        try {
+            User result = apiInstance.apiUsersIdGet(id);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling UsersApi#apiUsersIdGet");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-Users-apiUsersIdGet-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-Users-apiUsersIdGet-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">Configuration *apiConfig = [Configuration sharedConfig];
+// Configure API key authorization: (authentication scheme: cookieAuth)
+[apiConfig setApiKey:@"YOUR_API_KEY" forApiKeyIdentifier:@"stereodose_session"];
+// Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+//[apiConfig setApiKeyPrefix:@"Bearer" forApiKeyIdentifier:@"stereodose_session"];
+String *id = id_example; // 
+
+UsersApi *apiInstance = [[UsersApi alloc] init];
+
+// get information about a user
+[apiInstance apiUsersIdGetWith:id
+              completionHandler: ^(User output, NSError* error) {
+                            if (output) {
+                                NSLog(@"%@", output);
+                            }
+                            if (error) {
+                                NSLog(@"Error: %@", error);
+                            }
+                        }];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Users-apiUsersIdGet-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var StereodoseApi = require('stereodose_api');
+var defaultClient = StereodoseApi.ApiClient.instance;
+
+// Configure API key authorization: cookieAuth
+var cookieAuth = defaultClient.authentications['cookieAuth'];
+cookieAuth.apiKey = "YOUR API KEY"
+// Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
+//cookieAuth.apiKeyPrefix['stereodose_session'] = "Token"
+
+var api = new StereodoseApi.UsersApi()
+var id = id_example; // {{String}} 
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+api.apiUsersIdGet(id, callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-Users-apiUsersIdGet-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-Users-apiUsersIdGet-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using IO.Swagger.Api;
+using IO.Swagger.Client;
+using IO.Swagger.Model;
+
+namespace Example
+{
+    public class apiUsersIdGetExample
+    {
+        public void main()
+        {
+
+            // Configure API key authorization: cookieAuth
+            Configuration.Default.ApiKey.Add("stereodose_session", "YOUR_API_KEY");
+            // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+            // Configuration.Default.ApiKeyPrefix.Add("stereodose_session", "Bearer");
+
+            var apiInstance = new UsersApi();
+            var id = id_example;  // String | 
+
+            try
+            {
+                // get information about a user
+                User result = apiInstance.apiUsersIdGet(id);
+                Debug.WriteLine(result);
+            }
+            catch (Exception e)
+            {
+                Debug.Print("Exception when calling UsersApi.apiUsersIdGet: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Users-apiUsersIdGet-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+// Configure API key authorization: cookieAuth
+Swagger\Client\Configuration::getDefaultConfiguration()->setApiKey('stereodose_session', 'YOUR_API_KEY');
+// Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+// Swagger\Client\Configuration::getDefaultConfiguration()->setApiKeyPrefix('stereodose_session', 'Bearer');
+
+$api_instance = new Swagger\Client\ApiUsersApi();
+$id = id_example; // String | 
+
+try {
+    $result = $api_instance->apiUsersIdGet($id);
+    print_r($result);
+} catch (Exception $e) {
+    echo 'Exception when calling UsersApi->apiUsersIdGet: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Users-apiUsersIdGet-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::SwaggerClient::Configuration;
+use WWW::SwaggerClient::UsersApi;
+
+# Configure API key authorization: cookieAuth
+$WWW::SwaggerClient::Configuration::api_key->{'stereodose_session'} = 'YOUR_API_KEY';
+# uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+#$WWW::SwaggerClient::Configuration::api_key_prefix->{'stereodose_session'} = "Bearer";
+
+my $api_instance = WWW::SwaggerClient::UsersApi->new();
+my $id = id_example; # String | 
+
+eval { 
+    my $result = $api_instance->apiUsersIdGet(id => $id);
+    print Dumper($result);
+};
+if ($@) {
+    warn "Exception when calling UsersApi->apiUsersIdGet: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Users-apiUsersIdGet-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import swagger_client
+from swagger_client.rest import ApiException
+from pprint import pprint
+
+# Configure API key authorization: cookieAuth
+swagger_client.configuration.api_key['stereodose_session'] = 'YOUR_API_KEY'
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# swagger_client.configuration.api_key_prefix['stereodose_session'] = 'Bearer'
+
+# create an instance of the API class
+api_instance = swagger_client.UsersApi()
+id = id_example # String | 
+
+try: 
+    # get information about a user
+    api_response = api_instance.api_users_id_get(id)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling UsersApi->apiUsersIdGet: %s\n" % e)</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Parameters</h2>
+
+                            <div class="methodsubtabletitle">Path parameters</div>
+                            <table id="methodsubtable">
+                                <tr>
+                                  <th width="150px">Name</th>
+                                  <th>Description</th>
+                                </tr>
+                                  <tr><td style="width:150px;">id*</td>
+                                  <td>
+                                  
+                                  
+                                      <div id="d2e199_apiUsersIdGet_id">
+                                          <div class="json-schema-view">
+                                              <div class="primitive">
+                                                  <span class="type">
+                                                      String
+                                                  </span>
+                                  
+                                              </div>
+                                                  <div class="inner required">
+                                                      Required
+                                                  </div>
+                                          </div>
+                                      </div>
+                                  </td>
+                                  </tr>
+                            </table>
+
+
+
+
+
+                          <h2>Responses</h2>
+                            <h3> Status: 200 - JSON data about the currently logged in user </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-apiUsersIdGet-200-schema">Schema</a>
+                                </li>
+
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-apiUsersIdGet-200-schema">
+                                  <div id='responses-apiUsersIdGet-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "JSON data about the currently logged in user",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/User"
+      }
+    }
+  }
+};
+                                        var schema = schemaWrapper.content["application/json"].schema;
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else {
+                                          schemaWrapper.components = {};
+                                          schemaWrapper.components.schemas = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        //console.log(JSON.stringify(schema));
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-apiUsersIdGet-200-schema-data').val(stringify(schema));
+                                        var result = $('#responses-apiUsersIdGet-200-schema-200');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-apiUsersIdGet-200-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+
+                        </article>
+                      </div>
+                      <hr>
                     <div id="api-Users-apiUsersMeGet">
                       <article id="api-Users-apiUsersMeGet-0" data-group="User" data-name="apiUsersMeGet" data-version="0">
                         <div class="pull-left">

@@ -55,6 +55,7 @@ type Playlist struct {
 	BucketImageURL     string          `json:"bucketImageURL"`
 	BucketThumbnailURL string          `json:"bucketThumbnailURL"`
 	Permalink          string          `json:"permalink"`
+	TotalTracks 	   int 		   	   `json:"totalTracks"`
 }
 
 // PlaylistImage should contain a URL or reference to an image
@@ -210,6 +211,8 @@ func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlis
 	if err != nil {
 		return nil, err
 	}
+	playlist.TotalTracks = len(tracks)
+
 	for _, trk := range tracks {
 		track := trk.Track
 

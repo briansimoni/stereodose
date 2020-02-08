@@ -2,9 +2,11 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/briansimoni/stereodose/app/models"
 	"github.com/briansimoni/stereodose/app/util"
+	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 )
 
@@ -32,5 +34,27 @@ func (u *UsersController) Me(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	return nil
+}
+
+// GetByID grabs the user ID from the path parameter
+// fetches from the database and returns JSON to the client
+func (u *UsersController) GetByID(w http.ResponseWriter, r *http.Request) error {
+	pathVars := mux.Vars(r)
+	userID, err := strconv.Atoi(pathVars["id"])
+	if err != nil {
+		return &statusError{
+			Message: "Unable to get the UserID from the path parameter",
+			Code: http.StatusBadRequest,
+		}
+	}
+	user, err := u.DB.Users.ByID(uint(userID))
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	// since this endpoint is available to any "authenticated user"
+	// the spotify access token needs to be removed to maintain security
+	user.AccessToken = ""
+	util.JSON(w, user)
 	return nil
 }
