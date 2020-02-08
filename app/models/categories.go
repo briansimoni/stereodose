@@ -23,7 +23,7 @@ var Categories = categories{
 		Subcategories: []string{"matrix", "shaman", "space"},
 	},
 	{
-		Name:          "lsd",
+		Name:          "LSD",
 		Subcategories: []string{"calm", "trippy", "rockstar"},
 	},
 }
