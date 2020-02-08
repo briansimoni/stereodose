@@ -3,7 +3,7 @@
 # This is used with docker-compose in dev environments for hot reloading
 # It watches the files
 
-FROM golang:1.12
+FROM golang:1.13
 
 RUN apt-get update -y && apt-get install psmisc
 
@@ -11,7 +11,7 @@ COPY . /go/src/github.com/briansimoni/stereodose
 
 WORKDIR /go/src/github.com/briansimoni/stereodose
 
-RUN go get github.com/derekparker/delve/cmd/dlv
+RUN go get -u github.com/go-delve/delve/cmd/dlv
 RUN GO111MODULE=on go get github.com/cortesi/modd/cmd/modd
 
 CMD modd

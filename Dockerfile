@@ -1,17 +1,17 @@
 # multistage dockerfile for lightweight production images
 
 # first, build the go binary
-FROM golang:1.12 as go
+FROM golang:1.13 as go
 
 COPY . /go/src/github.com/briansimoni/stereodose
 
 WORKDIR /go/src/github.com/briansimoni/stereodose
 
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o stereodose .
+RUN CGO_ENABLED=0 GOOS=linux go build -mod=vendor -a -installsuffix cgo -o stereodose .
 
 
 # next, install node_modules and run a build for react
-FROM node:10 as node
+FROM node:12 as node
 
 WORKDIR /stereodose/
 

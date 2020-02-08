@@ -38,8 +38,14 @@ func UserContextMiddleware(next http.Handler) http.Handler {
 				Code:    http.StatusUnauthorized,
 			}
 		}
+		// If for some reason gorilla session is unable to decode the session,
+		// the cookie gets deleted here so a new can be created later.
+		// Invalid cookies can happen when crypto keys change or gob encoding changes
+		// and other reasons
 		s, err := store.Get(r, sessionName)
 		if err != nil {
+			s.Options.MaxAge = -1
+			s.Save(r, w)
 			return errors.WithStack(err)
 		}
 
