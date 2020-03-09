@@ -32,18 +32,14 @@ You can generate a random AUTH_KEY and ENCRYPTION_KEY by switching to the script
 
 If you don't want to use a .env file, you can use regular system environment variables instead.
 
-Once you have the variables set, on the **the very first run only** you need to
 
-`cd app/views/ && npm install && npm run build`
-
-for all successive starts of your dev environment:
 ```
 docker-compose up
 # new terminal
 cd app/views/
 npm start
 ```
-and you're all set to start writing code. You only have to run `npm run build` on the first setup.
+and you're all set to start writing code.
 
 It's running a proxy server that comes bundled with React. This enables hot reloading among other nice things. It listens on port 3000 and proxies requests to the golang server on port 4000.
 
