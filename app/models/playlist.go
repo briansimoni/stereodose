@@ -4,9 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"net/http"
 	"strings"
 	"time"
 
+	"github.com/briansimoni/stereodose/app/util"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 
@@ -91,7 +93,6 @@ func (s *StereodosePlaylistService) GetPlaylists(params *PlaylistSearchParams) (
 		Offset(params.Offset).
 		Limit(params.Limit)
 
-
 	if params.Category == "" && params.Subcategory != "" {
 		db = db.Where("category = ?", params.Category)
 	}
@@ -103,7 +104,7 @@ func (s *StereodosePlaylistService) GetPlaylists(params *PlaylistSearchParams) (
 	if params.Category != "" && params.Subcategory != "" {
 		db = db.Where("category = ? AND sub_category = ?", params.Category, params.Subcategory)
 	}
-	
+
 	err := db.Order(fmt.Sprintf("%s %s", params.SortKey, params.Order)).Find(&playlists).Error
 
 	if err != nil {
@@ -235,6 +236,13 @@ func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlis
 		return nil, err
 	}
 	playlist.TotalTracks = len(tracks)
+
+	if playlist.TotalTracks < 5 {
+		return nil, &util.StatusError{
+			Code:    http.StatusBadRequest,
+			Message: "your playlist needs 5 or more songs",
+		}
+	}
 
 	for _, trk := range tracks {
 		track := trk.Track

@@ -137,6 +137,12 @@ class ShareSpotifyPlaylist extends React.Component {
     return json;
   };
 
+  // shareToStereodose kicks off two requests
+  // First it tries to upload the image. Once it is successful, it will take the permalink of the image
+  // in the returned JSON and use that in the subsequent request to create the playlist in the database
+  // this works well at the consequence of having a bunch of trash images in S3.
+  // If the image upload is successful, but the playlist upload is not, there will just be an image
+  // out there with nothing pointing to it.
   shareToStereodose = async () => {
     // disable button while request is in flight
     if (this.state.inFlight) {
@@ -145,9 +151,9 @@ class ShareSpotifyPlaylist extends React.Component {
     this.setState({ inFlight: true });
     let imageURL, thumbnailURL;
     try {
-      const uploadReuslt = await this.uploadImage(this.state.imageBlob);
-      imageURL = uploadReuslt.imageURL;
-      thumbnailURL = uploadReuslt.thumbnailURL;
+      const uploadResult = await this.uploadImage(this.state.imageBlob);
+      imageURL = uploadResult.imageURL;
+      thumbnailURL = uploadResult.thumbnailURL;
     } catch (error) {
       this.setState({ inFlight: false });
       alert(error.message);
@@ -167,8 +173,19 @@ class ShareSpotifyPlaylist extends React.Component {
       })
     });
     if (resp.status !== 201) {
-      alert('error! ' + resp.status + ' ' + resp.statusText);
+      const errorMessage = await resp.text();
+      alert(`Problem sharing playlist: ${errorMessage}`);
+      this.setState({
+        selectedPlaylist: null,
+        selectedDrug: null,
+        selectedMood: null,
+        imagePermaLink: null,
+        inFlight: false
+      });
+      this.props.onUpdate();
+      return;
     }
+
     alert('Share Successful!');
     this.setState({
       selectedPlaylist: null,
