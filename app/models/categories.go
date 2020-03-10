@@ -2,6 +2,7 @@ package models
 
 // Categories
 type categories []struct {
+	DisplayName   string   `json:"displayName"`
 	Name          string   `json:"name"`
 	Subcategories []string `json:"subcategories"`
 }
@@ -11,18 +12,22 @@ type categories []struct {
 // Since there are so few categories, there is no need to have this at the database layer
 var Categories = categories{
 	{
+		DisplayName:   "Weed",
 		Name:          "weed",
 		Subcategories: []string{"chill", "groovin", "thug life"},
 	},
 	{
+		DisplayName:   "Ecstacy",
 		Name:          "ecstacy",
 		Subcategories: []string{"dance", "floored", "rolling balls"},
 	},
 	{
+		DisplayName:   "Shrooms",
 		Name:          "shrooms",
 		Subcategories: []string{"matrix", "shaman", "space"},
 	},
 	{
+		DisplayName:   "LSD",
 		Name:          "LSD",
 		Subcategories: []string{"calm", "trippy", "rockstar"},
 	},
