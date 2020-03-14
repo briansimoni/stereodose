@@ -13,11 +13,11 @@ if (browser) {
   if (browser.os === 'Android OS' && browser.name === 'firefox') {
     alert(notSupportedMessage);
   }
-  if (browser.name === 'safari') {
+  if (browser.name === 'safari' && browser.os !== 'iOS') {
     alert(notSupportedMessage);
   }
-  if (browser.os === 'iOS' && browser.name === 'chrome') {
-    alert(notSupportedMessage);
+  if (browser.os === 'iOS') {
+    alert('Stereodose is coming soon to the app store. The web app is currently incompatible with iOS.');
   }
 }
 

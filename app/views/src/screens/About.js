@@ -32,6 +32,7 @@ export default function About(props) {
             https://developer.spotify.com/documentation/web-playback-sdk/#supported-browsers
           </a>
         </p>
+        <p>Stereodose is coming to the iOS app store in the next few months. Be sure to check back!</p>
       </div>
     </div>
   );
