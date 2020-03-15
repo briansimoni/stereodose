@@ -42,8 +42,8 @@ func NewPlaylistsController(db *models.StereoDoseDB, b *blob.Bucket) *PlaylistsC
 func (p *PlaylistsController) GetPlaylists(w http.ResponseWriter, r *http.Request) error {
 	params, err := createSearchParamsFromRequest(r)
 	if err != nil {
-		return &statusError{
-			Code: http.StatusBadRequest,
+		return &util.StatusError{
+			Code:    http.StatusBadRequest,
 			Message: err.Error(),
 		}
 	}
@@ -79,14 +79,13 @@ func createSearchParamsFromRequest(r *http.Request) (*models.PlaylistSearchParam
 		order = "desc"
 	}
 
-
 	sortKeyAllowed := false
 	for _, allowedSortKey := range []string{
 		"created_at",
 		"updated_at",
 		"name",
 		"likes_count",
-	}{
+	} {
 		if sortKey == allowedSortKey {
 			sortKeyAllowed = true
 			break
@@ -111,12 +110,12 @@ func createSearchParamsFromRequest(r *http.Request) (*models.PlaylistSearchParam
 	}
 
 	return &models.PlaylistSearchParams{
-		Category: category,
+		Category:    category,
 		Subcategory: subcategory,
-		Offset: offset,
-		Limit: limit,
-		SortKey: sortKey,
-		Order: order,
+		Offset:      offset,
+		Limit:       limit,
+		SortKey:     sortKey,
+		Order:       order,
 	}, nil
 }
 
@@ -160,7 +159,7 @@ func (p *PlaylistsController) GetRandomPlaylist(w http.ResponseWriter, r *http.R
 	subcategory := queryValues.Get("subcategory")
 
 	if !models.Categories.Valid(category, subcategory) {
-		return &statusError{
+		return &util.StatusError{
 			Message: fmt.Sprintf("Category: %s Subcategory: %s is invalid", category, subcategory),
 			Code:    http.StatusBadRequest,
 		}
@@ -193,14 +192,14 @@ func (p *PlaylistsController) CreatePlaylist(w http.ResponseWriter, r *http.Requ
 	defer r.Body.Close()
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
-		return &statusError{
+		return &util.StatusError{
 			Message: fmt.Sprintf("Error parsing JSON: %s", err.Error()),
 			Code:    http.StatusBadRequest,
 		}
 	}
 	valid := models.Categories.Valid(data.Category, data.SubCategory)
 	if !valid {
-		return &statusError{
+		return &util.StatusError{
 			Message: fmt.Sprintf("Invalid Category/Subcategory: %s / %s", data.Category, data.SubCategory),
 			Code:    http.StatusBadRequest,
 		}
@@ -240,7 +239,7 @@ func (p *PlaylistsController) DeletePlaylist(w http.ResponseWriter, r *http.Requ
 		return errors.WithStack(err)
 	}
 	if targetPlaylist == nil {
-		return &statusError{
+		return &util.StatusError{
 			Message: fmt.Sprintf("Playlist does not exist"),
 			Code:    http.StatusNotFound,
 		}
@@ -257,7 +256,7 @@ func (p *PlaylistsController) DeletePlaylist(w http.ResponseWriter, r *http.Requ
 		}
 	}
 	if !authorized {
-		return &statusError{
+		return &util.StatusError{
 			Message: fmt.Sprintf("Unauthorized to remove this playlist"),
 			Code:    http.StatusUnauthorized,
 		}
@@ -296,7 +295,7 @@ func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request
 
 	// Deny if greater than 8mb
 	if header.Size > 8000000 {
-		return &statusError{
+		return &util.StatusError{
 			Message: "Image was too large",
 			Code:    http.StatusRequestEntityTooLarge,
 		}
@@ -338,7 +337,7 @@ func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request
 		}
 	}
 	if !valid {
-		return &statusError{
+		return &util.StatusError{
 			Message: fmt.Sprintf("%s is an invalid file type. Try jpeg, jpg, png, or gif", actualContentType),
 			Code:    http.StatusBadRequest,
 		}
@@ -397,7 +396,7 @@ func (p *PlaylistsController) uploadImage(img []byte, imageName string) error {
 	opts := &blob.WriterOptions{}
 	err := p.Bucket.WriteAll(ctx, imageName, img, opts)
 	if err != nil {
-		return &statusError{
+		return &util.StatusError{
 			Message: fmt.Sprintf("Error uploading to S3 bucket: %s", err.Error()),
 			Code:    http.StatusInternalServerError,
 		}
@@ -418,7 +417,7 @@ func (p *PlaylistsController) Comment(w http.ResponseWriter, r *http.Request) er
 	defer r.Body.Close()
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		return &statusError{
+		return &util.StatusError{
 			Message: fmt.Sprintf("Error parsing body %s", err.Error()),
 			Code:    http.StatusInternalServerError,
 		}
@@ -430,14 +429,14 @@ func (p *PlaylistsController) Comment(w http.ResponseWriter, r *http.Request) er
 	var m = new(model)
 	err = json.Unmarshal(data, m)
 	if err != nil {
-		return &statusError{
+		return &util.StatusError{
 			Message: fmt.Sprintf("Error parsing body %s", err.Error()),
 			Code:    http.StatusInternalServerError,
 		}
 	}
 
 	if m.Text == "" {
-		return &statusError{
+		return &util.StatusError{
 			Message: "Cannot upload empty comment",
 			Code:    http.StatusBadRequest,
 		}
@@ -461,7 +460,7 @@ func (p *PlaylistsController) DeleteComment(w http.ResponseWriter, r *http.Reque
 	vars := mux.Vars(r)
 	commentID, err := strconv.Atoi(vars["commentID"])
 	if err != nil {
-		return &statusError{
+		return &util.StatusError{
 			Message: "Unable to parse comment ID: " + err.Error(),
 			Code:    http.StatusBadRequest,
 		}
@@ -469,7 +468,7 @@ func (p *PlaylistsController) DeleteComment(w http.ResponseWriter, r *http.Reque
 
 	user, ok := r.Context().Value("User").(models.User)
 	if !ok {
-		return &statusError{
+		return &util.StatusError{
 			Message: "Unable to obtain user from session",
 			Code:    http.StatusUnauthorized,
 		}
@@ -477,14 +476,14 @@ func (p *PlaylistsController) DeleteComment(w http.ResponseWriter, r *http.Reque
 
 	comment, err := p.DB.Comments.ByID(uint(commentID))
 	if err != nil {
-		return &statusError{
+		return &util.StatusError{
 			Message: "Unable to read comment from database: " + err.Error(),
 			Code:    http.StatusInternalServerError,
 		}
 	}
 
 	if comment.UserID != user.ID {
-		return &statusError{
+		return &util.StatusError{
 			Message: "Not authorized - unable to delete other users' playlists",
 			Code:    http.StatusForbidden,
 		}
@@ -492,7 +491,7 @@ func (p *PlaylistsController) DeleteComment(w http.ResponseWriter, r *http.Reque
 
 	err = p.DB.Playlists.DeleteComment(uint(commentID))
 	if err != nil {
-		return &statusError{
+		return &util.StatusError{
 			Message: "Error deleting comment from database: " + err.Error(),
 			Code:    http.StatusInternalServerError,
 		}
@@ -508,7 +507,7 @@ func (p *PlaylistsController) Like(w http.ResponseWriter, r *http.Request) error
 
 	u, ok := r.Context().Value("User").(models.User)
 	if !ok {
-		return &statusError{
+		return &util.StatusError{
 			Message: "Unable to obtain user from session",
 			Code:    http.StatusUnauthorized,
 		}
@@ -522,7 +521,7 @@ func (p *PlaylistsController) Like(w http.ResponseWriter, r *http.Request) error
 
 	for _, userLike := range user.Likes {
 		if userLike.PlaylistID == playlistID {
-			return &statusError{
+			return &util.StatusError{
 				Message: "The user has already liked this playlist",
 				Code:    http.StatusConflict,
 			}
@@ -531,7 +530,7 @@ func (p *PlaylistsController) Like(w http.ResponseWriter, r *http.Request) error
 
 	like, err := p.DB.Playlists.Like(playlistID, *user)
 	if err != nil {
-		return &statusError{
+		return &util.StatusError{
 			Message: "Error writing to database: " + err.Error(),
 			Code:    http.StatusInternalServerError,
 		}
@@ -540,7 +539,7 @@ func (p *PlaylistsController) Like(w http.ResponseWriter, r *http.Request) error
 	w.WriteHeader(http.StatusCreated)
 	err = util.JSON(w, like)
 	if err != nil {
-		return &statusError{
+		return &util.StatusError{
 			Message: "Failed to write JSON " + err.Error(),
 			Code:    http.StatusInternalServerError,
 		}
@@ -557,7 +556,7 @@ func (p *PlaylistsController) Unlike(w http.ResponseWriter, r *http.Request) err
 	playlistID := vars["playlistID"]
 	likeID, err := strconv.Atoi(vars["likeID"])
 	if err != nil {
-		return &statusError{
+		return &util.StatusError{
 			Message: "Playlist ID is not an integer. Error: " + err.Error(),
 			Code:    http.StatusBadRequest,
 		}
@@ -565,7 +564,7 @@ func (p *PlaylistsController) Unlike(w http.ResponseWriter, r *http.Request) err
 
 	u, ok := r.Context().Value("User").(models.User)
 	if !ok {
-		return &statusError{
+		return &util.StatusError{
 			Message: "Unable to obtain user from session",
 			Code:    http.StatusUnauthorized,
 		}
@@ -586,7 +585,7 @@ func (p *PlaylistsController) Unlike(w http.ResponseWriter, r *http.Request) err
 	}
 
 	if !authorized {
-		return &statusError{
+		return &util.StatusError{
 			Message: "The user does not own this like",
 			Code:    http.StatusForbidden,
 		}
@@ -594,7 +593,7 @@ func (p *PlaylistsController) Unlike(w http.ResponseWriter, r *http.Request) err
 
 	err = p.DB.Playlists.Unlike(playlistID, uint(likeID))
 	if err != nil {
-		return &statusError{
+		return &util.StatusError{
 			Message: "Database Error " + err.Error(),
 			Code:    http.StatusInternalServerError,
 		}

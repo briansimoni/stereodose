@@ -3,11 +3,14 @@ package models
 import (
 	"errors"
 	"fmt"
-	"github.com/sirupsen/logrus"
-	log "github.com/sirupsen/logrus"
 	"math/rand"
+	"net/http"
 	"strings"
 	"time"
+
+	"github.com/briansimoni/stereodose/app/util"
+	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/jinzhu/gorm"
 	"github.com/zmb3/spotify"
@@ -82,6 +85,7 @@ type StereodosePlaylistService struct {
 }
 
 // GetPlaylists takes search parameters and returns a subset of playlists
+// callers of this method are responsible for checking the limit and offset
 func (s *StereodosePlaylistService) GetPlaylists(params *PlaylistSearchParams) ([]Playlist, error) {
 	playlists := []Playlist{}
 
@@ -89,12 +93,18 @@ func (s *StereodosePlaylistService) GetPlaylists(params *PlaylistSearchParams) (
 		Offset(params.Offset).
 		Limit(params.Limit)
 
-	if params.Subcategory == "" {
+	if params.Category == "" && params.Subcategory != "" {
 		db = db.Where("category = ?", params.Category)
-	} else {
+	}
+
+	if params.Category != "" && params.Subcategory == "" {
+		db = db.Where("category = ?", params.Category)
+	}
+
+	if params.Category != "" && params.Subcategory != "" {
 		db = db.Where("category = ? AND sub_category = ?", params.Category, params.Subcategory)
 	}
-	
+
 	err := db.Order(fmt.Sprintf("%s %s", params.SortKey, params.Order)).Find(&playlists).Error
 
 	if err != nil {
@@ -226,6 +236,13 @@ func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlis
 		return nil, err
 	}
 	playlist.TotalTracks = len(tracks)
+
+	if playlist.TotalTracks < 5 {
+		return nil, &util.StatusError{
+			Code:    http.StatusBadRequest,
+			Message: "your playlist needs 5 or more songs",
+		}
+	}
 
 	for _, trk := range tracks {
 		track := trk.Track

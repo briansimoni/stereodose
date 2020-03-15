@@ -692,6 +692,8 @@ components:
       properties:
         name:
           type: string
+        displayName:
+          type: string
         subcategories:
           type: array
           items:

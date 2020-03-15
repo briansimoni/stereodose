@@ -43,9 +43,9 @@ func (u *UsersController) GetByID(w http.ResponseWriter, r *http.Request) error 
 	pathVars := mux.Vars(r)
 	userID, err := strconv.Atoi(pathVars["id"])
 	if err != nil {
-		return &statusError{
+		return &util.StatusError{
 			Message: "Unable to get the UserID from the path parameter",
-			Code: http.StatusBadRequest,
+			Code:    http.StatusBadRequest,
 		}
 	}
 	user, err := u.DB.Users.ByID(uint(userID))

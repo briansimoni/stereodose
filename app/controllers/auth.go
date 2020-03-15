@@ -235,7 +235,7 @@ func (a *AuthController) TokenSwap(w http.ResponseWriter, r *http.Request) error
 	}
 	code := r.Form.Get("code")
 	if code == "" {
-		return &statusError{
+		return &util.StatusError{
 			Code:    http.StatusBadRequest,
 			Message: "missing 'code' in form data",
 		}
@@ -258,7 +258,7 @@ func (a *AuthController) TokenSwap(w http.ResponseWriter, r *http.Request) error
 	defer response.Body.Close()
 	if response.StatusCode != http.StatusOK {
 		errorBody, _ := ioutil.ReadAll(response.Body)
-		return &statusError{
+		return &util.StatusError{
 			Code:    response.StatusCode,
 			Message: "Error exchanging token with Spotify: " + string(errorBody),
 		}
