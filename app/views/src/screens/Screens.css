@@ -121,7 +121,7 @@ ul.drugs li {
   z-index: 2000;
 }
 
-#close-visualzier-button {
+#close-visualizer-button {
   position: fixed;
   top: 5%;
   right: 5%;
@@ -154,4 +154,8 @@ ul.drugs li {
 
 .pagination .page-link {
   color: green;
+}
+
+#visualizer > canvas {
+  background: black;
 }

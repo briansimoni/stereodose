@@ -5,7 +5,6 @@ import Likes from './Likes';
 // import Visualizer from './Visualizer';
 // import ExampleComponent from './spotify-viz/Example'
 import Visualizer2 from './Visualizer2';
-import Spotify from 'spotify-web-api-js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
