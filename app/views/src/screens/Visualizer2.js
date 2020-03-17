@@ -88,9 +88,13 @@ export default class Visualizer2 extends React.Component {
     }
 
 
-    const y = (window.innerHeight / 2) -100;
+    // TODO: remove this hot fix
+    if (!currentSegment) {
+      return;
+    }
+
+    const y = (window.innerHeight / 2) - 100;
     const amplitude = (Math.abs(currentSegment.loudness_start)) * 5
-    console.log(amplitude, currentSegment.loudness_start);
     this.sweep();
     this.ctx.lineTo(this.x, y + amplitude);
     this.ctx.strokeStyle = 'blue';
