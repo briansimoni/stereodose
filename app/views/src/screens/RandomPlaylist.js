@@ -1,7 +1,6 @@
 import React from 'react';
 import Track from './Track';
-import Visualizer from './Visualizer';
-import Spotify from 'spotify-web-api-js';
+import Visualizer2 from './Visualizer2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
@@ -50,12 +49,8 @@ class RandomPlaylist extends React.Component {
     return (
       <div className="row">
         <div className="col">
-          {this.state.visualizerShown && this.state.trackAnalysis && (
-            <Visualizer
-              app={this.props.app}
-              analysis={this.state.trackAnalysis}
-              toggleVisualizer={this.toggleVisualizer}
-            />
+          {this.state.visualizerShown && (
+            <Visualizer2 app={this.props.app} toggleVisualizer={this.toggleVisualizer} />
           )}
           <div id="playlist-heading">
             <h2>
@@ -105,23 +100,7 @@ class RandomPlaylist extends React.Component {
   }
 
   toggleVisualizer = async () => {
-    if (!this.state.visualizerShown) {
-      try {
-        this.setState({ visualizerLoading: true });
-        const accessToken = await this.props.app.getAccessToken();
-        const SDK = new Spotify();
-        SDK.setAccessToken(accessToken);
-        const playerState = await this.props.app.player.getCurrentState();
-        const trackId = playerState.track_window.current_track.id;
-        const analysis = await SDK.getAudioAnalysisForTrack(trackId);
-        this.setState({ trackAnalysis: analysis, visualizerLoading: false });
-      } catch (error) {
-        console.error(error);
-        alert(error.message);
-      }
-    }
     this.setState({ visualizerShown: !this.state.visualizerShown });
-    console.log(this.state.visualizerShown);
   };
 
   // getContextURIs is designed so that we get an array of track URIs
