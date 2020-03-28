@@ -75,6 +75,9 @@ func createSearchParamsFromRequest(r *http.Request) (*models.PlaylistSearchParam
 	if sortKey == "" {
 		sortKey = "likes_count"
 	}
+	if sortKey == "name" && order == "" {
+		order = "asc"
+	}
 	if order == "" {
 		order = "desc"
 	}
