@@ -127,6 +127,18 @@ ul.drugs li {
   right: 5%;
 }
 
+#temp-pitch-indicator {
+  position: fixed;
+  right: 15%;
+  top: 5%;
+}
+
+#temp-mode-indicator {
+  position: fixed;
+  right: 20%;
+  top: 5%;
+}
+
 .fa-eye {
   margin-left: 15px;
   font-size: 30px;

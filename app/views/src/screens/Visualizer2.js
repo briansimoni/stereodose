@@ -50,6 +50,14 @@ export default class Visualizer2 extends React.Component {
         <button onClick={this.props.toggleVisualizer} id="close-visualizer-button" className="btn btn-danger">
           CLOSE
         </button>
+
+        <button id="temp-pitch-indicator" className="btn btn-success">
+          pitch placeholder
+        </button>
+
+        <button id="temp-mode-indicator" className="btn btn-success">
+          mode placeholder
+        </button>
       </div>
     );
   }
@@ -83,8 +91,21 @@ export default class Visualizer2 extends React.Component {
     const segments = this.analysis.segments;
     const playerState = await this.props.app.player.getCurrentState();
     const songDuration = playerState.track_window.current_track.duration_ms;
-    const segmentIndex = Math.floor((segments.length / songDuration) * playerState.position);
+    const segmentIndex = Math.floor((playerState.position * segments.length) / songDuration);
     const currentSegment = segments[segmentIndex];
+
+
+    const sections = this.analysis.sections;
+    const sectionIndex = Math.floor((playerState.position * sections.length) / songDuration)
+    const currentSection = sections[sectionIndex]
+    const mode = this.getMode(currentSection.mode);
+
+    const modePlaceHolderButton = document.getElementById('temp-mode-indicator');
+    if(modePlaceHolderButton) {
+      modePlaceHolderButton.innerHTML = mode;
+    }
+
+    console.log(segmentIndex, currentSegment.start * 1000, playerState.position);
     if (this.x >= window.innerWidth) {
       this.x = -1;
       this.volumePoint = new Point(0,0);
@@ -116,11 +137,16 @@ export default class Visualizer2 extends React.Component {
   };
 
   animatePitch = (segment) => {
-    console.log(this.analysis)
+    const pitchPlaceHolderButton = document.getElementById('temp-pitch-indicator');
+    const pitch = this.getPitch(segment.pitches);
+    if(pitchPlaceHolderButton) {
+      pitchPlaceHolderButton.innerHTML = pitch;
+    }
+    console.log(pitch);
     const y = window.innerHeight / 2 - 50;
     this.ctx.beginPath();
     this.ctx.moveTo(this.pitchPoint.x, this.pitchPoint.y);
-    const amplitude = Math.abs(segment.pitches[0]) * 50;
+    const amplitude = Math.abs(segment.pitches[0]) * 100;
     this.ctx.lineTo(this.x, y + amplitude);
     this.ctx.strokeStyle = 'red';
     this.pitchPoint.x = this.x;
@@ -128,6 +154,29 @@ export default class Visualizer2 extends React.Component {
     this.ctx.closePath();
     this.ctx.stroke();
   };
+
+  /**
+   * @param {Array} pitches an array of pitches from a segment object
+   */
+  getPitch = (pitches) => {
+    const pitch = Math.max(...pitches);
+    const pitchIndex = pitches.indexOf(pitch)
+    const p = {
+      0: "C",
+      1: "Db",
+      2: "D",
+      3: "Eb",
+      4: "E",
+      5: "F",
+      6: "Gb",
+      7: "G",
+      8: "Ab",
+      9: "A",
+      10: "Bb",
+      11: "B",
+    }
+    return p[pitchIndex];
+  }
 
   sweep = () => {
     this.ctx.clearRect(this.x + 1, 0, 20, window.innerHeight);
@@ -150,6 +199,17 @@ export default class Visualizer2 extends React.Component {
   };
 
   setActiveIntervals = () => {};
+
+  /**
+   * @param {number} mode
+   */
+  getMode = (mode) => {
+    const m = {
+      0: "minor",
+      1: "major",
+    }
+    return m[mode];
+  }
 }
 
 class Point {
