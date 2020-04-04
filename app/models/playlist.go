@@ -37,30 +37,31 @@ type PlaylistService interface {
 // Playlist is the data structure that contains playlist metadata from Spotify
 // It additionally has relations to users and tracks on Stereodose
 type Playlist struct {
-	//gorm.Model
-	SpotifyID          string          `json:"spotifyID" gorm:"primary_key:true"`
-	CreatedAt          time.Time       `json:"createdAt"`
-	UpdatedAt          time.Time       `json:"updatedAt"`
-	Category           string          `json:"category"`
-	SubCategory        string          `json:"subCategory"`
-	Collaborative      bool            `json:"collaborative"`
-	Endpoint           string          `json:"href"`
-	Images             []PlaylistImage `json:"images"`
-	Name               string          `json:"name"`
-	IsPublic           bool            `json:"public"`
-	SnapshotID         string          `json:"snapshot_id"`
-	Tracks             []Track         `json:"tracks" gorm:"many2many:playlist_tracks"`
-	Comments           []Comment       `json:"comments" gorm:"ForeignKey:PlaylistID;AssociationForeignKey:spotify_id"`
-	Likes              []Like          `json:"likes" gorm:"ForeignKey:PlaylistID;AssociationForeignKey:spotify_id"`
-	LikesCount         uint            `json:"likesCount"`
-	URI                string          `json:"URI"`
-	UserID             uint            `json:"userID"`
-	BucketImageURL     string          `json:"bucketImageURL"`
-	BucketThumbnailURL string          `json:"bucketThumbnailURL"`
-	Permalink          string          `json:"permalink"`
-	TotalTracks        int             `json:"totalTracks"`
+	SpotifyID           string          `json:"spotifyID" gorm:"primary_key:true"`
+	CreatedAt           time.Time       `json:"createdAt"`
+	UpdatedAt           time.Time       `json:"updatedAt"`
+	Category            string          `json:"category"`
+	CategoryDisplayName string          `json:"categoryDisplayName"`
+	SubCategory         string          `json:"subCategory"`
+	Collaborative       bool            `json:"collaborative"`
+	Endpoint            string          `json:"href"`
+	Images              []PlaylistImage `json:"images"`
+	Name                string          `json:"name"`
+	IsPublic            bool            `json:"public"`
+	SnapshotID          string          `json:"snapshot_id"`
+	Tracks              []Track         `json:"tracks" gorm:"many2many:playlist_tracks"`
+	Comments            []Comment       `json:"comments" gorm:"ForeignKey:PlaylistID;AssociationForeignKey:spotify_id"`
+	Likes               []Like          `json:"likes" gorm:"ForeignKey:PlaylistID;AssociationForeignKey:spotify_id"`
+	LikesCount          uint            `json:"likesCount"`
+	URI                 string          `json:"URI"`
+	UserID              uint            `json:"userID"`
+	BucketImageURL      string          `json:"bucketImageURL"`
+	BucketThumbnailURL  string          `json:"bucketThumbnailURL"`
+	Permalink           string          `json:"permalink"`
+	TotalTracks         int             `json:"totalTracks"`
 }
 
+// PlaylistSearchParams can be created using URL query parameters
 type PlaylistSearchParams struct {
 	Offset      string
 	Limit       string
@@ -212,21 +213,27 @@ func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlis
 	if err != nil {
 		return nil, err
 	}
+	categoryObj, err := getCategoryFromName(category)
+	if err != nil {
+		return nil, err
+	}
+
 	permalink := fmt.Sprintf("/%s/%s/%s", category, subCategory, playlistID)
 	playlist := &Playlist{
-		SpotifyID:          string(list.ID),
-		Collaborative:      list.Collaborative,
-		Endpoint:           list.Endpoint,
-		Name:               list.Name,
-		IsPublic:           list.IsPublic,
-		SnapshotID:         list.SnapshotID,
-		URI:                string(list.URI),
-		UserID:             user.ID,
-		Category:           category,
-		SubCategory:        subCategory,
-		BucketImageURL:     image,
-		BucketThumbnailURL: thumbnail,
-		Permalink:          permalink,
+		SpotifyID:           string(list.ID),
+		Collaborative:       list.Collaborative,
+		Endpoint:            list.Endpoint,
+		Name:                list.Name,
+		IsPublic:            list.IsPublic,
+		SnapshotID:          list.SnapshotID,
+		URI:                 string(list.URI),
+		UserID:              user.ID,
+		Category:            category,
+		CategoryDisplayName: categoryObj.DisplayName,
+		SubCategory:         subCategory,
+		BucketImageURL:      image,
+		BucketThumbnailURL:  thumbnail,
+		Permalink:           permalink,
 	}
 	for _, image := range list.Images {
 		playlist.Images = append(playlist.Images, PlaylistImage{Image: image})
