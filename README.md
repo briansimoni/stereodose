@@ -3,6 +3,7 @@
 drug-inspired music app
 
 [![Build Status](https://travis-ci.org/briansimoni/stereodose.svg?branch=master)](https://travis-ci.org/briansimoni/stereodose)
+[![Go Report Card](https://goreportcard.com/badge/github.com/briansimoni/stereodose)](https://goreportcard.com/report/github.com/briansimoni/stereodose)
 
 ## Setup
 
