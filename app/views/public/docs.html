@@ -1138,6 +1138,9 @@
                     <li data-group="Users" data-name="apiUsersIdGet" class="">
                       <a href="#api-Users-apiUsersIdGet">apiUsersIdGet</a>
                     </li>
+                    <li data-group="Users" data-name="apiUsersIdLikesGet" class="">
+                      <a href="#api-Users-apiUsersIdLikesGet">apiUsersIdLikesGet</a>
+                    </li>
                     <li data-group="Users" data-name="apiUsersMeGet" class="">
                       <a href="#api-Users-apiUsersMeGet">apiUsersMeGet</a>
                     </li>
@@ -7194,7 +7197,7 @@ except ApiException as e:
 
 
                           <h2>Responses</h2>
-                            <h3> Status: 200 - JSON data about the currently logged in user </h3>
+                            <h3> Status: 200 - JSON data about the requested user </h3>
 
                             <ul class="nav nav-tabs nav-tabs-examples" >
                                 <li class="active">
@@ -7209,7 +7212,7 @@ except ApiException as e:
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "JSON data about the currently logged in user",
+  "description" : "JSON data about the requested user",
   "content" : {
     "application/json" : {
       "schema" : {
@@ -7239,6 +7242,336 @@ except ApiException as e:
                                     </script>
                                   </div>
                                   <input id='responses-apiUsersIdGet-200-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+
+                        </article>
+                      </div>
+                      <hr>
+                    <div id="api-Users-apiUsersIdLikesGet">
+                      <article id="api-Users-apiUsersIdLikesGet-0" data-group="User" data-name="apiUsersIdLikesGet" data-version="0">
+                        <div class="pull-left">
+                          <h1>apiUsersIdLikesGet</h1>
+                          <p>get a user&#x27;s likes</p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked">This endpoint returns an array of likes from a particular user.</p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/api/users/{id}/likes</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-Users-apiUsersIdLikesGet-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Users-apiUsersIdLikesGet-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Users-apiUsersIdLikesGet-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Users-apiUsersIdLikesGet-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Users-apiUsersIdLikesGet-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Users-apiUsersIdLikesGet-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Users-apiUsersIdLikesGet-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Users-apiUsersIdLikesGet-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Users-apiUsersIdLikesGet-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Users-apiUsersIdLikesGet-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Users-apiUsersIdLikesGet-0-python">Python</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-Users-apiUsersIdLikesGet-0-curl">
+                            <pre class="prettyprint"><code class="language-bsh">curl -X GET "https://stereodose.app/api/users/{id}/likes"</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-Users-apiUsersIdLikesGet-0-java">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
+import io.swagger.client.auth.*;
+import io.swagger.client.model.*;
+import io.swagger.client.api.UsersApi;
+
+import java.io.File;
+import java.util.*;
+
+public class UsersApiExample {
+
+    public static void main(String[] args) {
+        ApiClient defaultClient = Configuration.getDefaultApiClient();
+
+        // Configure API key authorization: cookieAuth
+        ApiKeyAuth cookieAuth = (ApiKeyAuth) defaultClient.getAuthentication("cookieAuth");
+        cookieAuth.setApiKey("YOUR API KEY");
+        // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
+        //cookieAuth.setApiKeyPrefix("Token");
+
+        UsersApi apiInstance = new UsersApi();
+        String id = id_example; // String | 
+        try {
+            User result = apiInstance.apiUsersIdLikesGet(id);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling UsersApi#apiUsersIdLikesGet");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-Users-apiUsersIdLikesGet-0-android">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.UsersApi;
+
+public class UsersApiExample {
+
+    public static void main(String[] args) {
+        UsersApi apiInstance = new UsersApi();
+        String id = id_example; // String | 
+        try {
+            User result = apiInstance.apiUsersIdLikesGet(id);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling UsersApi#apiUsersIdLikesGet");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-Users-apiUsersIdLikesGet-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-Users-apiUsersIdLikesGet-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">Configuration *apiConfig = [Configuration sharedConfig];
+// Configure API key authorization: (authentication scheme: cookieAuth)
+[apiConfig setApiKey:@"YOUR_API_KEY" forApiKeyIdentifier:@"stereodose_session"];
+// Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+//[apiConfig setApiKeyPrefix:@"Bearer" forApiKeyIdentifier:@"stereodose_session"];
+String *id = id_example; // 
+
+UsersApi *apiInstance = [[UsersApi alloc] init];
+
+// get a user's likes
+[apiInstance apiUsersIdLikesGetWith:id
+              completionHandler: ^(User output, NSError* error) {
+                            if (output) {
+                                NSLog(@"%@", output);
+                            }
+                            if (error) {
+                                NSLog(@"Error: %@", error);
+                            }
+                        }];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Users-apiUsersIdLikesGet-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var StereodoseApi = require('stereodose_api');
+var defaultClient = StereodoseApi.ApiClient.instance;
+
+// Configure API key authorization: cookieAuth
+var cookieAuth = defaultClient.authentications['cookieAuth'];
+cookieAuth.apiKey = "YOUR API KEY"
+// Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
+//cookieAuth.apiKeyPrefix['stereodose_session'] = "Token"
+
+var api = new StereodoseApi.UsersApi()
+var id = id_example; // {{String}} 
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+api.apiUsersIdLikesGet(id, callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-Users-apiUsersIdLikesGet-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-Users-apiUsersIdLikesGet-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using IO.Swagger.Api;
+using IO.Swagger.Client;
+using IO.Swagger.Model;
+
+namespace Example
+{
+    public class apiUsersIdLikesGetExample
+    {
+        public void main()
+        {
+
+            // Configure API key authorization: cookieAuth
+            Configuration.Default.ApiKey.Add("stereodose_session", "YOUR_API_KEY");
+            // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+            // Configuration.Default.ApiKeyPrefix.Add("stereodose_session", "Bearer");
+
+            var apiInstance = new UsersApi();
+            var id = id_example;  // String | 
+
+            try
+            {
+                // get a user's likes
+                User result = apiInstance.apiUsersIdLikesGet(id);
+                Debug.WriteLine(result);
+            }
+            catch (Exception e)
+            {
+                Debug.Print("Exception when calling UsersApi.apiUsersIdLikesGet: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Users-apiUsersIdLikesGet-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+// Configure API key authorization: cookieAuth
+Swagger\Client\Configuration::getDefaultConfiguration()->setApiKey('stereodose_session', 'YOUR_API_KEY');
+// Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+// Swagger\Client\Configuration::getDefaultConfiguration()->setApiKeyPrefix('stereodose_session', 'Bearer');
+
+$api_instance = new Swagger\Client\ApiUsersApi();
+$id = id_example; // String | 
+
+try {
+    $result = $api_instance->apiUsersIdLikesGet($id);
+    print_r($result);
+} catch (Exception $e) {
+    echo 'Exception when calling UsersApi->apiUsersIdLikesGet: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Users-apiUsersIdLikesGet-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::SwaggerClient::Configuration;
+use WWW::SwaggerClient::UsersApi;
+
+# Configure API key authorization: cookieAuth
+$WWW::SwaggerClient::Configuration::api_key->{'stereodose_session'} = 'YOUR_API_KEY';
+# uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+#$WWW::SwaggerClient::Configuration::api_key_prefix->{'stereodose_session'} = "Bearer";
+
+my $api_instance = WWW::SwaggerClient::UsersApi->new();
+my $id = id_example; # String | 
+
+eval { 
+    my $result = $api_instance->apiUsersIdLikesGet(id => $id);
+    print Dumper($result);
+};
+if ($@) {
+    warn "Exception when calling UsersApi->apiUsersIdLikesGet: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Users-apiUsersIdLikesGet-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import swagger_client
+from swagger_client.rest import ApiException
+from pprint import pprint
+
+# Configure API key authorization: cookieAuth
+swagger_client.configuration.api_key['stereodose_session'] = 'YOUR_API_KEY'
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# swagger_client.configuration.api_key_prefix['stereodose_session'] = 'Bearer'
+
+# create an instance of the API class
+api_instance = swagger_client.UsersApi()
+id = id_example # String | 
+
+try: 
+    # get a user's likes
+    api_response = api_instance.api_users_id_likes_get(id)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling UsersApi->apiUsersIdLikesGet: %s\n" % e)</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Parameters</h2>
+
+                            <div class="methodsubtabletitle">Path parameters</div>
+                            <table id="methodsubtable">
+                                <tr>
+                                  <th width="150px">Name</th>
+                                  <th>Description</th>
+                                </tr>
+                                  <tr><td style="width:150px;">id*</td>
+                                  <td>
+                                  
+                                  
+                                      <div id="d2e199_apiUsersIdLikesGet_id">
+                                          <div class="json-schema-view">
+                                              <div class="primitive">
+                                                  <span class="type">
+                                                      String
+                                                  </span>
+                                  
+                                              </div>
+                                                  <div class="inner required">
+                                                      Required
+                                                  </div>
+                                          </div>
+                                      </div>
+                                  </td>
+                                  </tr>
+                            </table>
+
+
+
+
+
+                          <h2>Responses</h2>
+                            <h3> Status: 200 - JSON array of likes </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-apiUsersIdLikesGet-200-schema">Schema</a>
+                                </li>
+
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-apiUsersIdLikesGet-200-schema">
+                                  <div id='responses-apiUsersIdLikesGet-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "JSON array of likes",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/User"
+      }
+    }
+  }
+};
+                                        var schema = schemaWrapper.content["application/json"].schema;
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else {
+                                          schemaWrapper.components = {};
+                                          schemaWrapper.components.schemas = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        //console.log(JSON.stringify(schema));
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-apiUsersIdLikesGet-200-schema-data').val(stringify(schema));
+                                        var result = $('#responses-apiUsersIdLikesGet-200-schema-200');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-apiUsersIdLikesGet-200-schema-data' type='hidden' value=''></input>
                                 </div>
                             </div>
 

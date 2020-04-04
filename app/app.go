@@ -87,6 +87,7 @@ func createRouter(c *config.Config) *util.AppRouter {
 	usersRouter.Use(UserContextMiddleware)
 	usersRouter.AppHandler("/me", users.Me).Methods(http.MethodGet)
 	usersRouter.AppHandler("/{id}", users.GetByID).Methods(http.MethodGet)
+	usersRouter.AppHandler("/{id}/likes", users.GetUserLikes).Methods(http.MethodGet)
 
 	// The order that the routes are registered does matter
 	// authPlaylistsRouter contains endpoints that require an authenticated user
