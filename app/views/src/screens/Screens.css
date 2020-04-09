@@ -116,7 +116,7 @@ ul.drugs li {
 
 #visualizer {
   position: fixed;
-  top: -125px;
+  top: 0;
   left: 0;
   z-index: 2000;
 }
@@ -166,8 +166,4 @@ ul.drugs li {
 
 .pagination .page-link {
   color: green;
-}
-
-#visualizer > canvas {
-  background: black;
 }

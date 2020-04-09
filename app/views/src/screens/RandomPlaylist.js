@@ -1,6 +1,6 @@
 import React from 'react';
 import Track from './Track';
-import Visualizer2 from './Visualizer2';
+import Data2D from './Visualizer/Data2D'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
@@ -50,7 +50,7 @@ class RandomPlaylist extends React.Component {
       <div className="row">
         <div className="col">
           {this.state.visualizerShown && (
-            <Visualizer2 app={this.props.app} toggleVisualizer={this.toggleVisualizer} />
+            <Data2D app={this.props.app} toggleVisualizer={this.toggleVisualizer} />
           )}
           <div id="playlist-heading">
             <h2>

@@ -22,7 +22,7 @@
         "react-scripts": "^3.3.0",
         "react-test-renderer": "^16.11.0",
         "spotify-web-api-js": "^1.2.0",
-        "three": "^0.110.0"
+        "three": "^0.115.0"
     },
     "scripts": {
         "start": "react-scripts start",

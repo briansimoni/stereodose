@@ -1,25 +1,17 @@
 import React from 'react';
-import Spotify from 'spotify-web-api-js';
+import Visualizer from './Visualizer';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMusic } from '@fortawesome/free-solid-svg-icons';
 
-export default class Visualizer2 extends React.Component {
-  analysis;
-  features;
-  playerState;
-  currentTrackId; // string spotify id
-  intervalTypes = ['tatums', 'segments', 'beats', 'bars', 'sections'];
-  /**
-   *
-   * @param {object} props
-   * @param {App} props.app - a reference to the App component
-   * @param {function} props.toggleVisualizer
-   */
+export default class Data2D extends Visualizer{
+
   constructor(props) {
     super(props);
     this.ref = React.createRef();
     this.canvas = document.createElement('canvas');
     this.ctx = this.canvas.getContext('2d');
     this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight;
+    this.canvas.height = window.innerHeight - 125;
 
     this.ctx.beginPath();
 
@@ -33,11 +25,6 @@ export default class Visualizer2 extends React.Component {
 
     this.sweeping = false;
   }
-
-  resizeCanvas = () => {
-    this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight;
-  };
 
   render() {
     return (
@@ -58,58 +45,62 @@ export default class Visualizer2 extends React.Component {
         <button id="temp-mode-indicator" className="btn btn-success">
           mode placeholder
         </button>
+
+        <div id="y-axis" />
+
+        <div id="pitch-Ab" />
+        <div id="pitch-G" />
+        <div id="pitch-Gb" />
+        <div id="pitch-F" />
+        <div id="pitch-E" />
+        <div id="pitch-Eb" />
+        <div id="pitch-D" />
+        <div id="pitch-Db" />
+        <div id="pitch-C" />
+        <div id="pitch-B" />
+        <div id="pitch-Bb" />
+        <div id="pitch-A" />
+
+        <FontAwesomeIcon id="beat-icon" className="active" icon={faMusic} />
+
       </div>
     );
   }
 
-  // whenever the component mounts or the playback changes, we make sure to do the calls
-  // to update the audio analysis. These are large network calls, so try to not make them too often
-  async componentDidMount() {
-    const playerState = await this.props.app.player.getCurrentState();
-    await this.getTrackInfo(playerState.track_window.current_track.id);
-    this.props.app.player.addListener('player_state_changed', this.playerStateChangeCallback);
-  }
-
-  playerStateChangeCallback = async playerState => {
-    if (this.currentTrack !== playerState.track_window.current_track.id) {
-      this.playerState = playerState;
-      this.currentTrackId = playerState.track_window.current_track.id;
-      await this.getTrackInfo(this.currentTrackId);
-    }
+  resizeCanvas = () => {
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight - 125;
   };
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.resizeCanvas);
-    this.props.app.player.removeListener('player_state_changed', this.playerStateChangeCallback);
-  }
 
   animate = async () => {
     requestAnimationFrame(this.animate);
     if (!this.analysis) {
       return;
     }
-    const segments = this.analysis.segments;
+    await this.setActiveIntervals();
+    
+    const { currentSegment } = this;
+    const { currentSection } = this;
+
     const playerState = await this.props.app.player.getCurrentState();
     const songDuration = playerState.track_window.current_track.duration_ms;
-    const segmentIndex = Math.floor((playerState.position * segments.length) / songDuration);
-    const currentSegment = segments[segmentIndex];
 
-
-    const sections = this.analysis.sections;
-    const sectionIndex = Math.floor((playerState.position * sections.length) / songDuration)
-    const currentSection = sections[sectionIndex]
     const mode = this.getMode(currentSection.mode);
 
+    const beats = this.analysis.beats;
+    const beatIndex = Math.floor((playerState.position * beats.length) / songDuration);
+    const currentBeat = beats[beatIndex];
+    document.getElementById('beat-icon').style['font-size'] = currentBeat.confidence * 100
+
     const modePlaceHolderButton = document.getElementById('temp-mode-indicator');
-    if(modePlaceHolderButton) {
+    if (modePlaceHolderButton) {
       modePlaceHolderButton.innerHTML = mode;
     }
 
-    console.log(segmentIndex, currentSegment.start * 1000, playerState.position);
     if (this.x >= window.innerWidth) {
       this.x = -1;
-      this.volumePoint = new Point(0,0);
-      this.pitchPoint = new Point(0,0);
+      this.volumePoint = new Point(0, 0);
+      this.pitchPoint = new Point(0, 0);
     }
 
     // TODO: remove this hot fix
@@ -123,7 +114,7 @@ export default class Visualizer2 extends React.Component {
     this.x += 1;
   };
 
-  animateVolume = (segment) => {
+    animateVolume = (segment) => {
     const y = window.innerHeight / 2 - 100;
     this.ctx.beginPath();
     this.ctx.moveTo(this.volumePoint.x, this.volumePoint.y);
@@ -139,22 +130,58 @@ export default class Visualizer2 extends React.Component {
   animatePitch = (segment) => {
     const pitchPlaceHolderButton = document.getElementById('temp-pitch-indicator');
     const pitch = this.getPitch(segment.pitches);
-    if(pitchPlaceHolderButton) {
+    if (pitchPlaceHolderButton) {
       pitchPlaceHolderButton.innerHTML = pitch;
     }
-    console.log(pitch);
-    const y = window.innerHeight / 2 - 50;
+
+    // const y = window.innerHeight - 20;
     this.ctx.beginPath();
     this.ctx.moveTo(this.pitchPoint.x, this.pitchPoint.y);
-    const amplitude = Math.abs(segment.pitches[0]) * 100;
-    this.ctx.lineTo(this.x, y + amplitude);
-    this.ctx.strokeStyle = 'red';
+    // const pitchMax = Math.max(...segment.pitches)
+    // const pitchIndex = segment.pitches.indexOf(pitchMax);
+    // const amplitude = segment.pitches[pitchIndex];
+    const amplitude = this.getPitchAmplitude(segment.pitches)
+
+    this.ctx.lineTo(this.x, amplitude);
+    this.ctx.strokeStyle = 'green';
     this.pitchPoint.x = this.x;
-    this.pitchPoint.y = y + amplitude;
+    this.pitchPoint.y = amplitude;
     this.ctx.closePath();
     this.ctx.stroke();
+
   };
 
+
+  /**
+ * @param {Array} pitches an array of pitches from a segment object
+ * this will return a number in pixels of the y coordinate of what the pitch
+ * line should be
+ */
+  getPitchAmplitude = (pitches) => {
+    const pitch = Math.max(...pitches);
+    const pitchIndex = pitches.indexOf(pitch)
+    // height of the screen minus the height of the player controls
+    // divided by 2 (half of that height) with a 5 % padding on both
+    // top and bottom (90%) divided by 12 distinct pitches
+    const multiple = (((window.innerHeight - 125) / 2) * .9) / 12;
+    const p = {
+      0: multiple * 9, // "C",
+      1: multiple * 8, // "Db",
+      2: multiple * 7, // "D",
+      3: multiple * 6, // "Eb",
+      4: multiple * 5, // "E",
+      5: multiple * 4, // "F",
+      6: multiple * 3, // "Gb",
+      7: multiple * 2, // "G",
+      8: multiple * 1, // "Ab",
+      9: multiple * 12, // "A",
+      10: multiple * 11, // "Bb",
+      11: multiple * 10, // "B",
+    } 
+    return p[pitchIndex];
+  }
+
+  
   /**
    * @param {Array} pitches an array of pitches from a segment object
    */
@@ -182,24 +209,6 @@ export default class Visualizer2 extends React.Component {
     this.ctx.clearRect(this.x + 1, 0, 20, window.innerHeight);
   };
 
-  getTrackInfo = async trackId => {
-    const accessToken = await this.props.app.getAccessToken();
-    const spotify = new Spotify();
-    spotify.setAccessToken(accessToken);
-    try {
-      const [analysis, features] = await Promise.all([
-        spotify.getAudioAnalysisForTrack(trackId),
-        spotify.getAudioFeaturesForTrack(trackId)
-      ]);
-      this.analysis = analysis;
-      this.features = features;
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  setActiveIntervals = () => {};
-
   /**
    * @param {number} mode
    */
@@ -211,6 +220,7 @@ export default class Visualizer2 extends React.Component {
     return m[mode];
   }
 }
+
 
 class Point {
   /**

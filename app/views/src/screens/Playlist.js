@@ -3,8 +3,8 @@ import Track from './Track';
 import Comments from './Comments';
 import Likes from './Likes';
 // import Visualizer from './Visualizer';
-// import ExampleComponent from './spotify-viz/Example'
-import Visualizer2 from './Visualizer2';
+import Data2D from './Visualizer/Data2D';
+import Data3D from './Visualizer/Data3D';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
@@ -52,7 +52,10 @@ class Playlist extends React.Component {
       <div className="row">
         <div className="col">
           {this.state.visualizerShown && (
-            <Visualizer2 app={this.props.app} toggleVisualizer={this.toggleVisualizer}/>
+            // <Visualizer app={this.props.app} toggleVisualizer={this.toggleVisualizer} />
+            // <Data2D app={this.props.app} toggleVisualizer={this.toggleVisualizer} />
+            <Data3D app={this.props.app} toggleVisualizer={this.toggleVisualizer} />
+            // <Visualizer2 app={this.props.app} toggleVisualizer={this.toggleVisualizer} />
           )}
           <div id="playlist-heading">
             <h2>
@@ -109,6 +112,12 @@ class Playlist extends React.Component {
   }
 
   toggleVisualizer = async () => {
+    if (!this.state.visualizerShown) {
+      if (!this.props.app.state.currentTrack) {
+        alert('Start playing music to use the visualizer');
+        return;
+      }
+    }
     this.setState({ visualizerShown: !this.state.visualizerShown });
   };
 
