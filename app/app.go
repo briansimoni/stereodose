@@ -83,16 +83,18 @@ func createRouter(c *config.Config) *util.AppRouter {
 	authRouter.AppHandler("/token-swap", auth.TokenSwap).Methods(http.MethodPost)
 	authRouter.AppHandler("/mobile-login", auth.MobileLogin).Methods(http.MethodPost)
 
-	usersRouter := util.AppRouter{Router: app.PathPrefix("/api/users/").Subrouter()}
-	usersRouter.Use(UserContextMiddleware)
-	usersRouter.AppHandler("/me", users.Me).Methods(http.MethodGet)
-	usersRouter.AppHandler("/{id}", users.GetByID).Methods(http.MethodGet)
-	usersRouter.AppHandler("/{id}/likes", users.GetUserLikes).Methods(http.MethodGet)
+	protectedUserRouter := util.AppRouter{Router: app.PathPrefix("/api/users/").Subrouter()}
+	protectedUserRouter.Use(UserContextMiddleware)
+	protectedUserRouter.AppHandler("/me", users.Me).Methods(http.MethodGet)
+
+	userRouter := util.AppRouter{Router: app.PathPrefix("/api/users/").Subrouter()}
+	userRouter.AppHandler("/{id}", users.GetByID).Methods(http.MethodGet)
+	userRouter.AppHandler("/{id}/likes", users.GetUserLikes).Methods(http.MethodGet)
 
 	// The order that the routes are registered does matter
-	// authPlaylistsRouter contains endpoints that require an authenticated user
-	authPlaylistsRouter := util.AppRouter{Router: app.PathPrefix("/api/playlists").Subrouter()}
-	authPlaylistsRouter.Use(UserContextMiddleware)
+	// protectedPlaylistsRouter contains endpoints that require an authenticated user
+	protectedPlaylistsRouter := util.AppRouter{Router: app.PathPrefix("/api/playlists").Subrouter()}
+	protectedPlaylistsRouter.Use(UserContextMiddleware)
 	playlistsRouter := util.AppRouter{Router: app.PathPrefix("/api/playlists").Subrouter()}
 
 	playlistsRouter.AppHandler("/", playlists.GetPlaylists).Methods(http.MethodGet)
@@ -106,20 +108,20 @@ func createRouter(c *config.Config) *util.AppRouter {
 			"order", "{order:[a-zA-Z]").
 		Methods(http.MethodGet)
 
-	authPlaylistsRouter.AppHandler("/me", playlists.GetMyPlaylists).Methods(http.MethodGet)
-	authPlaylistsRouter.AppHandler("/random", playlists.GetRandomPlaylist).
+	protectedPlaylistsRouter.AppHandler("/me", playlists.GetMyPlaylists).Methods(http.MethodGet)
+	protectedPlaylistsRouter.AppHandler("/random", playlists.GetRandomPlaylist).
 		Queries(
 			"category", "{category:.+}",
 			"subcategory", "{subcategory:.+}",
 		).Methods(http.MethodGet)
 	playlistsRouter.AppHandler("/{id}", playlists.GetPlaylistByID).Methods(http.MethodGet)
-	authPlaylistsRouter.AppHandler("/", playlists.CreatePlaylist).Methods(http.MethodPost)
-	authPlaylistsRouter.AppHandler("/{id}/image", playlists.UploadImage).Methods(http.MethodPost)
-	authPlaylistsRouter.AppHandler("/{id}", playlists.DeletePlaylist).Methods(http.MethodDelete)
-	authPlaylistsRouter.AppHandler("/{id}/comments", playlists.Comment).Methods(http.MethodPost)
-	authPlaylistsRouter.AppHandler("/{playlistID}/comments/{commentID}", playlists.DeleteComment).Methods(http.MethodDelete)
-	authPlaylistsRouter.AppHandler("/{id}/likes", playlists.Like).Methods(http.MethodPost)
-	authPlaylistsRouter.AppHandler("/{playlistID}/likes/{likeID}", playlists.Unlike).Methods(http.MethodDelete)
+	protectedPlaylistsRouter.AppHandler("/", playlists.CreatePlaylist).Methods(http.MethodPost)
+	protectedPlaylistsRouter.AppHandler("/{id}/image", playlists.UploadImage).Methods(http.MethodPost)
+	protectedPlaylistsRouter.AppHandler("/{id}", playlists.DeletePlaylist).Methods(http.MethodDelete)
+	protectedPlaylistsRouter.AppHandler("/{id}/comments", playlists.Comment).Methods(http.MethodPost)
+	protectedPlaylistsRouter.AppHandler("/{playlistID}/comments/{commentID}", playlists.DeleteComment).Methods(http.MethodDelete)
+	protectedPlaylistsRouter.AppHandler("/{id}/likes", playlists.Like).Methods(http.MethodPost)
+	protectedPlaylistsRouter.AppHandler("/{playlistID}/likes/{likeID}", playlists.Unlike).Methods(http.MethodDelete)
 
 	categoriesRouter := util.AppRouter{Router: app.PathPrefix("/api/categories").Subrouter()}
 	categoriesRouter.AppHandler("/", categories.GetAvailableCategories).Methods(http.MethodGet)
