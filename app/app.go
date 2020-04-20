@@ -116,7 +116,7 @@ func createRouter(c *config.Config) *util.AppRouter {
 		).Methods(http.MethodGet)
 	playlistsRouter.AppHandler("/{id}", playlists.GetPlaylistByID).Methods(http.MethodGet)
 	protectedPlaylistsRouter.AppHandler("/", playlists.CreatePlaylist).Methods(http.MethodPost)
-	protectedPlaylistsRouter.AppHandler("/{id}/image", playlists.UploadImage).Methods(http.MethodPost)
+	protectedPlaylistsRouter.AppHandler("/image", playlists.UploadImage).Methods(http.MethodPost)
 	protectedPlaylistsRouter.AppHandler("/{id}", playlists.DeletePlaylist).Methods(http.MethodDelete)
 	protectedPlaylistsRouter.AppHandler("/{id}/comments", playlists.Comment).Methods(http.MethodPost)
 	protectedPlaylistsRouter.AppHandler("/{playlistID}/comments/{commentID}", playlists.DeleteComment).Methods(http.MethodDelete)
