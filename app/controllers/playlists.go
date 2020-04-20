@@ -293,7 +293,7 @@ func getImageKey(url string) string {
 func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request) error {
 	multipartFile, header, err := r.FormFile("playlist-image")
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	// Deny if greater than 8mb
@@ -310,18 +310,17 @@ func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request
 	reader := io.TeeReader(multipartFile, buffer)
 	imageCopy, err := jpeg.Decode(reader)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	resizedImage := imaging.Resize(imageCopy, 250, 200, imaging.Lanczos)
 	imageDataCopy := new(bytes.Buffer)
 	err = jpeg.Encode(imageDataCopy, resizedImage, nil)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	imageData, err := ioutil.ReadAll(buffer)
 	if err != nil {
-		log.Println(err.Error())
-		return err
+		return errors.WithStack(err)
 	}
 
 	// Only allow web-safe image files
