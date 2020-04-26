@@ -65,6 +65,7 @@ func createSearchParamsFromRequest(r *http.Request) (*models.PlaylistSearchParam
 	subcategory := queryValues.Get("subcategory")
 	sortKey := queryValues.Get("sort-key")
 	order := queryValues.Get("order")
+	IDs := queryValues.Get("spotify-ids")
 
 	if offset == "" {
 		offset = "0"
@@ -112,6 +113,13 @@ func createSearchParamsFromRequest(r *http.Request) (*models.PlaylistSearchParam
 		return nil, errors.Errorf("order value: '%s' is not allowed", order)
 	}
 
+	spotifyIds := strings.Split(IDs, " ")
+	// Split always returns a string even if its empty
+	// In the case that it is empty, we'll set the slice to be nil
+	if spotifyIds[0] == "" {
+		spotifyIds = nil
+	}
+
 	return &models.PlaylistSearchParams{
 		Category:    category,
 		Subcategory: subcategory,
@@ -119,6 +127,7 @@ func createSearchParamsFromRequest(r *http.Request) (*models.PlaylistSearchParam
 		Limit:       limit,
 		SortKey:     sortKey,
 		Order:       order,
+		SpotifyIDs:  spotifyIds,
 	}, nil
 }
 
@@ -602,3 +611,32 @@ func (p *PlaylistsController) Unlike(w http.ResponseWriter, r *http.Request) err
 	}
 	return nil
 }
+
+// IsShared allows consumers to send an arbitrary number of playlist IDs to check and
+// see if those playlists are in the database. This becomes useful when it comes to
+// creating views that allow users to share playlists. In Spotify, users can "like"
+// other peoples' playlists. They will then appear in their own set of playlists.
+// Thus, by default when we try to find out what playlists that a user can share, it could
+// return playlists that actually belong to other users. Those playlists may have already been
+// shared to Stereodose. This endpoint will tell you if they have been shared so that you can
+// redact those playlists from the view. Otherwise, users may try to share them and they'll get
+// an error like "Playlist has already been shared"
+// func (p *PlaylistsController) IsShared(w http.ResponseWriter, r *http.Request) error {
+// 	var querySet []string
+// 	defer r.Body.Close()
+// 	err := json.NewDecoder(r.Body).Decode(&querySet)
+// 	if err != nil {
+// 		return &util.StatusError{
+// 			Code: http.StatusBadRequest,
+// 			Message: fmt.Sprintf("Unable to parse JSON body %s", err.Error()),
+// 		}
+// 	}
+
+// 	for _, playlistID := range querySet{
+// 		p.DB.Playlists.GetPlaylists(&models.PlaylistSearchParams{})
+// 	}
+// 	return &util.StatusError{
+// 		Code: http.StatusNotImplemented,
+// 		Message: "nope",
+// 	}
+// }

@@ -294,6 +294,11 @@ paths:
           schema:
             type: string
           description: "Can be one of the following defaulting to desc: asc, desc"
+        - in: query
+          name: spotify-ids
+          schema:
+            type: string
+          description: "A space delimited set of playlist IDs"
       responses:
         200:
           description: A JSON array of playlists

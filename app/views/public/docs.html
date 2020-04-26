@@ -3372,7 +3372,7 @@ except ApiException as e:
 
                         <div class="tab-content">
                           <div class="tab-pane active" id="examples-Playlists-apiPlaylistsGet-0-curl">
-                            <pre class="prettyprint"><code class="language-bsh">curl -X GET "https://stereodose.app/api/playlists/?offset=&limit=&category=&subcategory=&sort-key=&order="</code></pre>
+                            <pre class="prettyprint"><code class="language-bsh">curl -X GET "https://stereodose.app/api/playlists/?offset=&limit=&category=&subcategory=&sort-key=&order=&spotify-ids="</code></pre>
                           </div>
                           <div class="tab-pane" id="examples-Playlists-apiPlaylistsGet-0-java">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
@@ -3394,8 +3394,9 @@ public class PlaylistsApiExample {
         String subcategory = subcategory_example; // String | The subcategory of playlist
         String sortKey = sortKey_example; // String | Can be one of the following defaulting to likes_count: created_at, updated_at, name, likes_count
         String order = order_example; // String | Can be one of the following defaulting to desc: asc, desc
+        String spotifyIds = spotifyIds_example; // String | A space delimited set of playlist IDs
         try {
-            array[Playlist] result = apiInstance.apiPlaylistsGet(offset, limit, category, subcategory, sortKey, order);
+            array[Playlist] result = apiInstance.apiPlaylistsGet(offset, limit, category, subcategory, sortKey, order, spotifyIds);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling PlaylistsApi#apiPlaylistsGet");
@@ -3418,8 +3419,9 @@ public class PlaylistsApiExample {
         String subcategory = subcategory_example; // String | The subcategory of playlist
         String sortKey = sortKey_example; // String | Can be one of the following defaulting to likes_count: created_at, updated_at, name, likes_count
         String order = order_example; // String | Can be one of the following defaulting to desc: asc, desc
+        String spotifyIds = spotifyIds_example; // String | A space delimited set of playlist IDs
         try {
-            array[Playlist] result = apiInstance.apiPlaylistsGet(offset, limit, category, subcategory, sortKey, order);
+            array[Playlist] result = apiInstance.apiPlaylistsGet(offset, limit, category, subcategory, sortKey, order, spotifyIds);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling PlaylistsApi#apiPlaylistsGet");
@@ -3439,6 +3441,7 @@ String *category = category_example; // The overall category of playlist (option
 String *subcategory = subcategory_example; // The subcategory of playlist (optional)
 String *sortKey = sortKey_example; // Can be one of the following defaulting to likes_count: created_at, updated_at, name, likes_count (optional)
 String *order = order_example; // Can be one of the following defaulting to desc: asc, desc (optional)
+String *spotifyIds = spotifyIds_example; // A space delimited set of playlist IDs (optional)
 
 PlaylistsApi *apiInstance = [[PlaylistsApi alloc] init];
 
@@ -3449,6 +3452,7 @@ PlaylistsApi *apiInstance = [[PlaylistsApi alloc] init];
     subcategory:subcategory
     sortKey:sortKey
     order:order
+    spotifyIds:spotifyIds
               completionHandler: ^(array[Playlist] output, NSError* error) {
                             if (output) {
                                 NSLog(@"%@", output);
@@ -3470,7 +3474,8 @@ var opts = {
   'category': category_example, // {{String}} The overall category of playlist
   'subcategory': subcategory_example, // {{String}} The subcategory of playlist
   'sortKey': sortKey_example, // {{String}} Can be one of the following defaulting to likes_count: created_at, updated_at, name, likes_count
-  'order': order_example // {{String}} Can be one of the following defaulting to desc: asc, desc
+  'order': order_example, // {{String}} Can be one of the following defaulting to desc: asc, desc
+  'spotifyIds': spotifyIds_example // {{String}} A space delimited set of playlist IDs
 };
 var callback = function(error, data, response) {
   if (error) {
@@ -3507,11 +3512,12 @@ namespace Example
             var subcategory = subcategory_example;  // String | The subcategory of playlist (optional) 
             var sortKey = sortKey_example;  // String | Can be one of the following defaulting to likes_count: created_at, updated_at, name, likes_count (optional) 
             var order = order_example;  // String | Can be one of the following defaulting to desc: asc, desc (optional) 
+            var spotifyIds = spotifyIds_example;  // String | A space delimited set of playlist IDs (optional) 
 
             try
             {
                 // get a set of playlists
-                array[Playlist] result = apiInstance.apiPlaylistsGet(offset, limit, category, subcategory, sortKey, order);
+                array[Playlist] result = apiInstance.apiPlaylistsGet(offset, limit, category, subcategory, sortKey, order, spotifyIds);
                 Debug.WriteLine(result);
             }
             catch (Exception e)
@@ -3535,9 +3541,10 @@ $category = category_example; // String | The overall category of playlist
 $subcategory = subcategory_example; // String | The subcategory of playlist
 $sortKey = sortKey_example; // String | Can be one of the following defaulting to likes_count: created_at, updated_at, name, likes_count
 $order = order_example; // String | Can be one of the following defaulting to desc: asc, desc
+$spotifyIds = spotifyIds_example; // String | A space delimited set of playlist IDs
 
 try {
-    $result = $api_instance->apiPlaylistsGet($offset, $limit, $category, $subcategory, $sortKey, $order);
+    $result = $api_instance->apiPlaylistsGet($offset, $limit, $category, $subcategory, $sortKey, $order, $spotifyIds);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling PlaylistsApi->apiPlaylistsGet: ', $e->getMessage(), PHP_EOL;
@@ -3557,9 +3564,10 @@ my $category = category_example; # String | The overall category of playlist
 my $subcategory = subcategory_example; # String | The subcategory of playlist
 my $sortKey = sortKey_example; # String | Can be one of the following defaulting to likes_count: created_at, updated_at, name, likes_count
 my $order = order_example; # String | Can be one of the following defaulting to desc: asc, desc
+my $spotifyIds = spotifyIds_example; # String | A space delimited set of playlist IDs
 
 eval { 
-    my $result = $api_instance->apiPlaylistsGet(offset => $offset, limit => $limit, category => $category, subcategory => $subcategory, sortKey => $sortKey, order => $order);
+    my $result = $api_instance->apiPlaylistsGet(offset => $offset, limit => $limit, category => $category, subcategory => $subcategory, sortKey => $sortKey, order => $order, spotifyIds => $spotifyIds);
     print Dumper($result);
 };
 if ($@) {
@@ -3582,10 +3590,11 @@ category = category_example # String | The overall category of playlist (optiona
 subcategory = subcategory_example # String | The subcategory of playlist (optional)
 sortKey = sortKey_example # String | Can be one of the following defaulting to likes_count: created_at, updated_at, name, likes_count (optional)
 order = order_example # String | Can be one of the following defaulting to desc: asc, desc (optional)
+spotifyIds = spotifyIds_example # String | A space delimited set of playlist IDs (optional)
 
 try: 
     # get a set of playlists
-    api_response = api_instance.api_playlists_get(offset=offset, limit=limit, category=category, subcategory=subcategory, sortKey=sortKey, order=order)
+    api_response = api_instance.api_playlists_get(offset=offset, limit=limit, category=category, subcategory=subcategory, sortKey=sortKey, order=order, spotifyIds=spotifyIds)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling PlaylistsApi->apiPlaylistsGet: %s\n" % e)</code></pre>
@@ -3712,6 +3721,25 @@ except ApiException as e:
                                 
                                                     <div class="inner description">
                                                         Can be one of the following defaulting to desc: asc, desc
+                                                    </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                </tr>
+                                <tr><td style="width:150px;">spotify-ids</td>
+                                <td>
+                                
+                                
+                                    <div id="d2e199_apiPlaylistsGet_spotifyIds">
+                                        <div class="json-schema-view">
+                                            <div class="primitive">
+                                                <span class="type">
+                                                    String
+                                                </span>
+                                
+                                                    <div class="inner description">
+                                                        A space delimited set of playlist IDs
                                                     </div>
                                             </div>
                                         </div>

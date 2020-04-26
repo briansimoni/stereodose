@@ -69,6 +69,7 @@ type PlaylistSearchParams struct {
 	Subcategory string
 	SortKey     string
 	Order       string
+	SpotifyIDs  []string
 }
 
 // PlaylistImage should contain a URL or reference to an image
@@ -104,6 +105,10 @@ func (s *StereodosePlaylistService) GetPlaylists(params *PlaylistSearchParams) (
 
 	if params.Category != "" && params.Subcategory != "" {
 		db = db.Where("category = ? AND sub_category = ?", params.Category, params.Subcategory)
+	}
+
+	if len(params.SpotifyIDs) > 0 {
+		db = db.Where("spotify_id IN(?)", params.SpotifyIDs)
 	}
 
 	err := db.Order(fmt.Sprintf("%s %s", params.SortKey, params.Order)).Find(&playlists).Error
