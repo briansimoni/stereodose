@@ -1,7 +1,13 @@
 package models
 
+import (
+	"fmt"
+)
+
 // Categories
-type categories []struct {
+type categories []category
+
+type category struct {
 	DisplayName   string   `json:"displayName"`
 	Name          string   `json:"name"`
 	Subcategories []string `json:"subcategories"`
@@ -31,6 +37,15 @@ var Categories = categories{
 		Name:          "LSD",
 		Subcategories: []string{"calm", "trippy", "rockstar"},
 	},
+}
+
+func getCategoryFromName(categoryName string) (category, error) {
+	for _, cat := range Categories {
+		if cat.Name == categoryName {
+			return cat, nil
+		}
+	}
+	return category{}, fmt.Errorf("Unable to find category with name %s", categoryName)
 }
 
 func (c categories) Valid(category, subcategory string) bool {

@@ -61,7 +61,7 @@ func NewAuthController(db *models.StereoDoseDB, store *sessions.CookieStore, con
 		Scopes: []string{
 			"playlist-modify-public",
 			"streaming",
-			"user-read-birthdate",
+			// "user-read-birthdate",
 			"user-read-email",
 			"user-read-private",
 			"playlist-read-collaborative",
@@ -461,7 +461,8 @@ func refreshToken(c *oauth2.Config, refreshToken string) (*refreshTokenResponse,
 		return nil, err
 	}
 	if res.StatusCode != 200 {
-		return nil, errors.New("Response from spotify.com/api/token " + res.Status)
+		str, _ := ioutil.ReadAll(res.Body)
+		return nil, errors.New("Response from spotify.com/api/token " + res.Status + " " + string(str))
 	}
 	defer res.Body.Close()
 	var tok refreshTokenResponse
@@ -487,6 +488,7 @@ func checkState(r *http.Request, s *sessions.Session) error {
 }
 
 func (a *AuthController) saveUserData(token *oauth2.Token, u *spotify.PrivateUser) (*models.User, error) {
+	log.Println(token.RefreshToken)
 	user := &models.User{
 		Birthdate:    u.Birthdate,
 		DisplayName:  u.DisplayName,
@@ -527,6 +529,10 @@ func (a *AuthController) saveUserData(token *oauth2.Token, u *spotify.PrivateUse
 		}
 
 	}
+	// make sure that the tokens are up to date
+	user.RefreshToken = token.RefreshToken
+	user.AccessToken = token.AccessToken
+	
 	err = a.DB.Users.Update(user)
 	if err != nil {
 		return nil, err

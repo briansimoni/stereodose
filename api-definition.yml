@@ -214,11 +214,35 @@ paths:
         - cookieAuth: []
       responses:
         200:
-          description: JSON data about the currently logged in user
+          description: JSON data about the requested user
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+                
+  '/api/users/{id}/likes':
+    get:
+      tags:
+        - users
+      summary: get a user's likes
+      description: This endpoint returns an array of likes from a particular user.
+      parameters: 
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            
+      security:
+        - cookieAuth: []
+      responses:
+        200:
+          description: JSON array of likes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          
                 
   '/api/categories/':
     get:
@@ -270,6 +294,11 @@ paths:
           schema:
             type: string
           description: "Can be one of the following defaulting to desc: asc, desc"
+        - in: query
+          name: spotify-ids
+          schema:
+            type: string
+          description: "A space delimited set of playlist IDs"
       responses:
         200:
           description: A JSON array of playlists
@@ -369,7 +398,7 @@ paths:
         204:
           description: no content indicates success
 
-  '/api/playlists/{id}/image':
+  '/api/playlists/image':
     post:
       tags:
         - playlists
@@ -398,6 +427,7 @@ paths:
                   type: string
                 playlist-image:
                   type: string
+                  format: binary
       responses:
         201:
           description: returns JSON useful for creating a Stereodose playlist
@@ -590,6 +620,8 @@ components:
           type: string
         category:
           type: string
+        categoryDisplayName:
+          type: string
         subCategory:
           type: string
         collaborative:
@@ -684,6 +716,8 @@ components:
           type: string
         playlistName:
           type: string
+        playlist: 
+          $ref: '#/components/schemas/Playlist'
         permalink:
           type: string
 

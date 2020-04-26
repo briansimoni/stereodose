@@ -58,3 +58,21 @@ func (u *UsersController) GetByID(w http.ResponseWriter, r *http.Request) error 
 	util.JSON(w, user)
 	return nil
 }
+
+// GetUserLikes returns just an array of likes for a particular user
+func (u *UsersController) GetUserLikes(w http.ResponseWriter, r *http.Request) error {
+	pathVars := mux.Vars(r)
+	userID, err := strconv.Atoi(pathVars["id"])
+	if err != nil {
+		return &util.StatusError{
+			Message: "Unable to get the UserID from the path parameter",
+			Code:    http.StatusBadRequest,
+		}
+	}
+	user, err := u.DB.Users.ByID(uint(userID))
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	util.JSON(w, user.Likes)
+	return nil
+}
