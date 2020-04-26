@@ -220,10 +220,10 @@ func (p *PlaylistsController) CreatePlaylist(w http.ResponseWriter, r *http.Requ
 		return errors.New("Unable to obtain user from session")
 	}
 
-	existingPlaylist, err := p.DB.Playlists.GetByID(data.SpotifyID)
+	existingPlaylist, _ := p.DB.Playlists.GetByID(data.SpotifyID)
 	if existingPlaylist != nil {
 		return &util.StatusError{
-			Message: fmt.Sprintf("Playlist with ID %s already exists", existingPlaylist.SnapshotID),
+			Message: fmt.Sprintf("Playlist with ID %s already exists", existingPlaylist.SpotifyID),
 			Code:    http.StatusConflict,
 		}
 	}

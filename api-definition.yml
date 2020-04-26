@@ -114,7 +114,7 @@ paths:
       description: >
         MobileLogin is here to support the iOS app.
         Because Spotify basically constrains iOS developers to using only their SDK
-        and not the WebAPI for authentication, we have to create this seperate endpoint
+        and not the WebAPI for authentication, we have to create this separate endpoint
         It will take a Spotify access token, and then create a Stereodose session.
         The response is simply a 200 and a set-cookie header
       tags:
@@ -168,7 +168,7 @@ paths:
         - auth
       responses:
         200:
-          description: returns the current access token (notice this is differentthan /refresh)
+          description: returns the current access token (notice this is different than /refresh)
           content:
             application/json:
               schema:
@@ -510,7 +510,7 @@ paths:
     delete:
       tags:
         - playlists
-      summary: remove a comment from a playlist
+      summary: remove a like from a playlist
       security:
         - cookieAuth: []
       parameters:

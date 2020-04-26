@@ -260,7 +260,7 @@ func TestPlaylistsController_CreatePlaylist(t *testing.T) {
 	}
 
 	validData := postBody{
-		SpotifyID:   "test",
+		SpotifyID:   "9000",
 		Category:    "weed",
 		SubCategory: "chill",
 	}
@@ -275,7 +275,7 @@ func TestPlaylistsController_CreatePlaylist(t *testing.T) {
 		// {name: "Invalid Categories", status: 400, user: nil, data: postBody{"test", "Fake", "Category"}},
 		// {name: "Invalid User Context", status: 500, user: nil, data: validData},
 		// {name: "Invalid POST body", status: 400, user: models.User{}, data: 69},
-		{name: "Database Error", status: 500, user: models.User{}, data: postBody{
+		{name: "Database Error", status: 409, user: models.User{}, data: postBody{
 			SpotifyID:   "alreadyExists",
 			Category:    "weed",
 			SubCategory: "chill",
