@@ -546,7 +546,28 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Playlist'
-
+                  
+  '/api/feedback/':
+    post:
+      tags:
+        - feedback
+      summary: send feedback about Stereodose
+      responses:
+        200:
+          description: Feedback submission successful
+      requestBody:
+        description: JSON represrenting feedback
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                goodExperience:
+                  type: boolean
+                otherComments:
+                  type: string
+                  
 externalDocs:
   description: Find out more about Swagger
   url: 'http://swagger.io'

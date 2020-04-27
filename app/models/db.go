@@ -15,6 +15,7 @@ type StereoDoseDB struct {
 	Users     UserService
 	Playlists PlaylistService
 	Comments  CommentService
+	Feedback  FeedbackService
 }
 
 // NewStereodoseDB takes a reference to gorm and returns
@@ -22,7 +23,7 @@ type StereoDoseDB struct {
 func NewStereodoseDB(db *gorm.DB, s *sessions.CookieStore) *StereoDoseDB {
 	// db = db.Debug()
 	// db.DropTable(User{}, Playlist{}, UserImage{}, PlaylistImage{}, Track{}, Comment{}, Like{})
-	err := db.AutoMigrate(User{}, Playlist{}, UserImage{}, PlaylistImage{}, Track{}, Comment{}, Like{}).Error
+	err := db.AutoMigrate(User{}, Playlist{}, UserImage{}, PlaylistImage{}, Track{}, Comment{}, Like{}, Feedback{}).Error
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -32,7 +33,7 @@ func NewStereodoseDB(db *gorm.DB, s *sessions.CookieStore) *StereoDoseDB {
 	database.Users = &StereodoseUserService{db: db}
 	database.Playlists = &StereodosePlaylistService{db: db}
 	database.Comments = &StereodoseCommentService{db: db}
-
+	database.Feedback = &StereodoseFeedbackService{db: db}
 	//test
 	// u, _ := database.Users.ByID(1)
 	// _, err = database.Playlists.Like("6DRd1s2Hx7VEWWV85GYx6S", *u)
