@@ -735,6 +735,8 @@ components:
           type: string
         PlaylistID:
           type: string
+        userID:
+          type: string
         displayName:
           type: string
         permalink:
