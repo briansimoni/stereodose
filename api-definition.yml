@@ -719,6 +719,8 @@ components:
           type: string
         artists:
           type: string
+        spotifyArtistIDs:
+          type: string
 
     Comment:
       type: object
