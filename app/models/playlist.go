@@ -273,13 +273,14 @@ func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlis
 			continue
 		}
 		trackToAdd := Track{
-			SpotifyID:   string(track.ID),
-			Name:        track.Name,
-			Duration:    track.Duration,
-			PreviewURL:  track.PreviewURL,
-			TrackNumber: track.TrackNumber,
-			URI:         string(track.URI),
-			Artists:     simpleArtistsToString(track.Artists),
+			SpotifyID:        string(track.ID),
+			Name:             track.Name,
+			Duration:         track.Duration,
+			PreviewURL:       track.PreviewURL,
+			TrackNumber:      track.TrackNumber,
+			URI:              string(track.URI),
+			Artists:          simpleArtistsToString(track.Artists),
+			SpotifyArtistIDs: simpleArtistIdsToString(track.Artists),
 		}
 		playlist.Tracks = append(playlist.Tracks, trackToAdd)
 	}
@@ -332,6 +333,16 @@ func simpleArtistsToString(artists []spotify.SimpleArtist) string {
 		data = append(data, artist.Name)
 	}
 	return strings.Join(data, ", ")
+}
+
+// simpleArtistIdsToString is pretty much the same as the above function.
+// Just note that I removed the space
+func simpleArtistIdsToString(artists []spotify.SimpleArtist) string {
+	data := make([]string, 0)
+	for _, artist := range artists {
+		data = append(data, artist.ID.String())
+	}
+	return strings.Join(data, ",")
 }
 
 // DeletePlaylist hard deletes the playlist (only from the StereodoseDB)

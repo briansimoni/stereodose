@@ -114,7 +114,7 @@ paths:
       description: >
         MobileLogin is here to support the iOS app.
         Because Spotify basically constrains iOS developers to using only their SDK
-        and not the WebAPI for authentication, we have to create this seperate endpoint
+        and not the WebAPI for authentication, we have to create this separate endpoint
         It will take a Spotify access token, and then create a Stereodose session.
         The response is simply a 200 and a set-cookie header
       tags:
@@ -168,7 +168,7 @@ paths:
         - auth
       responses:
         200:
-          description: returns the current access token (notice this is differentthan /refresh)
+          description: returns the current access token (notice this is different than /refresh)
           content:
             application/json:
               schema:
@@ -456,6 +456,18 @@ paths:
           schema:
             type: string
           description: The playlist ID
+      requestBody:
+        required: true
+        description: >
+          Send the comment as the value of the Text property. The backend allows
+          for up to 10,000 characters
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Text:
+                  type: string
       responses:
         201:
           description: returns the new Comment object
@@ -510,7 +522,7 @@ paths:
     delete:
       tags:
         - playlists
-      summary: remove a comment from a playlist
+      summary: remove a like from a playlist
       security:
         - cookieAuth: []
       parameters:
@@ -546,7 +558,34 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Playlist'
-
+                  
+  '/api/feedback/':
+    post:
+      tags:
+        - feedback
+      summary: send feedback about Stereodose
+      description: >
+        This is essentially a way to collect survey data. Expect more fields to
+        be added in the near future. While this endpoint does not require
+        authentication, it will save more data if the request is authenticated.
+        For instance, behind the scenes I'm tracking userID. The otherComments
+        field is currently limited to 10,000 characters.
+      responses:
+        200:
+          description: Feedback submission successful
+      requestBody:
+        description: JSON represrenting feedback
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                goodExperience:
+                  type: boolean
+                otherComments:
+                  type: string
+                  
 externalDocs:
   description: Find out more about Swagger
   url: 'http://swagger.io'
@@ -680,6 +719,8 @@ components:
           type: string
         artists:
           type: string
+        spotifyArtistIDs:
+          type: string
 
     Comment:
       type: object
@@ -695,6 +736,8 @@ components:
         content:
           type: string
         PlaylistID:
+          type: string
+        userID:
           type: string
         displayName:
           type: string

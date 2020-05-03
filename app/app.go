@@ -62,6 +62,7 @@ func createRouter(c *config.Config) *util.AppRouter {
 	playlists := controllers.NewPlaylistsController(stereoDoseDB, cloudBucket)
 	auth := controllers.NewAuthController(stereoDoseDB, store, c)
 	health := controllers.NewHealthController(stereoDoseDB)
+	feedback := controllers.NewFeedbackController(stereoDoseDB, store)
 
 	// Serve all of the static files
 	fs := http.StripPrefix("/public/", http.FileServer(http.Dir("app/views/build/")))
@@ -125,6 +126,9 @@ func createRouter(c *config.Config) *util.AppRouter {
 
 	categoriesRouter := util.AppRouter{Router: app.PathPrefix("/api/categories").Subrouter()}
 	categoriesRouter.AppHandler("/", categories.GetAvailableCategories).Methods(http.MethodGet)
+
+	feedbackRouter := util.AppRouter{Router: app.PathPrefix("/api/feedback").Subrouter()}
+	feedbackRouter.AppHandler("/", feedback.CreateFeedback).Methods(http.MethodPost)
 
 	app.HandleFunc("/", serveFile(fileCache["/index.html"], nil))
 	// Serving the React app on 404's enables the use of arbitrary routes with react browser-router

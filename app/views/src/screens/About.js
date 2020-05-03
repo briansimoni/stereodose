@@ -1,10 +1,12 @@
 import React from 'react';
+import Feedback from './Feedback';
 
-export default function About(props) {
+
+export default function About() {
   return (
     <div className="row">
       <div className="col">
-        <h2 className="about-header">About</h2>
+        <h1 className="about-header">About</h1>
         <p className="about-body">
           Stereodose is a reincarnation of the web/mobile application that closed down back in 2016. It provided a way
           for people to discover music that mainstream services just don't offer. You can share your playlists from
@@ -23,7 +25,7 @@ export default function About(props) {
           </a>
         </p>
 
-        <h3>Compatibility</h3>
+        <h1>Compatibility</h1>
         <p>
           You need to have Spotify Premium for the player to function. Additionally, the Spotify Web SDK only supports
           certain browsers. While it does seem to work okay on many mobile browsers, it isn't officially supported. See
@@ -33,7 +35,9 @@ export default function About(props) {
           </a>
         </p>
         <p>Stereodose is coming to the iOS app store in the next few months. Be sure to check back!</p>
+        <Feedback />
       </div>
     </div>
   );
 }
+
