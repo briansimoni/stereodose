@@ -17,7 +17,7 @@ type Feedback struct {
 	gorm.Model
 	UserID            uint   `json:"userID"`
 	DetectedUserAgent string `json:"detectedUserAgent"`
-	OtherComments     string `json:"otherComments"`
+	OtherComments     string `json:"otherComments" gorm:"type:varchar(10000);"`
 	GoodExperience    bool   `json:"goodExperience"`
 }
 
