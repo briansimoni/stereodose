@@ -10,7 +10,8 @@ export default class Visualizer extends React.Component {
   currentSegment = null;
   nextSegment = null;
   currentSection = null;
-  fetchingData = true;
+  fetchingData = false;
+  componentID = Math.random()
 
   getTrackInfo = async trackId => {
     const accessToken = await this.props.app.getAccessToken();
@@ -34,8 +35,8 @@ export default class Visualizer extends React.Component {
    * Thus we guarantee that every frame has the correct data available to it
    */
   setActiveIntervals = async () => {
-    if (this.fetchingData) {
-      console.log('fetching data');
+    if (!this.analysis) {
+      console.log('fetching data', this.componentID);
       return;
     }
 
@@ -46,7 +47,7 @@ export default class Visualizer extends React.Component {
     const positionInSeconds = position / 1000;
     const segments = this.analysis.segments;
 
-    // important to set the position everytime.
+    // important to set the position every time.
     this.position = position;
 
     // these loops and conditions helps to synchronize segments to the position
@@ -69,32 +70,48 @@ export default class Visualizer extends React.Component {
       this.nextSegment = segments[this.currentSegmentIndex + 1]; // n + 1
 
     }
-    // if (position >= this.nextSegment.start) {
-    //   console.log('bigger');
-    //   this.currentSegmentIndex++;
-    //   this.currentSegment = segments[this.currentSegmentIndex]; // n
-    //   this.nextSegment = segments[this.currentSegmentIndex + 1]; // n + 1
-    // }
 
 
-
-    // const segmentIndex = Math.floor((playerState.position * segments.length) / songDuration);
-    // const currentSegment = segments[segmentIndex];
-    // this.currentSegment = currentSegment;
-    // if (segments[segmentIndex +1] !== undefined) {
-    //   this.nextSegment = segments[segmentIndex+1];
-    // }
-
+    // sections is calculated with a proportion and may not be at a desirable level of synchronization
     const sections = this.analysis.sections;
     const sectionIndex = Math.floor((playerState.position * sections.length) / songDuration)
     const currentSection = sections[sectionIndex]
     this.currentSection = currentSection;
   }
 
+  /**
+   * For this function to work properly, the active intervals need to have been set.
+   * It will take the current segment and the next segment and calculate the slope-intercept (y=mx+b)
+   * equation between the volume in decibels between the two segments. It will plug in
+   * the current position of the song into the equation to get the approximate volume at any given time
+   */
+  getVolume = () => {
+    if (this.currentSegment) {
+      const x = this.position;
+      let { loudness_start, start, duration } = this.currentSegment;
+      let loudness_end = this.nextSegment.loudness_start;
+      loudness_start = Math.abs(loudness_start);
+      loudness_end = Math.abs(loudness_end);
+
+      const x1 = start * 1000; // convert seconds to ms
+      const y1 = loudness_start;
+      const x2 = (start + duration) * 1000 // convert seconds to ms
+      const y2 = loudness_end;
+
+      const m = (y2 - y1) / (x2 - x1);
+      const b = y1 - (m * x1);
+
+      return 100 - (m * x + b);
+    }
+  }
+
   async componentDidMount() {
     const playerState = await this.props.app.player.getCurrentState();
+    if (!this.fetchingData) {
+      console.log('getting the info');
+      this.getTrackInfo(playerState.track_window.current_track.id);
+    }
     this.fetchingData = true;
-    this.getTrackInfo(playerState.track_window.current_track.id);
     this.props.app.player.addListener('player_state_changed', this.playerStateChangeCallback);
   }
 

@@ -14,7 +14,7 @@ function GlobalShareButton(props) {
     <div id="global-share-button">
       <Link to="/profile/available">
         <button type="button" className="btn btn-success">
-          Share <FontAwesomeIcon icon={faMusic} fa-10x/>
+          Share <FontAwesomeIcon icon={faMusic}/>
         </button>
       </Link>
     </div>
