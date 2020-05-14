@@ -65,6 +65,7 @@ func createSearchParamsFromRequest(r *http.Request) (*models.PlaylistSearchParam
 	subcategory := queryValues.Get("subcategory")
 	sortKey := queryValues.Get("sort-key")
 	order := queryValues.Get("order")
+	IDs := queryValues.Get("spotify-ids")
 
 	if offset == "" {
 		offset = "0"
@@ -112,6 +113,13 @@ func createSearchParamsFromRequest(r *http.Request) (*models.PlaylistSearchParam
 		return nil, errors.Errorf("order value: '%s' is not allowed", order)
 	}
 
+	spotifyIds := strings.Split(IDs, " ")
+	// Split always returns a string even if its empty
+	// In the case that it is empty, we'll set the slice to be nil
+	if spotifyIds[0] == "" {
+		spotifyIds = nil
+	}
+
 	return &models.PlaylistSearchParams{
 		Category:    category,
 		Subcategory: subcategory,
@@ -119,6 +127,7 @@ func createSearchParamsFromRequest(r *http.Request) (*models.PlaylistSearchParam
 		Limit:       limit,
 		SortKey:     sortKey,
 		Order:       order,
+		SpotifyIDs:  spotifyIds,
 	}, nil
 }
 
@@ -182,7 +191,6 @@ func (p *PlaylistsController) GetRandomPlaylist(w http.ResponseWriter, r *http.R
 
 // CreatePlaylist reads the SpotifyID from the POST body
 // It then calls the spotify API to get the full info and store in the local DB
-// TODO: return 409 conflict instead of 500 error if playlist already exists
 func (p *PlaylistsController) CreatePlaylist(w http.ResponseWriter, r *http.Request) error {
 	type jsonBody struct {
 		SpotifyID    string `json:"SpotifyID"`
@@ -210,6 +218,14 @@ func (p *PlaylistsController) CreatePlaylist(w http.ResponseWriter, r *http.Requ
 	user, ok := r.Context().Value("User").(models.User)
 	if !ok {
 		return errors.New("Unable to obtain user from session")
+	}
+
+	existingPlaylist, _ := p.DB.Playlists.GetByID(data.SpotifyID)
+	if existingPlaylist != nil {
+		return &util.StatusError{
+			Message: fmt.Sprintf("Playlist with ID %s already exists", existingPlaylist.SpotifyID),
+			Code:    http.StatusConflict,
+		}
 	}
 
 	playlist, err := p.DB.Playlists.CreatePlaylistBySpotifyID(user, data.SpotifyID, data.Category, data.SubCategory, data.ImageURL, data.ThumbnailURL)
@@ -293,7 +309,7 @@ func getImageKey(url string) string {
 func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request) error {
 	multipartFile, header, err := r.FormFile("playlist-image")
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	// Deny if greater than 8mb
@@ -310,18 +326,17 @@ func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request
 	reader := io.TeeReader(multipartFile, buffer)
 	imageCopy, err := jpeg.Decode(reader)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	resizedImage := imaging.Resize(imageCopy, 250, 200, imaging.Lanczos)
 	imageDataCopy := new(bytes.Buffer)
 	err = jpeg.Encode(imageDataCopy, resizedImage, nil)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	imageData, err := ioutil.ReadAll(buffer)
 	if err != nil {
-		log.Println(err.Error())
-		return err
+		return errors.WithStack(err)
 	}
 
 	// Only allow web-safe image files

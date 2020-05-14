@@ -37,30 +37,31 @@ type PlaylistService interface {
 // Playlist is the data structure that contains playlist metadata from Spotify
 // It additionally has relations to users and tracks on Stereodose
 type Playlist struct {
-	//gorm.Model
-	SpotifyID          string          `json:"spotifyID" gorm:"primary_key:true"`
-	CreatedAt          time.Time       `json:"createdAt"`
-	UpdatedAt          time.Time       `json:"updatedAt"`
-	Category           string          `json:"category"`
-	SubCategory        string          `json:"subCategory"`
-	Collaborative      bool            `json:"collaborative"`
-	Endpoint           string          `json:"href"`
-	Images             []PlaylistImage `json:"images"`
-	Name               string          `json:"name"`
-	IsPublic           bool            `json:"public"`
-	SnapshotID         string          `json:"snapshot_id"`
-	Tracks             []Track         `json:"tracks" gorm:"many2many:playlist_tracks"`
-	Comments           []Comment       `json:"comments" gorm:"ForeignKey:PlaylistID;AssociationForeignKey:spotify_id"`
-	Likes              []Like          `json:"likes" gorm:"ForeignKey:PlaylistID;AssociationForeignKey:spotify_id"`
-	LikesCount         uint            `json:"likesCount"`
-	URI                string          `json:"URI"`
-	UserID             uint            `json:"userID"`
-	BucketImageURL     string          `json:"bucketImageURL"`
-	BucketThumbnailURL string          `json:"bucketThumbnailURL"`
-	Permalink          string          `json:"permalink"`
-	TotalTracks        int             `json:"totalTracks"`
+	SpotifyID           string          `json:"spotifyID" gorm:"primary_key:true"`
+	CreatedAt           time.Time       `json:"createdAt"`
+	UpdatedAt           time.Time       `json:"updatedAt"`
+	Category            string          `json:"category"`
+	CategoryDisplayName string          `json:"categoryDisplayName"`
+	SubCategory         string          `json:"subCategory"`
+	Collaborative       bool            `json:"collaborative"`
+	Endpoint            string          `json:"href"`
+	Images              []PlaylistImage `json:"images"`
+	Name                string          `json:"name"`
+	IsPublic            bool            `json:"public"`
+	SnapshotID          string          `json:"snapshot_id"`
+	Tracks              []Track         `json:"tracks" gorm:"many2many:playlist_tracks"`
+	Comments            []Comment       `json:"comments" gorm:"ForeignKey:PlaylistID;AssociationForeignKey:spotify_id"`
+	Likes               []Like          `json:"likes" gorm:"ForeignKey:PlaylistID;AssociationForeignKey:spotify_id"`
+	LikesCount          uint            `json:"likesCount"`
+	URI                 string          `json:"URI"`
+	UserID              uint            `json:"userID"`
+	BucketImageURL      string          `json:"bucketImageURL"`
+	BucketThumbnailURL  string          `json:"bucketThumbnailURL"`
+	Permalink           string          `json:"permalink"`
+	TotalTracks         int             `json:"totalTracks"`
 }
 
+// PlaylistSearchParams can be created using URL query parameters
 type PlaylistSearchParams struct {
 	Offset      string
 	Limit       string
@@ -68,6 +69,7 @@ type PlaylistSearchParams struct {
 	Subcategory string
 	SortKey     string
 	Order       string
+	SpotifyIDs  []string
 }
 
 // PlaylistImage should contain a URL or reference to an image
@@ -105,6 +107,10 @@ func (s *StereodosePlaylistService) GetPlaylists(params *PlaylistSearchParams) (
 		db = db.Where("category = ? AND sub_category = ?", params.Category, params.Subcategory)
 	}
 
+	if len(params.SpotifyIDs) > 0 {
+		db = db.Where("spotify_id IN(?)", params.SpotifyIDs)
+	}
+
 	err := db.Order(fmt.Sprintf("%s %s", params.SortKey, params.Order)).Find(&playlists).Error
 
 	if err != nil {
@@ -116,7 +122,7 @@ func (s *StereodosePlaylistService) GetPlaylists(params *PlaylistSearchParams) (
 // GetByID returns a playlist populated with all of its tracks
 func (s *StereodosePlaylistService) GetByID(ID string) (*Playlist, error) {
 	playlist := &Playlist{}
-	err := s.db.Preload("Tracks").Preload("Comments").Preload("Likes").Find(playlist, "spotify_id = ?", ID).Error
+	err := s.db.Preload("Tracks").Preload("Comments").Preload("Likes.Playlist").Find(playlist, "spotify_id = ?", ID).Error
 	if err != nil {
 		return nil, err
 	}
@@ -212,21 +218,27 @@ func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlis
 	if err != nil {
 		return nil, err
 	}
+	categoryObj, err := getCategoryFromName(category)
+	if err != nil {
+		return nil, err
+	}
+
 	permalink := fmt.Sprintf("/%s/%s/%s", category, subCategory, playlistID)
 	playlist := &Playlist{
-		SpotifyID:          string(list.ID),
-		Collaborative:      list.Collaborative,
-		Endpoint:           list.Endpoint,
-		Name:               list.Name,
-		IsPublic:           list.IsPublic,
-		SnapshotID:         list.SnapshotID,
-		URI:                string(list.URI),
-		UserID:             user.ID,
-		Category:           category,
-		SubCategory:        subCategory,
-		BucketImageURL:     image,
-		BucketThumbnailURL: thumbnail,
-		Permalink:          permalink,
+		SpotifyID:           string(list.ID),
+		Collaborative:       list.Collaborative,
+		Endpoint:            list.Endpoint,
+		Name:                list.Name,
+		IsPublic:            list.IsPublic,
+		SnapshotID:          list.SnapshotID,
+		URI:                 string(list.URI),
+		UserID:              user.ID,
+		Category:            category,
+		CategoryDisplayName: categoryObj.DisplayName,
+		SubCategory:         subCategory,
+		BucketImageURL:      image,
+		BucketThumbnailURL:  thumbnail,
+		Permalink:           permalink,
 	}
 	for _, image := range list.Images {
 		playlist.Images = append(playlist.Images, PlaylistImage{Image: image})
@@ -261,13 +273,14 @@ func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlis
 			continue
 		}
 		trackToAdd := Track{
-			SpotifyID:   string(track.ID),
-			Name:        track.Name,
-			Duration:    track.Duration,
-			PreviewURL:  track.PreviewURL,
-			TrackNumber: track.TrackNumber,
-			URI:         string(track.URI),
-			Artists:     simpleArtistsToString(track.Artists),
+			SpotifyID:        string(track.ID),
+			Name:             track.Name,
+			Duration:         track.Duration,
+			PreviewURL:       track.PreviewURL,
+			TrackNumber:      track.TrackNumber,
+			URI:              string(track.URI),
+			Artists:          simpleArtistsToString(track.Artists),
+			SpotifyArtistIDs: simpleArtistIdsToString(track.Artists),
 		}
 		playlist.Tracks = append(playlist.Tracks, trackToAdd)
 	}
@@ -333,6 +346,16 @@ func simpleArtistsToString(artists []spotify.SimpleArtist) string {
 		data = append(data, artist.Name)
 	}
 	return strings.Join(data, ", ")
+}
+
+// simpleArtistIdsToString is pretty much the same as the above function.
+// Just note that I removed the space
+func simpleArtistIdsToString(artists []spotify.SimpleArtist) string {
+	data := make([]string, 0)
+	for _, artist := range artists {
+		data = append(data, artist.ID.String())
+	}
+	return strings.Join(data, ",")
 }
 
 // DeletePlaylist hard deletes the playlist (only from the StereodoseDB)

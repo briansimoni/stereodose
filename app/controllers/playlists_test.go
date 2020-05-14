@@ -260,7 +260,7 @@ func TestPlaylistsController_CreatePlaylist(t *testing.T) {
 	}
 
 	validData := postBody{
-		SpotifyID:   "test",
+		SpotifyID:   "9000",
 		Category:    "weed",
 		SubCategory: "chill",
 	}
@@ -275,7 +275,7 @@ func TestPlaylistsController_CreatePlaylist(t *testing.T) {
 		// {name: "Invalid Categories", status: 400, user: nil, data: postBody{"test", "Fake", "Category"}},
 		// {name: "Invalid User Context", status: 500, user: nil, data: validData},
 		// {name: "Invalid POST body", status: 400, user: models.User{}, data: 69},
-		{name: "Database Error", status: 500, user: models.User{}, data: postBody{
+		{name: "Database Error", status: 409, user: models.User{}, data: postBody{
 			SpotifyID:   "alreadyExists",
 			Category:    "weed",
 			SubCategory: "chill",
@@ -714,12 +714,12 @@ func Test_createSearchParamsFromRequest(t *testing.T) {
 	request3, _ := http.NewRequest(http.MethodGet, "https://stereodose.app/api/playlists/?category=weed&sort-key=poop&order=desc", nil)
 
 	expected1 := &models.PlaylistSearchParams{
-		Offset: "0",
-		Limit: "10",
-		Category: "weed",
+		Offset:      "0",
+		Limit:       "10",
+		Category:    "weed",
 		Subcategory: "",
-		SortKey: "created_at",
-		Order: "asc",
+		SortKey:     "created_at",
+		Order:       "asc",
 	}
 	type args struct {
 		r *http.Request
@@ -730,9 +730,9 @@ func Test_createSearchParamsFromRequest(t *testing.T) {
 		want    *models.PlaylistSearchParams
 		wantErr bool
 	}{
-		{name: "Valid request", args: args{request1}, want: expected1, wantErr: false,},
-		{name: "Bad order value", args: args{request2}, want: nil, wantErr: true,},
-		{name: "Bad sort key", args: args{request3}, want: nil, wantErr: true,},
+		{name: "Valid request", args: args{request1}, want: expected1, wantErr: false},
+		{name: "Bad order value", args: args{request2}, want: nil, wantErr: true},
+		{name: "Bad sort key", args: args{request3}, want: nil, wantErr: true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

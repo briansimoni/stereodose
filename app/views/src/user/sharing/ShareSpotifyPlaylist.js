@@ -125,7 +125,7 @@ class ShareSpotifyPlaylist extends React.Component {
     const data = new FormData();
     data.append('playlist-image', blob);
     data.append('filename', 'playlist-image');
-    const response = await fetch(`/api/playlists/${this.state.selectedPlaylist.id}/image`, {
+    const response = await fetch(`/api/playlists/image`, {
       method: 'POST',
       body: data
     });
