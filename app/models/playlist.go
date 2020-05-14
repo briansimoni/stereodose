@@ -276,6 +276,19 @@ func (s *StereodosePlaylistService) CreatePlaylistBySpotifyID(user User, playlis
 	if err != nil {
 		return nil, err
 	}
+
+	playlist, err = s.GetByID(playlist.SpotifyID)
+	if err != nil {
+		return nil, err
+	}
+	if len(playlist.Likes) > 0 {
+		playlist.LikesCount = uint(len(playlist.Likes))
+		err = s.db.Save(playlist).Error
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return playlist, nil
 }
 
