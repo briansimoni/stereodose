@@ -122,7 +122,7 @@ func (s *StereodosePlaylistService) GetPlaylists(params *PlaylistSearchParams) (
 // GetByID returns a playlist populated with all of its tracks
 func (s *StereodosePlaylistService) GetByID(ID string) (*Playlist, error) {
 	playlist := &Playlist{}
-	err := s.db.Preload("Tracks").Preload("Comments").Preload("Likes.Playlist").Find(playlist, "spotify_id = ?", ID).Error
+	err := s.db.Preload("Tracks").Preload("Comments.Playlist").Preload("Likes.Playlist").Find(playlist, "spotify_id = ?", ID).Error
 	if err != nil {
 		return nil, err
 	}

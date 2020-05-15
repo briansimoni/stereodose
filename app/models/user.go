@@ -54,7 +54,7 @@ type StereodoseUserService struct {
 // if it doesn't it creates one, otherwise it returns a pointer to user
 func (u *StereodoseUserService) ByID(ID uint) (*User, error) {
 	user := &User{}
-	err := u.db.Preload("Images").Preload("Playlists").Preload("Comments").Preload("Likes.Playlist").Find(user, "id = ?", ID).Error
+	err := u.db.Preload("Images").Preload("Playlists").Preload("Comments.Playlist").Preload("Likes.Playlist").Find(user, "id = ?", ID).Error
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (u *StereodoseUserService) ByID(ID uint) (*User, error) {
 // BySpotifyID searches by the SpotifyID and returns a User
 func (u *StereodoseUserService) BySpotifyID(ID string) (*User, error) {
 	user := &User{}
-	err := u.db.Preload("Images").Preload("Playlists").Preload("Comments").Preload("Likes").Find(user, "spotify_id = ?", ID).Error
+	err := u.db.Preload("Images").Preload("Playlists").Preload("Comments.Playlist").Preload("Likes.Playlist").Find(user, "spotify_id = ?", ID).Error
 	if err != nil {
 		return nil, err
 	}

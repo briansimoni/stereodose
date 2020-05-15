@@ -9,11 +9,12 @@ import (
 // There is a one-to-many relationship between users and comments
 type Comment struct {
 	gorm.Model
-	Content     string `json:"content" gorm:"type:varchar(10000);"`
-	UserID      uint   `json:"userID"`
-	PlaylistID  string `json:"playlistID"`
-	DisplayName string `json:"displayName"`
-	Permalink   string `json:"permalink"`
+	Content     string   `json:"content" gorm:"type:varchar(10000);"`
+	UserID      uint     `json:"userID"`
+	PlaylistID  string   `json:"playlistID"`
+	Playlist    Playlist `json:"playlist" gorm:"foreignkey:PlaylistID"`
+	DisplayName string   `json:"displayName"`
+	Permalink   string   `json:"permalink"`
 }
 
 // CommentService is an interface for directly performing actions on the comments table
