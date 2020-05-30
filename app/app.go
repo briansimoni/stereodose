@@ -71,7 +71,7 @@ func createRouter(c *config.Config) *util.AppRouter {
 	app.HandleFunc("/robots.txt", serveFile(fileCache["/robots.txt"], nil))
 	app.HandleFunc("/manifest.json", serveFile(fileCache["/manifest.json"], nil))
 	app.HandleFunc("/sw.js", serveFile(fileCache["/sw.js"], map[string]string{"Content-Type": "application/javascript"}))
-	app.HandleFunc("/terms-of-service", serveFile(fileCache["/terms-of-service.html"], nil))
+	app.HandleFunc("/terms-and-conditions", serveFile(fileCache["/terms-and-conditions.html"], nil))
 
 	healthRouter := util.AppRouter{Router: app.PathPrefix("/api/health").Subrouter()}
 	healthRouter.AppHandler("/", health.CheckHealth).Methods(http.MethodGet)
@@ -186,7 +186,7 @@ func init() {
 		"./app/views/public/robots.txt",
 		"./app/views/public/manifest.json",
 		"./app/views/build/sw.js",
-		"./app/views/public/terms-of-service.html",
+		"./app/views/public/terms-and-conditions.html",
 	}
 
 	for _, file := range files {
