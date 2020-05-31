@@ -347,6 +347,7 @@ func TestPlaylistsController_DeletePlaylist(t *testing.T) {
 	user1 := models.User{}
 	user1.ID = 1
 	user1.DisplayName = "HasPlaylistsUser1"
+	user1.Admin = true
 
 	user2 := models.User{}
 	user2.ID = 2
@@ -357,7 +358,7 @@ func TestPlaylistsController_DeletePlaylist(t *testing.T) {
 		statusCode int
 	}{
 		{name: "authorized delete", user: user1, playlistID: "10", statusCode: 200},
-		{name: "unauthorized delete", user: user1, playlistID: "20", statusCode: 401},
+		{name: "unauthorized delete", user: user2, playlistID: "20", statusCode: 401},
 		{name: "noexistent playlist", user: user1, playlistID: "9000", statusCode: 404},
 		{name: "bad session cookie", user: nil, playlistID: "10", statusCode: 500},
 		{name: "empty playlist id", user: user1, playlistID: "error-condition", statusCode: 500},
