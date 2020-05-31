@@ -245,13 +245,20 @@ func (p *PlaylistsController) CreatePlaylist(w http.ResponseWriter, r *http.Requ
 }
 
 // DeletePlaylist takes the id variable from the url path
-// It performs a hard delete of the playlist from the DB
+// It performs a hard delete of the playlist from the DB, but a soft delete on likes and comments
+// Only admins may perform this operation
 func (p *PlaylistsController) DeletePlaylist(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	ID := vars["id"]
 	user, ok := r.Context().Value("User").(models.User)
 	if !ok {
 		return errors.New("Unable to obtain user from session")
+	}
+	if !user.Admin {
+		return &util.StatusError{
+			Message: fmt.Sprintf("Unauthorized"),
+			Code:    http.StatusUnauthorized,
+		}
 	}
 	targetPlaylist, err := p.DB.Playlists.GetByID(ID)
 	if err != nil {

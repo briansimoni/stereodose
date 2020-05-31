@@ -1,25 +1,24 @@
 {
-	"files.watcherExclude": {
-		"**/.git/objects/**": true,
-		"**/.git/subtree-cache/**": true,
-		"app/views/node_modules/**": true,
-		"app/views/build/**": true,
-	},
-	"[javascript]": {
-		"editor.detectIndentation": false,
-		"editor.tabSize": 2
-	},
-	"editor.defaultFormatter": "esbenp.prettier-vscode",
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "app/views/node_modules/**": true,
+    "app/views/build/**": true
+  },
+  "[javascript]": {
+    "editor.detectIndentation": false,
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[go]": {
+    "editor.insertSpaces": false,
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "ms-vscode.Go",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    }
+  },
+  "prettier.disableLanguages": ["golang", "go"],
 
-	"cSpell.words": [
-		"briansimoni",
-		"gorm",
-		"jinzhu",
-		"logrus",
-		"oauth",
-		"octicon",
-		"spotify",
-		"structs",
-		"uuid"
-	]
+  "cSpell.words": ["briansimoni", "gorm", "jinzhu", "logrus", "oauth", "octicon", "spotify", "structs", "uuid"]
 }

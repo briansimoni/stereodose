@@ -2,7 +2,6 @@ import React from 'react';
 import Spotify from 'spotify-web-api-js';
 import { Link } from 'react-router-dom';
 import ShareSpotifyPlaylist from './sharing/ShareSpotifyPlaylist';
-import StereodosePlaylist from './StereodosePlaylist';
 import './Profile.css';
 import profilePlaceholder from '../images/profile-placeholder.jpeg';
 
@@ -20,30 +19,6 @@ class UserProfile extends React.Component {
     if (spotifyPlaylists && stereodosePlaylists && categories) {
       return (
         <div className="container profile">
-          {this.props.location.pathname === '/profile/shared' && (
-            <div label="Playlists Shared to Stereodose">
-              <h2 id="content-title">Playlists Shared to Stereodose</h2>
-              <table className="table shared-playlists-table">
-                <tbody>
-                  <tr>
-                    <th>Playlist Name</th>
-                    <th>Drug</th>
-                    <th>Mood</th>
-                    <th>Delete?</th>
-                  </tr>
-                  {stereodosePlaylists.map(playlist => (
-                    <StereodosePlaylist
-                      key={playlist.spotifyID}
-                      playlist={playlist}
-                      onUpdate={() => {
-                        this.checkPlaylists();
-                      }}
-                    />
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
 
           {this.props.location.pathname === '/profile/available' && (
             <div label="Playlists Available" className="container">
@@ -86,14 +61,6 @@ class UserProfile extends React.Component {
                 <div className="col-md-12">
                   <Link className="nav-link" to="/profile/available">
                     <button className="btn btn-success">Share Playlist</button>
-                  </Link>
-                </div>
-              </div>
-
-              <div className="row">
-                <div className="col-md-12">
-                  <Link className="nav-link" to="/profile/shared">
-                    <button className="btn btn-danger">Delete Playlists</button>
                   </Link>
                 </div>
               </div>

@@ -359,7 +359,6 @@ func simpleArtistIdsToString(artists []spotify.SimpleArtist) string {
 }
 
 // DeletePlaylist hard deletes the playlist (only from the StereodoseDB)
-// TODO: find the related likes/comments and delete those too
 func (s *StereodosePlaylistService) DeletePlaylist(spotifyID string) error {
 	if spotifyID == "" {
 		return errors.New("spotifyID was empty string")
@@ -369,14 +368,33 @@ func (s *StereodosePlaylistService) DeletePlaylist(spotifyID string) error {
 		return err
 	}
 
-	result := s.db.Delete(playlist)
-	if result.Error != nil {
-		return result.Error
+	tx := s.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return err
 	}
-	if result.RowsAffected == 0 {
-		return errors.New("Delete failed. Playlist Did not exist")
+
+	if err := tx.Delete(playlist.Likes, "playlist_id = ?", playlist.SpotifyID).Error; err != nil {
+		tx.Rollback()
+		return err
 	}
-	return nil
+
+	if err := tx.Delete(playlist.Comments, "playlist_id = ?", playlist.SpotifyID).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Delete(playlist).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
 }
 
 // Comment will save a comment to the specified playlist

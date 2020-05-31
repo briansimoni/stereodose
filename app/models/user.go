@@ -34,6 +34,7 @@ type User struct {
 	Likes        []Like      `json:"likes"`
 	// Product is the user's subscription level: "premium, free etc..."
 	Product string `json:"product"`
+	Admin   bool
 }
 
 // UserImage should contain a URL or reference to an image
