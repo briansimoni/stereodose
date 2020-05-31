@@ -270,23 +270,6 @@ func (p *PlaylistsController) DeletePlaylist(w http.ResponseWriter, r *http.Requ
 			Code:    http.StatusNotFound,
 		}
 	}
-	userPlaylists, err := p.DB.Playlists.GetMyPlaylists(user)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	authorized := false
-	for _, playlist := range userPlaylists {
-		if playlist.SpotifyID == ID {
-			authorized = true
-			break
-		}
-	}
-	if !authorized {
-		return &util.StatusError{
-			Message: fmt.Sprintf("Unauthorized to remove this playlist"),
-			Code:    http.StatusUnauthorized,
-		}
-	}
 
 	err = p.DB.Playlists.DeletePlaylist(ID)
 	if err != nil {
