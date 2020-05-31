@@ -1,5 +1,7 @@
 import React from 'react';
-import Octicon from 'react-octicon';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 class Comments extends React.Component {
   constructor(props) {
@@ -35,7 +37,7 @@ class Comments extends React.Component {
                         onDeleteComment(comment.ID);
                       }}
                     >
-                      <Octicon name="trashcan" />
+                      <FontAwesomeIcon icon={faTrash}/>
                     </button>
                   )}
                 </div>
