@@ -37,6 +37,7 @@ export default function About() {
         <h1>Legal</h1>
         <ul>
           <li><a href="/terms-and-conditions">Terms And Conditions</a></li>
+          <li><a href="/privacy-policy">Privacy Policy</a></li>
         </ul>
         <p>Stereodose is coming to the iOS app store in the next few months. Be sure to check back!</p>
         <Feedback />
