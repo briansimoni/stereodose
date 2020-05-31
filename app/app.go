@@ -72,6 +72,7 @@ func createRouter(c *config.Config) *util.AppRouter {
 	app.HandleFunc("/manifest.json", serveFile(fileCache["/manifest.json"], nil))
 	app.HandleFunc("/sw.js", serveFile(fileCache["/sw.js"], map[string]string{"Content-Type": "application/javascript"}))
 	app.HandleFunc("/terms-and-conditions", serveFile(fileCache["/terms-and-conditions.html"], nil))
+	app.HandleFunc("/privacy-policy", serveFile(fileCache["/privacy-policy.html"], nil))
 
 	healthRouter := util.AppRouter{Router: app.PathPrefix("/api/health").Subrouter()}
 	healthRouter.AppHandler("/", health.CheckHealth).Methods(http.MethodGet)
@@ -187,6 +188,7 @@ func init() {
 		"./app/views/public/manifest.json",
 		"./app/views/build/sw.js",
 		"./app/views/public/terms-and-conditions.html",
+		"./app/views/public/privacy-policy.html",
 	}
 
 	for _, file := range files {
