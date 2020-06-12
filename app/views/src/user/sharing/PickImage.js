@@ -13,7 +13,7 @@ export default class PickImage extends React.Component {
     crop: {
       unit: '%',
       width: 40,
-      aspect: 5 / 4
+      aspect: 1
     }
   };
 

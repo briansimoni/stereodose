@@ -318,7 +318,7 @@ func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	resizedImage := imaging.Resize(imageCopy, 250, 200, imaging.Lanczos)
+	resizedImage := imaging.Resize(imageCopy, 250, 250, imaging.Lanczos)
 	imageDataCopy := new(bytes.Buffer)
 	err = jpeg.Encode(imageDataCopy, resizedImage, nil)
 	if err != nil {
