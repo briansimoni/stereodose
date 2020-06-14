@@ -2,4 +2,10 @@
     position: absolute;
     right: 20px;
     bottom: 150px;
+    background-color: #8B578F
+}
+
+#global-share-button button {
+    background-color: #8B578F;
+    border-color: #8B578F;
 }

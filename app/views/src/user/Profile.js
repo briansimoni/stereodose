@@ -2,6 +2,8 @@ import React from 'react';
 import profilePlaceholder from '../images/profile-placeholder.jpeg';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
+import { faComments } from '@fortawesome/free-solid-svg-icons';
+import { faMusic } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 
 class Profile extends React.Component {
@@ -26,8 +28,17 @@ class Profile extends React.Component {
       <div>
         <div className="row justify-content-center">
           <div className="col col-auto">
-            <img src={profilePlaceholder} alt="profile" />
+            {/*this strange-looking code is here to compensate in the edge cases where a user image may not exist or the API has bad data*/}
+            {this.state.user.images && this.state.user.images.length > 0 && (
+              <img id="profile-image" src={this.state.user.images[this.state.user.images.length - 1].url} alt="profile" />
+            )}
+
+            {(!this.state.user.images || !this.state.user.images.length > 0) && <img src={profilePlaceholder} alt="profile" />}
           </div>
+        </div>
+
+        <div className="row justify-content-center">
+            <h5>{this.state.user.displayName}</h5>
         </div>
 
         <div className="row">
@@ -44,7 +55,7 @@ class Profile extends React.Component {
                       aria-expanded="false"
                       aria-controls="collapseOne"
                     >
-                      Likes ({this.state.user.likes.length})
+                      <FontAwesomeIcon icon={faHeart} /> Likes ({this.state.user.likes.length})
                     </button>
                   </h2>
                 </div>
@@ -73,7 +84,7 @@ class Profile extends React.Component {
                       aria-expanded="false"
                       aria-controls="collapseTwo"
                     >
-                      Comments
+                      <FontAwesomeIcon icon={faComments} /> Comments ({this.state.user.comments.length})
                     </button>
                   </h2>
                 </div>
@@ -83,7 +94,11 @@ class Profile extends React.Component {
                   aria-labelledby="headingTwo"
                   data-parent="#profile-accordion"
                 >
-                  <div className="card-body"></div>
+                  <div className="card-body">
+                    {this.state.user.comments.map((comment, index) => (
+                      <Comment key={index} comment={comment} />
+                    ))}
+                  </div>
                 </div>
               </div>
               <div className="card">
@@ -97,7 +112,7 @@ class Profile extends React.Component {
                       aria-expanded="false"
                       aria-controls="collapseThree"
                     >
-                      Playlists
+                      <FontAwesomeIcon icon={faMusic} /> Playlists ({this.state.user.playlists.length})
                     </button>
                   </h2>
                 </div>
@@ -107,7 +122,11 @@ class Profile extends React.Component {
                   aria-labelledby="headingThree"
                   data-parent="#profile-accordion"
                 >
-                  <div className="card-body"></div>
+                  <div className="card-body">
+                    {this.state.user.playlists.map((playlist, index) => (
+                      <Playlist key={index} playlist={playlist} />
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -135,8 +154,6 @@ class Profile extends React.Component {
   };
 }
 
-export default Profile;
-
 function Like(props) {
   const like = props.like;
 
@@ -144,7 +161,7 @@ function Like(props) {
     <div className="card mb-3">
       <div className="row no-gutters">
         <div className="col-3 col-sm-2">
-          <img src={like.playlist.bucketThumbnailURL} className="card-img" alt="..."></img>
+          <img src={like.playlist.bucketThumbnailURL} className="card-img" alt="playlist-artwork"></img>
         </div>
         <div className="col-9 col-sm-6">
           <div className="card-body">
@@ -153,17 +170,69 @@ function Like(props) {
             </Link>
             <p className="card-text">
               <small>
-                {like.playlist.category} - {like.playlist.subCategory} <FontAwesomeIcon icon={faHeart} /> {like.playlist.likesCount}
+                {like.playlist.category} - {like.playlist.subCategory}
               </small>
             </p>
-            {/* <p className="card-text">
-              <small className="text-muted">
-                {like.playlist.likesCount} <FontAwesomeIcon icon={faHeart} />
-              </small>
-            </p> */}
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+function Comment(props) {
+  const comment = props.comment;
+
+  return (
+    <div className="card mb-3">
+      <div className="row no-gutters">
+        <div className="col-3 col-sm-2">
+          <img src={comment.playlist.bucketThumbnailURL} className="card-img" alt="playlist-artwork"></img>
+        </div>
+        <div className="col-9 col-sm-6">
+          <div className="card-body">
+            <Link to={comment.playlist.permalink}>
+              <h6 className="card-title">{comment.playlist.name}</h6>
+            </Link>
+            <p className="card-text">
+              <small>
+                {comment.playlist.category} - {comment.playlist.subCategory}
+              </small>
+            </p>
+            <p className="card-text">
+              <small className="text-muted">{comment.content}</small>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Playlist(props) {
+  const playlist = props.playlist;
+
+  return (
+    <div className="card mb-3">
+      <div className="row no-gutters">
+        <div className="col-3 col-sm-2">
+          <img src={playlist.bucketThumbnailURL} className="card-img" alt="playlist-artwork"></img>
+        </div>
+        <div className="col-9 col-sm-6">
+          <div className="card-body">
+            <Link to={playlist.permalink}>
+              <h6 className="card-title">{playlist.name}</h6>
+            </Link>
+            <p className="card-text">
+              <small>
+                {playlist.category} - {playlist.subCategory}
+              </small>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Profile;
