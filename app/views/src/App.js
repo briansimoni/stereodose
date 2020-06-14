@@ -6,6 +6,7 @@ import Playlist from './screens/Playlist';
 import Player from './player/Player';
 import About from './screens/About';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import UserProfile from './user/UserProfile';
 import Profile from './user/Profile';
 import Header from './user/Header';
 import NoMatch from './404';
@@ -44,9 +45,9 @@ class App extends React.Component {
             <Switch>
               <Route exact path="/profile" render={props => <Profile {...props} app={this} />} />
 
-              <Route exact path="/profile/shared" render={props => <Profile {...props} app={this} />} />
+              <Route exact path="/profile/shared" render={props => <UserProfile {...props} app={this} />} />
 
-              <Route exact path="/profile/available" render={props => <Profile {...props} app={this} />} />
+              <Route exact path="/profile/available" render={props => <UserProfile {...props} app={this} />} />
 
               <Route exact path="/" render={props => <Drugs {...props} app={this} />} />
 

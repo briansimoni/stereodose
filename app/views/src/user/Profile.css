@@ -64,3 +64,19 @@ span.nav-link {
   text-align: left;
   padding-left: 35%;
 }
+
+#profile-accordion .card {
+  background-color: #303030
+}
+
+#profile-accordion .card-img {
+  height: 100px;
+  width: auto;
+  border: 2px solid black;
+  max-width: 100px;
+}
+
+#profile-accordion .card-body {
+  padding: 0 0;
+  text-align: center;
+}
