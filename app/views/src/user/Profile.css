@@ -7,7 +7,7 @@ nav img {
 }
 
 .signin-button {
-  color: #008f0c;
+  color: #8b578f;
   cursor: pointer;
 }
 
@@ -22,7 +22,7 @@ span.nav-link {
 }
 
 .list-group-item-action {
-  color: #008f0c;
+  color: #8b578f;
   text-align: center;
   cursor: pointer;
 }
@@ -36,7 +36,7 @@ span.nav-link {
 }
 
 .navbar-dark .navbar-nav .nav-link {
-  color: #008f0c;
+  color: #8b578f;
 }
 
 .ReactCrop {
@@ -45,6 +45,16 @@ span.nav-link {
 
 #profile-picture-row {
   margin-bottom: 20px;
+}
+
+#profile-image {
+  display: inline-block;
+  position: relative;
+  width: 200px;
+  height: 200px;
+  overflow: hidden;
+  border-radius: 50%;
+  border: 2px solid black;
 }
 
 .profile-main ul {
@@ -63,4 +73,35 @@ span.nav-link {
 .profile ul {
   text-align: left;
   padding-left: 35%;
+}
+
+#profile-accordion .card {
+  background-color: #303030;
+}
+
+#profile-accordion .card-img {
+  height: 100px;
+  width: auto;
+  border: 2px solid black;
+  max-width: 100px;
+}
+
+#profile-accordion .card-body {
+  padding: 0 0;
+}
+
+@media only screen and (max-width: 768px) {
+  #profile-accordion .card-body {
+    text-align: center;
+  }
+}
+
+#profile-accordion .btn-link {
+  color: #8b578f;
+}
+
+#profile-accordion svg {
+  color: white;
+  font-size: 18px;
+  margin-right: 20px;
 }

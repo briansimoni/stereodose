@@ -34,12 +34,12 @@ export default function About() {
             https://developer.spotify.com/documentation/web-playback-sdk/#supported-browsers
           </a>
         </p>
+        <p>Stereodose is coming to the iOS app store in the next few months. Be sure to check back!</p>
         <h1>Legal</h1>
         <ul>
           <li><a href="/terms-and-conditions">Terms And Conditions</a></li>
           <li><a href="/privacy-policy">Privacy Policy</a></li>
         </ul>
-        <p>Stereodose is coming to the iOS app store in the next few months. Be sure to check back!</p>
         <Feedback />
       </div>
     </div>

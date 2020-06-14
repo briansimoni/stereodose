@@ -1,11 +1,12 @@
 import React from 'react';
-import Spotify from 'spotify-web-api-js';
-import { Link } from 'react-router-dom';
-import ShareSpotifyPlaylist from './sharing/ShareSpotifyPlaylist';
-import './Profile.css';
 import profilePlaceholder from '../images/profile-placeholder.jpeg';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHeart } from '@fortawesome/free-solid-svg-icons';
+import { faComments } from '@fortawesome/free-solid-svg-icons';
+import { faMusic } from '@fortawesome/free-solid-svg-icons';
+import { Link } from 'react-router-dom';
 
-class UserProfile extends React.Component {
+class Profile extends React.Component {
   state = {
     spotifyPlaylists: null,
     stereodosePlaylists: null,
@@ -13,102 +14,123 @@ class UserProfile extends React.Component {
   };
 
   render() {
-    const { spotifyPlaylists, stereodosePlaylists, user } = this.state;
-    const categories = this.props.app.state.categories;
-
-    if (spotifyPlaylists && stereodosePlaylists && categories) {
+    if (!this.state.user) {
       return (
-        <div className="container profile">
-
-          {this.props.location.pathname === '/profile/available' && (
-            <div label="Playlists Available" className="container">
-              <div className="row justify-content-md-center">
-                <div className="col col-md-auto">
-                  <ShareSpotifyPlaylist
-                    playlists={spotifyPlaylists}
-                    categories={categories}
-                    onUpdate={() => {
-                      this.checkPlaylists();
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {this.props.location.pathname === '/profile' && user && (
-            <div className="text-center profile-main">
-              <div className="row" id="profile-picture-row">
-                <div className="col">
-                  {/*hotfix*/}
-                  {user.images && user.images.length > 0 && (
-                    <img
-                      src={user.images[user.images.length - 1].url}
-                      alt="profile"
-                    />
-                  )}
-
-                  {(!user.images || !user.images.length > 0) && (
-                    <img src={profilePlaceholder} alt="profile" />
-                  )}
-
-                  <br />
-                  {user.displayName}
-                </div>
-              </div>
-
-              <div className="row">
-                <div className="col-md-12">
-                  <Link className="nav-link" to="/profile/available">
-                    <button className="btn btn-success">Share Playlist</button>
-                  </Link>
-                </div>
-              </div>
-
-              <div className="row">
-                <div className="col-md-4">
-                  <h3>Likes: {user.likes.length}</h3>
-                  <ul>
-                    {user.likes.map(like => (
-                      <li key={like.ID}>
-                        <Link to={like.permalink}>{like.playlistName}</Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="col-md-4">
-                  <h3>Comments: {user.comments.length}</h3>
-                  <ul>
-                    {user.comments.map(comment => (
-                      <li key={comment.ID}>
-                        <Link to={comment.permalink}>{`${comment.content.slice(0, 15)}...`}</Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="col-md-4">
-                  <h3>Shared: {stereodosePlaylists.length}</h3>
-                  <ul>
-                    {stereodosePlaylists.map(playlist => (
-                      <li key={playlist.spotifyID}>
-                        <Link to={playlist.permalink}>{playlist.name}</Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
-          )}
-
+        <div className="row justify-content-md-center">
+          <div className="spinner-grow text-success text-center" role="status">
+            <span className="sr-only">Loading...</span>
+          </div>
         </div>
       );
     }
+
     return (
-      <div className="row justify-content-md-center">
-        <div className="spinner-grow text-success text-center" role="status">
-          <span className="sr-only">Loading...</span>
+      <div>
+        <div className="row justify-content-center">
+          <div className="col col-auto">
+            {/*this strange-looking code is here to compensate in the edge cases where a user image may not exist or the API has bad data*/}
+            {this.state.user.images && this.state.user.images.length > 0 && (
+              <img id="profile-image" src={this.state.user.images[this.state.user.images.length - 1].url} alt="profile" />
+            )}
+
+            {(!this.state.user.images || !this.state.user.images.length > 0) && <img src={profilePlaceholder} alt="profile" />}
+          </div>
+        </div>
+
+        <div className="row justify-content-center">
+            <h5>{this.state.user.displayName}</h5>
+        </div>
+
+        <div className="row">
+          <div className="col">
+            <div className="accordion" id="profile-accordion">
+              <div className="card">
+                <div className="card-header" id="headingOne">
+                  <h2 className="mb-0">
+                    <button
+                      className="btn btn-link btn-block text-left"
+                      type="button"
+                      data-toggle="collapse"
+                      data-target="#collapseOne"
+                      aria-expanded="false"
+                      aria-controls="collapseOne"
+                    >
+                      <FontAwesomeIcon icon={faHeart} /> Likes ({this.state.user.likes.length})
+                    </button>
+                  </h2>
+                </div>
+
+                <div
+                  id="collapseOne"
+                  className="collapse"
+                  aria-labelledby="headingOne"
+                  data-parent="#profile-accordion"
+                >
+                  <div className="card-body">
+                    {this.state.user.likes.map((like, index) => {
+                      return <Like key={index} like={like} />;
+                    })}
+                  </div>
+                </div>
+              </div>
+              <div className="card">
+                <div className="card-header" id="headingTwo">
+                  <h2 className="mb-0">
+                    <button
+                      className="btn btn-link btn-block text-left collapsed"
+                      type="button"
+                      data-toggle="collapse"
+                      data-target="#collapseTwo"
+                      aria-expanded="false"
+                      aria-controls="collapseTwo"
+                    >
+                      <FontAwesomeIcon icon={faComments} /> Comments ({this.state.user.comments.length})
+                    </button>
+                  </h2>
+                </div>
+                <div
+                  id="collapseTwo"
+                  className="collapse"
+                  aria-labelledby="headingTwo"
+                  data-parent="#profile-accordion"
+                >
+                  <div className="card-body">
+                    {this.state.user.comments.map((comment, index) => (
+                      <Comment key={index} comment={comment} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="card">
+                <div className="card-header" id="headingThree">
+                  <h2 className="mb-0">
+                    <button
+                      className="btn btn-link btn-block text-left collapsed"
+                      type="button"
+                      data-toggle="collapse"
+                      data-target="#collapseThree"
+                      aria-expanded="false"
+                      aria-controls="collapseThree"
+                    >
+                      <FontAwesomeIcon icon={faMusic} /> Playlists ({this.state.user.playlists.length})
+                    </button>
+                  </h2>
+                </div>
+                <div
+                  id="collapseThree"
+                  className="collapse"
+                  aria-labelledby="headingThree"
+                  data-parent="#profile-accordion"
+                >
+                  <div className="card-body">
+                    {this.state.user.playlists.map((playlist, index) => (
+                      <Playlist key={index} playlist={playlist} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -116,62 +138,11 @@ class UserProfile extends React.Component {
 
   async componentDidMount() {
     try {
-      await this.checkPlaylists();
       await this.fetchUserData();
     } catch (err) {
       alert(err.message);
     }
   }
-
-  checkPlaylists = async () => {
-    const SDK = new Spotify();
-    const token = await this.props.app.getAccessToken();
-    SDK.setAccessToken(token);
-
-    let spotifyPlaylists = [];
-    let allPlaylistsLoaded = false;
-    let offset = 0;
-    while (!allPlaylistsLoaded) {
-      const userPlaylists = await SDK.getUserPlaylists({
-        limit: 50,
-        offset: offset
-      });
-      spotifyPlaylists = spotifyPlaylists.concat(userPlaylists.items);
-      if (userPlaylists.items.length < 50) {
-        allPlaylistsLoaded = true;
-      }
-      offset = offset + 50;
-    }
-
-    const response = await fetch('/api/playlists/me', { credentials: 'same-origin' });
-    if (response.status !== 200) {
-      throw new Error(`${response.status} Unable to fetch user profile`);
-    }
-    const stereodosePlaylists = await response.json();
-
-    const diffedSpotifyPlaylists = [];
-    const diffedStereodosePlaylists = [];
-
-    // const spotifyPlaylists = userPlaylists.items;
-    for (let i = 0; i < spotifyPlaylists.length; i++) {
-      let match = false;
-      for (let j = 0; j < stereodosePlaylists.length; j++) {
-        if (spotifyPlaylists[i].id === stereodosePlaylists[j].spotifyID) {
-          diffedStereodosePlaylists.push(stereodosePlaylists[j]);
-          match = true;
-          break;
-        }
-      }
-      if (match === false) {
-        diffedSpotifyPlaylists.push(spotifyPlaylists[i]);
-      }
-    }
-
-    this.setState({
-      spotifyPlaylists: diffedSpotifyPlaylists,
-      stereodosePlaylists: diffedStereodosePlaylists
-    });
-  };
 
   fetchUserData = async () => {
     const response = await fetch('/api/users/me', { credentials: 'same-origin' });
@@ -183,4 +154,85 @@ class UserProfile extends React.Component {
   };
 }
 
-export default UserProfile;
+function Like(props) {
+  const like = props.like;
+
+  return (
+    <div className="card mb-3">
+      <div className="row no-gutters">
+        <div className="col-3 col-sm-2">
+          <img src={like.playlist.bucketThumbnailURL} className="card-img" alt="playlist-artwork"></img>
+        </div>
+        <div className="col-9 col-sm-6">
+          <div className="card-body">
+            <Link to={like.playlist.permalink}>
+              <h6 className="card-title">{like.playlist.name}</h6>
+            </Link>
+            <p className="card-text">
+              <small>
+                {like.playlist.category} - {like.playlist.subCategory}
+              </small>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Comment(props) {
+  const comment = props.comment;
+
+  return (
+    <div className="card mb-3">
+      <div className="row no-gutters">
+        <div className="col-3 col-sm-2">
+          <img src={comment.playlist.bucketThumbnailURL} className="card-img" alt="playlist-artwork"></img>
+        </div>
+        <div className="col-9 col-sm-6">
+          <div className="card-body">
+            <Link to={comment.playlist.permalink}>
+              <h6 className="card-title">{comment.playlist.name}</h6>
+            </Link>
+            <p className="card-text">
+              <small>
+                {comment.playlist.category} - {comment.playlist.subCategory}
+              </small>
+            </p>
+            <p className="card-text">
+              <small className="text-muted">{comment.content}</small>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Playlist(props) {
+  const playlist = props.playlist;
+
+  return (
+    <div className="card mb-3">
+      <div className="row no-gutters">
+        <div className="col-3 col-sm-2">
+          <img src={playlist.bucketThumbnailURL} className="card-img" alt="playlist-artwork"></img>
+        </div>
+        <div className="col-9 col-sm-6">
+          <div className="card-body">
+            <Link to={playlist.permalink}>
+              <h6 className="card-title">{playlist.name}</h6>
+            </Link>
+            <p className="card-text">
+              <small>
+                {playlist.category} - {playlist.subCategory}
+              </small>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Profile;
