@@ -28,8 +28,8 @@ export default function ChoosePlaylistType(props) {
               </Link>
               {`${drug}: ${subcategory}`}
             </h2>
-            <h2 className="text-center"><Link to={`/${drug}/${subcategory}`}>User Created</Link></h2>
-            <h2 className="text-center"><Link to={`/${drug}/${subcategory}/random`}>Random</Link></h2>
+            <h3 className="text-center"><Link to={`/${drug}/${subcategory}`}>User Created</Link></h3>
+            <h3 className="text-center"><Link to={`/${drug}/${subcategory}/random`}>Random</Link></h3>
           </div>
         </div>
       </div>
