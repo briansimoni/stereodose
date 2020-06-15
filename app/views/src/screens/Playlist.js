@@ -38,7 +38,7 @@ class Playlist extends React.Component {
     if (loading) {
       return (
         <div className="row justify-content-md-center">
-          <div className="spinner-grow text-success text-center" role="status">
+          <div className="spinner-grow text-center" role="status">
             <span className="sr-only">Loading...</span>
           </div>
         </div>

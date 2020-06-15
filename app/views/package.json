@@ -14,7 +14,7 @@
         "http-proxy-middleware": "^0.19.0",
         "react": "^16.10.2",
         "react-app-polyfill": "^1.0.4",
-        "react-compound-slider": "^2.0.0",
+        "react-compound-slider": "^2.5.0",
         "react-dom": "^16.10.2",
         "react-image-crop": "^6.0.12",
         "react-router-dom": "^5.1.2",

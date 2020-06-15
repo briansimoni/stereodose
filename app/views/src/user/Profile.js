@@ -17,7 +17,7 @@ class Profile extends React.Component {
     if (!this.state.user) {
       return (
         <div className="row justify-content-md-center">
-          <div className="spinner-grow text-success text-center" role="status">
+          <div className="spinner-grow text-center" role="status">
             <span className="sr-only">Loading...</span>
           </div>
         </div>

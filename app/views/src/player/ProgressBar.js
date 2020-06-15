@@ -14,29 +14,9 @@ export default class ProgressBar extends React.Component {
     this.trackRef = React.createRef();
   }
 
-  componentDidMount() {
-    // for some reason with the compound-slider API and even the DOM mouseup API
-    // I couldn't get it to consistently fire. Maybe some kind of race condition...
-    // This isn't the most ideal experience but I think its pitfalls are hardly noticeable.
-    //  setTimeout with 0 defers seeking until the values have been updated
-    this.railRef.current.addEventListener('mousedown', e => {
-      setTimeout(() => {
-        this.props.onSeek(this.values, this.props.duration);
-      }, 0);
-    });
-
-    this.trackRef.current.addEventListener('mousedown', e => {
-      setTimeout(() => {
-        this.props.onSeek(this.values, this.props.duration);
-      }, 0);
-    });
+  onSlideEnd = values => {
+    this.props.onSeek(values, this.props.duration);
   }
-
-  // I'm storing updated values outside of state because I don't need this to trigger
-  // another render
-  onUpdate = values => {
-    this.values = values;
-  };
 
   render() {
     const progress = this.props.position / this.props.duration;
@@ -46,6 +26,7 @@ export default class ProgressBar extends React.Component {
       <Slider
         disabled={this.props.disabled}
         onUpdate={this.onUpdate}
+        onSlideEnd={this.onSlideEnd}
         className="progress-bar-slider"
         domain={[0, 100]}
         values={[percentage]}
