@@ -15,7 +15,7 @@ body {
 
 #player-message-not-signed-in {
   text-align: center;
-  color: #DB5B87;
+  color: #8B578F;
   cursor: pointer;
 }
 
@@ -32,13 +32,13 @@ body {
 
 .fa-pause {
   cursor: pointer;
-  color: #DB5B87;
+  color: #8B578F;
   font-size: 35px;
 }
 
 .fa-play {
   cursor: pointer;
-  color: #DB5B87;
+  color: #8B578F;
   font-size: 35px;
 }
 
@@ -50,7 +50,7 @@ body {
 
 .fa-step-forward {
   cursor: pointer;
-  color: #DB5B87;
+  color: #8B578F;
   margin-left: 30px;
   font-size: 35px;
 }
@@ -62,7 +62,7 @@ body {
 
 .fa-step-backward {
   cursor: pointer;
-  color: #DB5B87;
+  color: #8B578F;
   margin-right: 30px;
   font-size: 35px;
 }
@@ -103,7 +103,7 @@ body {
   position: relative;
   margin-right: 10%;
   margin-left: -10%;
-  color: #DB5B87;
+  color: #8B578F;
 }
 
 .repeat-track-number {
@@ -116,11 +116,11 @@ body {
 }
 
 .fa-redo.repeat.context {
-  color: #DB5B87;
+  color: #8B578F;
 }
 
 .fa-redo.repeat.track {
-  color: #DB5B87;
+  color: #8B578F;
 }
 
 .fa-redo.repeat.disabled {
@@ -131,7 +131,7 @@ body {
 .fa-redo.repeat.track::after {
   position: absolute;
   content: '1';
-  color: #DB5B87;
+  color: #8B578F;
   font-size: 12px;
   font-weight: 700;
 }
@@ -162,7 +162,7 @@ body {
 }
 
 .fa-random.shuffle.on {
-  color: #DB5B87;
+  color: #8B578F;
 }
 
 #current-track-link > span {
@@ -171,7 +171,7 @@ body {
 
 @media only screen and (max-width: 767.98px) {
   #current-track-link > span {
-    color: #DB5B87;
+    color: #8B578F;
   }
 }
 
