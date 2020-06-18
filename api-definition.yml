@@ -329,6 +329,8 @@ paths:
                   type: string
                 Category:
                   type: string
+                Subcategory:
+                  type: string
                 ImageURL:
                   type: string
                 ThumbnailURL:
@@ -589,9 +591,6 @@ paths:
                 otherComments:
                   type: string
                   
-externalDocs:
-  description: Find out more about Swagger
-  url: 'http://swagger.io'
 
 components:
   schemas:

@@ -473,6 +473,10 @@ func refreshToken(c *oauth2.Config, refreshToken string) (*refreshTokenResponse,
 	return &tok, nil
 }
 
+func Test() string {
+	return "lol"
+}
+
 func checkState(r *http.Request, s *sessions.Session) error {
 	responseState := r.URL.Query().Get("state")
 	if responseState == "" {
@@ -532,7 +536,7 @@ func (a *AuthController) saveUserData(token *oauth2.Token, u *spotify.PrivateUse
 	// make sure that the tokens are up to date
 	user.RefreshToken = token.RefreshToken
 	user.AccessToken = token.AccessToken
-	
+
 	err = a.DB.Users.Update(user)
 	if err != nil {
 		return nil, err

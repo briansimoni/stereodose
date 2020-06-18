@@ -31,7 +31,7 @@ var (
 )
 
 // InitApp puts together the Router to use as the app's main HTTP handler
-func InitApp(c *config.Config, db *gorm.DB) *util.AppRouter {
+func InitApp(c *config.Config) (*util.AppRouter, *models.StereoDoseDB) {
 	authKey, err := base64.StdEncoding.DecodeString(c.AuthKey)
 	if err != nil {
 		log.Fatal("Unable to obtain auth key", err.Error())
@@ -47,8 +47,8 @@ func InitApp(c *config.Config, db *gorm.DB) *util.AppRouter {
 		log.Fatal("Unable to setup cloud bucket storage", err.Error())
 	}
 
-	stereoDoseDB = models.NewStereodoseDB(db, store)
-	return createRouter(c)
+	stereoDoseDB = models.NewStereodoseDB(c, store)
+	return createRouter(c), stereoDoseDB
 }
 
 func createRouter(c *config.Config) *util.AppRouter {
