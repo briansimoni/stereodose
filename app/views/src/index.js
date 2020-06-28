@@ -17,7 +17,7 @@ if (browser) {
     alert(notSupportedMessage);
   }
   if (browser.os === 'iOS') {
-    alert('Stereodose is coming soon to the app store. The web app is currently incompatible with iOS.');
+    alert('Stereodose is coming soon to the app store. Download now from https://testflight.apple.com/join/214iUi3U');
   }
 }
 

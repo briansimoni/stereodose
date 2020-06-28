@@ -35,11 +35,10 @@ export default function About() {
           </a>
         </p>
         <p>Stereodose is coming to the iOS app store in the next few months. Be sure to check back!</p>
+        <p>Download the iOS beta now from <a href="https://testflight.apple.com/join/214iUi3U">Test Flight</a></p>
         <h1>Legal</h1>
-        <ul>
-          <li><a href="/terms-and-conditions">Terms And Conditions</a></li>
-          <li><a href="/privacy-policy">Privacy Policy</a></li>
-        </ul>
+        <p><a href="/terms-and-conditions">Terms And Conditions</a></p>
+        <p><a href="/privacy-policy">Privacy Policy</a></p>
         <Feedback />
       </div>
     </div>
