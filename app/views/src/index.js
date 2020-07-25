@@ -23,17 +23,33 @@ if (browser) {
 
 ReactDOM.render(<App />, document.getElementById('root'));
 
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function () {
-    navigator.serviceWorker.register('/sw.js').then(
-      function (registration) {
-        // Registration was successful
-        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-      },
-      function (err) {
-        // registration failed :(
-        console.log('ServiceWorker registration failed: ', err);
+isLoggedIn().then(loggedIn => {
+  if (loggedIn) {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/sw.js').then(
+          function (registration) {
+            // Registration was successful
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          },
+          function (err) {
+            // registration failed :(
+            console.log('ServiceWorker registration failed: ', err);
+          }
+        );
+      });
+    }
+  }
+})
+
+
+function isLoggedIn() {
+  return new Promise((resolve) => {
+    fetch('/api/users/me').then((response) => {
+      if (response.status === 200) {
+        resolve(true);
       }
-    );
+      resolve(false);
+    });
   });
 }

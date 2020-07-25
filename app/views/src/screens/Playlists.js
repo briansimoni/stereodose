@@ -25,7 +25,7 @@ class Playlists extends React.Component {
     if (loading) {
       return (
         <div className="row">
-          <div className="spinner-grow text-success" role="status">
+          <div className="spinner-grow" role="status">
             <span className="sr-only">Loading...</span>
           </div>
         </div>

@@ -4,6 +4,9 @@ import WebPlaybackReact from './WebPlaybackReact';
 import Spotify from 'spotify-web-api-js';
 import DisabledPlayer from './DisabledPlayer';
 import GlobalShareButton from '../user/sharing/GlobalShareButton';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSignInAlt } from '@fortawesome/free-solid-svg-icons';
+import spotifyIcon from '../images/Spotify_Icon_RGB_Black.png';
 
 import NowPlayingScreen from './NowPlaying';
 
@@ -148,15 +151,18 @@ export default class Player extends Component {
       <div>
         {authError && (
           <footer className="footer fixed-bottom">
-            <div className="container-fluid">
-              <h2
+            <div className="container-fluid sign-in-required-container">
+              <h5>Spotify Premium is required to play music</h5>
+              <button
                 onClick={() => {
                   window.location = `/auth/login?path=${window.location.pathname}`;
                 }}
                 id="player-message-not-signed-in"
               >
-                {authError.message}
-              </h2>
+                <img alt="spotify-logo" src={spotifyIcon}></img>
+                Sign In
+                <FontAwesomeIcon icon={faSignInAlt}/>
+              </button>
             </div>
           </footer>
         )}
