@@ -5,42 +5,47 @@ import './ProgressBar.css';
 // ProgressBar represents how far into the song you are
 // It displays visually like a loading bar
 export default class ProgressBar extends React.Component {
-  updatedValues = null;
+  values = [0];
 
   constructor(props) {
     super(props);
-
-    this.railRef = React.createRef();
-    this.trackRef = React.createRef();
   }
 
-  onSlideEnd = values => {
-    this.props.onSeek(values, this.props.duration);
+
+  onChange = (values) => {
+    const changeAmount = Math.abs(this.values[0] - values[0]);
+    if (changeAmount > 3) {
+      this.props.onSeek(values, this.props.duration).then(() => (this.seeking = false));
+    }
+    this.values = values;
   }
 
   render() {
     const progress = this.props.position / this.props.duration;
     const percentage = Math.round(progress * 1000) / 10;
 
+    if (!this.seeking) {
+      this.percentage = percentage;
+    }
+
     return (
       <Slider
         disabled={this.props.disabled}
-        onUpdate={this.onUpdate}
-        onSlideEnd={this.onSlideEnd}
+        onChange={this.onChange}
         className="progress-bar-slider"
         domain={[0, 100]}
-        values={[percentage]}
+        values={[this.percentage]}
       >
         <Rail>
           {(
             { getRailProps } // adding the rail props sets up events on the rail
-          ) => <div ref={this.railRef} className="progress-bar-rail" {...getRailProps()} />}
+          ) => <div className="progress-bar-rail" {...getRailProps()} />}
         </Rail>
 
         <Handles>
           {({ handles, getHandleProps }) => (
             <div className="slider-handles">
-              {handles.map(handle => (
+              {handles.map((handle) => (
                 <Handle key={handle.id} handle={handle} getHandleProps={getHandleProps} />
               ))}
             </div>
@@ -48,7 +53,7 @@ export default class ProgressBar extends React.Component {
         </Handles>
         <Tracks right={false}>
           {({ tracks, getTrackProps }) => (
-            <div ref={this.trackRef} className="slider-tracks">
+            <div className="slider-tracks">
               {tracks.map(({ id, source, target }) => (
                 <Track key={id} source={source} target={target} getTrackProps={getTrackProps} />
               ))}

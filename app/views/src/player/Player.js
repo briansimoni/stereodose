@@ -85,9 +85,9 @@ export default class Player extends Component {
 
   // position is the desired percentage to seek to
   // duration is the total length in ms of the song.
-  seek = (position, duration) => {
+  seek = async (position, duration) => {
     const ms = Math.round((position / 100) * duration);
-    this.props.app.player.seek(ms);
+    await this.props.app.player.seek(ms);
   };
 
   getSDK = async () => {

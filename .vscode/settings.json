@@ -13,7 +13,7 @@
   "[go]": {
     "editor.insertSpaces": false,
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "ms-vscode.Go",
+    "editor.defaultFormatter": "golang.go",
     "editor.codeActionsOnSave": {
       "source.organizeImports": true
     }
