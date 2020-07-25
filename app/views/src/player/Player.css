@@ -1,16 +1,22 @@
 body {
   /* Margin bottom by footer height plus the margin between other stuff*/
   /* margin-bottom: 175px; */
-  padding-bottom: 175px;
+  padding-bottom: 135px;
 }
 
 .footer {
   bottom: 0;
   width: 100%;
   /* Set the fixed height of the footer here */
-  height: 125px;
+  height: 100px;
   background-color: black;
   padding-top: 15px;
+}
+
+@media only screen and (max-width: 576px) {
+  .footer {
+    padding: 0;
+  }
 }
 
 #player-message-not-signed-in {
@@ -20,7 +26,7 @@ body {
 }
 
 #album-image {
-  height: 100px;
+  height: 75px;
 }
 
 .controls {
@@ -172,6 +178,13 @@ body {
 @media only screen and (max-width: 767.98px) {
   #current-track-link > span {
     color: #aa52b0;
+  }
+}
+
+@media only screen and (max-width: 767.98px) {
+  #current-track-link {
+    white-space: nowrap;
+    overflow: hidden;
   }
 }
 

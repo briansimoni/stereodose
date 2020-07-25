@@ -7,26 +7,18 @@ import './ProgressBar.css';
 export default class ProgressBar extends React.Component {
   values = [0];
 
-  constructor(props) {
-    super(props);
-  }
-
-
   onChange = (values) => {
     const changeAmount = Math.abs(this.values[0] - values[0]);
     if (changeAmount > 3) {
-      this.props.onSeek(values, this.props.duration).then(() => (this.seeking = false));
+      this.props.onSeek(values, this.props.duration);
     }
-    this.values = values;
-  }
+  };
 
   render() {
     const progress = this.props.position / this.props.duration;
     const percentage = Math.round(progress * 1000) / 10;
 
-    if (!this.seeking) {
-      this.percentage = percentage;
-    }
+    this.values = [percentage];
 
     return (
       <Slider
@@ -34,7 +26,7 @@ export default class ProgressBar extends React.Component {
         onChange={this.onChange}
         className="progress-bar-slider"
         domain={[0, 100]}
-        values={[this.percentage]}
+        values={[this.values]}
       >
         <Rail>
           {(
