@@ -61,6 +61,13 @@ ul.drugs li {
   height: 40vh;
   margin: 0 auto;
   background-color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#random-playlist-image-placeholder svg{
+  font-size: 72px;
 }
 
 .track-play-button {
