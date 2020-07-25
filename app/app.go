@@ -138,10 +138,21 @@ func createRouter(c *config.Config) *util.AppRouter {
 	// Could use the hash router for a looser coupling but /#/some/path is ugly
 	app.HandleFunc("/{page1}", serveFile(fileCache["/index.html"], nil))
 	app.HandleFunc("/{page1}/{page2}", serveFile(fileCache["/index.html"], nil))
+	app.HandleFunc("/{page1}/{page2}/{playlistID:[A-Za-z0-9]{22}}", dynamicStatusCodeHandler)
 	// app.NotFoundHandler = util.RequestLogger(app.NotFoundHandler)
 	app.NotFoundHandler = util.RequestLogger(http.HandlerFunc(serveReactApp404))
 
 	return app
+}
+
+func dynamicStatusCodeHandler(w http.ResponseWriter, r *http.Request) {
+	pathVars := mux.Vars(r)
+	playlistID := pathVars["playlistID"]
+	playlist, _ := stereoDoseDB.Playlists.GetByID(playlistID)
+	if playlist == nil {
+		w.WriteHeader(http.StatusNotFound)
+	}
+	fmt.Fprint(w, string(fileCache["/index.html"]))
 }
 
 func serveReactApp404(w http.ResponseWriter, r *http.Request) {

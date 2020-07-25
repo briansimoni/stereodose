@@ -12,6 +12,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/jinzhu/gorm"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 
@@ -136,6 +137,9 @@ func (p *PlaylistsController) GetPlaylistByID(w http.ResponseWriter, r *http.Req
 	vars := mux.Vars(r)
 	ID := vars["id"]
 	playlist, err := p.DB.Playlists.GetByID(ID)
+	if gorm.IsRecordNotFoundError(err) {
+		w.WriteHeader(http.StatusNotFound)
+	}
 	if err != nil {
 		return errors.WithStack(err)
 	}
