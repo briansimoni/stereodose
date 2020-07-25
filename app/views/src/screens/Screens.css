@@ -64,7 +64,7 @@ ul.drugs li {
 }
 
 .track-play-button {
-  background-color: #8B578F;
+  background-color: #aa52b0;
 }
 
 .track-play-button > .fa-play {
@@ -155,12 +155,12 @@ ul.drugs li {
 }
 
 .pagination .page-item.active .page-link {
-  background-color: #8B578F;
-  border-color: #8B578F;
+  background-color: #aa52b0;
+  border-color: #aa52b0;
 }
 
 .pagination .page-link {
-  color: #8B578F;
+  color: #aa52b0;
 }
 
 #visualizer > canvas {

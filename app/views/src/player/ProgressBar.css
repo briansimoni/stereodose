@@ -29,14 +29,14 @@
   text-align: center;
   cursor: pointer;
   border-radius: 50%;
-  background-color: #8B578F;
+  background-color: #aa52b0;
 }
 
 .progress-bar-slider .progress-bar-track {
   position: absolute;
   height: 10px;
   z-index: 1;
-  background-color:#8B578F;
+  background-color:#aa52b0;
   border-radius: 5px;
   cursor: pointer;
 }

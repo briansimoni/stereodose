@@ -264,6 +264,10 @@ func TestPlaylistsController_CreatePlaylist(t *testing.T) {
 		Category:    "weed",
 		SubCategory: "chill",
 	}
+
+	testUser := models.User{}
+	testUser.ID = 1
+
 	var testRouter = &util.AppRouter{Router: mux.NewRouter()}
 	tt := []struct {
 		name   string
@@ -271,11 +275,11 @@ func TestPlaylistsController_CreatePlaylist(t *testing.T) {
 		user   interface{}
 		data   interface{}
 	}{
-		{name: "Valid ID", status: 201, user: models.User{}, data: validData},
-		// {name: "Invalid Categories", status: 400, user: nil, data: postBody{"test", "Fake", "Category"}},
-		// {name: "Invalid User Context", status: 500, user: nil, data: validData},
-		// {name: "Invalid POST body", status: 400, user: models.User{}, data: 69},
-		{name: "Database Error", status: 409, user: models.User{}, data: postBody{
+		{name: "Valid ID", status: 201, user: testUser, data: validData},
+		{name: "Invalid Categories", status: 400, user: nil, data: postBody{"test", "Fake", "Category"}},
+		{name: "Invalid User Context", status: 500, user: nil, data: validData},
+		{name: "Invalid POST body", status: 400, user: models.User{}, data: 69},
+		{name: "Database Error", status: 409, user: testUser, data: postBody{
 			SpotifyID:   "alreadyExists",
 			Category:    "weed",
 			SubCategory: "chill",

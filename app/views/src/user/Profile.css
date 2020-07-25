@@ -7,7 +7,7 @@ nav img {
 }
 
 .signin-button {
-  color: #8B578F;
+  color: #aa52b0;
   cursor: pointer;
 }
 
@@ -22,7 +22,7 @@ span.nav-link {
 }
 
 .list-group-item-action {
-  color: #8B578F;
+  color: #aa52b0;
   text-align: center;
   cursor: pointer;
 }
@@ -36,7 +36,7 @@ span.nav-link {
 }
 
 .navbar-dark .navbar-nav .nav-link {
-  color: #8B578F;
+  color: #aa52b0;
 }
 
 .ReactCrop {
@@ -97,7 +97,7 @@ span.nav-link {
 }
 
 #profile-accordion .btn-link {
-  color: #8B578F;
+  color: #aa52b0;
 }
 
 #profile-accordion svg {
