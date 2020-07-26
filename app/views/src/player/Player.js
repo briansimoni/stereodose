@@ -152,7 +152,7 @@ export default class Player extends Component {
         {authError && (
           <footer className="footer fixed-bottom">
             <div className="container-fluid sign-in-required-container">
-              <h5>Spotify Premium is required to play music</h5>
+              <p>Spotify Premium is required to play music</p>
               <button
                 onClick={() => {
                   window.location = `/auth/login?path=${window.location.pathname}`;

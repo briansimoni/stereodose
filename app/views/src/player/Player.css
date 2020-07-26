@@ -20,19 +20,19 @@ body {
 }
 
 #player-message-not-signed-in {
+  margin-top: -15px;
   text-align: center;
   color: white;
   cursor: pointer;
-  text-decoration: underline;
   border: none;
-  border-radius: 5px;
-  padding: 10px;
+  border-radius: 20px;
+  padding: 8px;
   background-color: #1DB954;
 }
 
 #player-message-not-signed-in > img {
   height: 30px;
-  margin-right: 15px;
+  margin-right: 10px;
 }
 
 #player-message-not-signed-in > svg {
@@ -208,4 +208,8 @@ body {
 
 #current-track-link > #current-track-link-separator {
   color: white;
+}
+
+#disabled-player-row {
+  padding-top: 15px;
 }

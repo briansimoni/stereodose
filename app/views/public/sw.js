@@ -1,7 +1,3 @@
-// Only set the service worker once the user has logged in.
-// This prevents certain login bugs where the PWA is switched to during the login process but doesn't receive auth cookies.
-// It also only asks the user to install the app if they log in
-
 const CACHE_NAME = 'stereodose-cache';
 const urlsToCache = ['/manifest.json', '/'];
 
