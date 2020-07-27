@@ -95,7 +95,6 @@ class Playlists extends React.Component {
 
   // when this component loads, grab the query params for pagination
   async componentDidMount() {
-    window.scrollTo(0,0);
     try {
       const playlists = await this.fetchPlaylists();
       this.setState({
@@ -123,6 +122,7 @@ class Playlists extends React.Component {
         return;
       }
       this.setState({ playlists: newPlaylists });
+      window.scrollTo(0, 0);
     } catch (err) {
       this.setState({
         loading: false,
