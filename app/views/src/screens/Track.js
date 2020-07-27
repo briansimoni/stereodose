@@ -16,8 +16,8 @@ export default function Track(props) {
     displayTime = `${minutes}:0${seconds}`;
   }
 
-  // Apparently the Spotify ID from the web API doesn't necessarilly match the ID in the web player
-  // Somteimtes there is linked_from object that contains the ID that you would find in the web API
+  // Apparently the Spotify ID from the web API doesn't necessarily match the ID in the web player
+  // Sometimes there is linked_from object that contains the ID that you would find in the web API
   let currentTrackId;
   if (props.currentlyPlayingTrack) {
     currentTrackId = props.currentlyPlayingTrack.linked_from.id || props.currentlyPlayingTrack.id;

@@ -95,6 +95,7 @@ class Playlists extends React.Component {
 
   // when this component loads, grab the query params for pagination
   async componentDidMount() {
+    window.scrollTo(0,0);
     try {
       const playlists = await this.fetchPlaylists();
       this.setState({
