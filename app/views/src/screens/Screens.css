@@ -172,3 +172,8 @@ ul.drugs li {
 #visualizer > canvas {
   background: black;
 }
+
+#apple-app-store-button {
+  width: 200px;
+  margin-bottom: 30px;
+}

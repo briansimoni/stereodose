@@ -1,6 +1,6 @@
 import React from 'react';
 import Feedback from './Feedback';
-
+import appStoreImage from '..//images/Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg';
 
 export default function About() {
   return (
@@ -34,14 +34,20 @@ export default function About() {
             https://developer.spotify.com/documentation/web-playback-sdk/#supported-browsers
           </a>
         </p>
-        <p>Stereodose is coming to the iOS app store in the next few months. Be sure to check back!</p>
-        <p>Download the iOS beta now from <a href="https://testflight.apple.com/join/214iUi3U">Test Flight</a></p>
+        <p>Stereodose is now available for iOS!</p>
+        <a href="https://apps.apple.com/us/app/id1518862133">
+          <img id="apple-app-store-button" alt="apple-app-store-button" src={appStoreImage}></img>
+        </a>
+
         <h1>Legal</h1>
-        <p><a href="/terms-and-conditions">Terms And Conditions</a></p>
-        <p><a href="/privacy-policy">Privacy Policy</a></p>
+        <p>
+          <a href="/terms-and-conditions">Terms And Conditions</a>
+        </p>
+        <p>
+          <a href="/privacy-policy">Privacy Policy</a>
+        </p>
         <Feedback />
       </div>
     </div>
   );
 }
-
