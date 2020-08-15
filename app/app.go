@@ -111,12 +111,13 @@ func createRouter(c *config.Config) *util.AppRouter {
 			"order", "{order:[a-zA-Z]").
 		Methods(http.MethodGet)
 
-	protectedPlaylistsRouter.AppHandler("/me", playlists.GetMyPlaylists).Methods(http.MethodGet)
-	protectedPlaylistsRouter.AppHandler("/random", playlists.GetRandomPlaylist).
+	playlistsRouter.AppHandler("/random", playlists.GetRandomPlaylist).
 		Queries(
 			"category", "{category:.+}",
 			"subcategory", "{subcategory:.+}",
 		).Methods(http.MethodGet)
+
+	protectedPlaylistsRouter.AppHandler("/me", playlists.GetMyPlaylists).Methods(http.MethodGet)
 	playlistsRouter.AppHandler("/{id}", playlists.GetPlaylistByID).Methods(http.MethodGet)
 	protectedPlaylistsRouter.AppHandler("/", playlists.CreatePlaylist).Methods(http.MethodPost)
 	protectedPlaylistsRouter.AppHandler("/image", playlists.UploadImage).Methods(http.MethodPost)
