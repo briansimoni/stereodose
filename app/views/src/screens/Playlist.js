@@ -5,6 +5,8 @@ import Likes from './Likes';
 // import Visualizer from './Visualizer';
 // import ExampleComponent from './spotify-viz/Example'
 import Visualizer2 from './Visualizer2';
+import Helmet from 'react-helmet';
+import { captializeFirstLetter } from '../util';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
@@ -48,16 +50,24 @@ class Playlist extends React.Component {
       return <h3>{error.message}</h3>;
     }
 
+    const { drug, subcategory } = this.props.match.params;
+
     return (
       <div className="row">
+        <Helmet>
+          <title>
+            {playlist.name} | {captializeFirstLetter(drug)} {captializeFirstLetter(subcategory)}
+          </title>
+        </Helmet>
+
         <div className="col">
-          {this.state.visualizerShown && (
-            <Visualizer2 app={this.props.app} toggleVisualizer={this.toggleVisualizer}/>
-          )}
+          {this.state.visualizerShown && <Visualizer2 app={this.props.app} toggleVisualizer={this.toggleVisualizer} />}
           <div id="playlist-heading">
             <h2>
               {/* The header contains the playlist name and a back button*/}
-              <Link to={`/${this.props.match.params.drug}/${this.props.match.params.subcategory}`}><FontAwesomeIcon icon={faArrowLeft} /></Link>
+              <Link to={`/${this.props.match.params.drug}/${this.props.match.params.subcategory}`}>
+                <FontAwesomeIcon icon={faArrowLeft} />
+              </Link>
               {playlist.name}
             </h2>
             <img src={playlist.bucketImageURL} alt="playlist-artwork" />
@@ -79,7 +89,7 @@ class Playlist extends React.Component {
           {!showComments ? (
             <ul className="list-group playlist">
               {playlist.tracks &&
-                playlist.tracks.map(track => {
+                playlist.tracks.map((track) => {
                   return (
                     <li className="list-group-item" key={track.spotifyID}>
                       <Track
@@ -96,13 +106,13 @@ class Playlist extends React.Component {
                 })}
             </ul>
           ) : (
-              <Comments
-                comments={playlist.comments}
-                onSubmitComment={this.submitComment}
-                onDeleteComment={this.deleteComment}
-                user={this.state.user}
-              />
-            )}
+            <Comments
+              comments={playlist.comments}
+              onSubmitComment={this.submitComment}
+              onDeleteComment={this.deleteComment}
+              user={this.state.user}
+            />
+          )}
         </div>
       </div>
     );
@@ -116,7 +126,7 @@ class Playlist extends React.Component {
   // For very large playlists, we need to get just a slice relative to the selected track
   // so that we can avoid HTTP 413 (request too large) errors
   getContextURIs(playlist, trackURI) {
-    const trackURIs = playlist.tracks.map(track => track.URI);
+    const trackURIs = playlist.tracks.map((track) => track.URI);
     // Taking a guess at the payload maximum size
     // With trial and error, length of 500 seems to be pretty safe
     // Only use slices in the case where the playlist is very large
@@ -158,9 +168,7 @@ class Playlist extends React.Component {
     // first, if the selectedTrack is currently playing, we actually need to pause instead
     if (this.props.app.state.currentTrack) {
       const currentTrackId = this.props.app.state.currentTrack.linked_from.id || this.props.app.state.currentTrack.id;
-      if (
-        selectedTrack.includes(currentTrackId)
-      ) {
+      if (selectedTrack.includes(currentTrackId)) {
         await this.props.app.player.togglePlay();
         return;
       }
@@ -210,7 +218,7 @@ class Playlist extends React.Component {
   };
 
   // if 401 need to alert user
-  submitComment = async text => {
+  submitComment = async (text) => {
     const options = {
       method: 'POST',
       body: JSON.stringify({
@@ -234,7 +242,7 @@ class Playlist extends React.Component {
     }
   };
 
-  deleteComment = async commentID => {
+  deleteComment = async (commentID) => {
     const options = {
       method: 'DELETE',
       credentials: 'same-origin'
@@ -251,7 +259,7 @@ class Playlist extends React.Component {
     // Instead of calling this.updatePlaylistState, simply remove the comment from state immediately
     // We know it was deleted from the database because the response was 200
     // This removes a network call and makes the app more responsive
-    playlist.comments = playlist.comments.filter(comment => comment.ID !== commentID);
+    playlist.comments = playlist.comments.filter((comment) => comment.ID !== commentID);
     this.setState({
       playlist: playlist
     });
@@ -268,11 +276,11 @@ class Playlist extends React.Component {
     this.likePending = true;
 
     // The user already liked this playlist. Unlike.
-    const like = user.likes.find(like => like.playlistID === playlist.spotifyID);
+    const like = user.likes.find((like) => like.playlistID === playlist.spotifyID);
     if (like) {
       try {
         await this.unlike(like.ID);
-        user.likes = user.likes.filter(l => l.ID !== like.ID);
+        user.likes = user.likes.filter((l) => l.ID !== like.ID);
         this.setState({
           user: user
         });
@@ -307,7 +315,7 @@ class Playlist extends React.Component {
     this.likePending = false;
   };
 
-  unlike = async likeID => {
+  unlike = async (likeID) => {
     const options = {
       method: 'DELETE',
       credentials: 'same-origin'
@@ -321,7 +329,7 @@ class Playlist extends React.Component {
       throw new Error(`${errorMessage}, ${response.status}, ${response.statusText}`);
     }
 
-    playlist.likes = playlist.likes.filter(l => l.ID !== likeID);
+    playlist.likes = playlist.likes.filter((l) => l.ID !== likeID);
     this.setState({ playlist: playlist });
   };
 
@@ -378,10 +386,7 @@ class Playlist extends React.Component {
   async componentDidMount() {
     try {
       // updating the playlist state and user state can occur in parallel
-      await Promise.all([
-        this.updatePlaylistState(),
-        this.updateUserState()
-      ]);
+      await Promise.all([this.updatePlaylistState(), this.updateUserState()]);
     } catch (err) {
       this.setState({
         loading: false,

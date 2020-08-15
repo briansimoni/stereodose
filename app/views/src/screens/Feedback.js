@@ -71,7 +71,7 @@ class Feedback extends React.Component {
         <h1>Send Feedback</h1>
         <p>We want to know how you like the app. Please let us know if you find bugs or you would like to request a feature.</p>
         <form onSubmit={this.handleSubmit}>
-          <h4>Do You Like Sterodose.app?</h4>
+          <p>Do You Like Sterodose.app?</p>
           <div className="form-check">
             <input onChange={this.handleChange} required={true} className="form-check-input" type="radio" name="goodExperience" id="yes-radio" value={true} />
             <label className="form-check-label" htmlFor="yes-radio">

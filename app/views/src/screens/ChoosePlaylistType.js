@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import NoMatch from '../404';
 import { Route } from 'react-router-dom';
+import Helmet from 'react-helmet';
+import { captializeFirstLetter } from '../util';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import './Screens.css';
@@ -13,13 +15,18 @@ export default function ChoosePlaylistType(props) {
   const categories = props.app.state.categories;
   const subcategory = props.match.params.subcategory;
 
-  if (categories !== null && !categories.find(category => category.name === drug)) {
+  if (categories !== null && !categories.find((category) => category.name === drug)) {
     return <Route component={NoMatch} />;
   }
 
   if (categories !== null) {
     return (
       <div>
+        <Helmet>
+          <title>Stereodose | {captializeFirstLetter(drug)} {captializeFirstLetter(subcategory)} | Choose Type</title>
+          <meta name="Description" content="Choose between user-generated and random playlists"></meta>
+        </Helmet>
+
         <div className="row">
           <div className="col">
             <h2 className="mood-choice-header">
@@ -28,8 +35,12 @@ export default function ChoosePlaylistType(props) {
               </Link>
               {`${drug}: ${subcategory}`}
             </h2>
-            <h3 className="text-center"><Link to={`/${drug}/${subcategory}`}>User Created</Link></h3>
-            <h3 className="text-center"><Link to={`/${drug}/${subcategory}/random`}>Random</Link></h3>
+            <h3 className="text-center">
+              <Link to={`/${drug}/${subcategory}`}>User Created</Link>
+            </h3>
+            <h3 className="text-center">
+              <Link to={`/${drug}/${subcategory}/random`}>Random</Link>
+            </h3>
           </div>
         </div>
       </div>

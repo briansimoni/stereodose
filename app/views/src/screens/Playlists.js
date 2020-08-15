@@ -1,5 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Helmet from 'react-helmet';
+import { captializeFirstLetter } from '../util';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import Pagination from './Pagination';
@@ -54,17 +56,30 @@ class Playlists extends React.Component {
         return accumulator;
       }, []);
 
+      const { subcategory, drug } = this.props.match.params;
       return (
         <div className="playlists">
+          <Helmet>
+            <title>
+              Stereodose | {captializeFirstLetter(drug)} {captializeFirstLetter(subcategory)} | Choose Playlist
+            </title>
+            <meta
+              name="Description"
+              content={`Find music for a ${subcategory} ${drug} vibe`}
+            ></meta>
+          </Helmet>
+
           <h2 id="choose-a-playlist">
-            <Link to={`/${this.props.match.params.drug}/${this.props.match.params.subcategory}/type`}><FontAwesomeIcon icon={faArrowLeft} /></Link>
+            <Link to={`/${this.props.match.params.drug}/${this.props.match.params.subcategory}/type`}>
+              <FontAwesomeIcon icon={faArrowLeft} />
+            </Link>
             Choose A Playlist
           </h2>
 
           {rows.map((row, index) => {
             return (
               <div className="row" key={index}>
-                {row.map(playlist => {
+                {row.map((playlist) => {
                   const thumbnailImageURL = playlist.bucketThumbnailURL
                     ? playlist.bucketThumbnailURL
                     : 'https://via.placeholder.com/250x200';
