@@ -210,6 +210,9 @@ body {
   color: white;
 }
 
-#disabled-player-row {
-  padding-top: 15px;
+@media only screen and (max-width: 576px) {
+  #disabled-player-row {
+    padding-top: 15px;
+  }
+  
 }

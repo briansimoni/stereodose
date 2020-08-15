@@ -129,7 +129,7 @@ ul.drugs li {
 
 #visualizer {
   position: fixed;
-  top: -125px;
+  top: -100px;
   left: 0;
   z-index: 2000;
 }
