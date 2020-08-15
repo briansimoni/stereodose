@@ -1,6 +1,7 @@
 import React from 'react';
 import Feedback from './Feedback';
-import appStoreImage from '..//images/Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg';
+import appStoreImage from '../images/Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg';
+import braveImage from '../images/brave_logo_2color_reversed.svg';
 
 export default function About() {
   return (
@@ -18,13 +19,6 @@ export default function About() {
           </strong>
         </p>
 
-        <p>
-          Please report issues to{' '}
-          <a href="https://github.com/briansimoni/stereodose/issues">
-            https://github.com/briansimoni/stereodose/issues
-          </a>
-        </p>
-
         <h1>Compatibility</h1>
         <p>
           You need to have Spotify Premium for the player to function. Additionally, the Spotify Web SDK only supports
@@ -37,6 +31,19 @@ export default function About() {
         <p>Stereodose is now available for iOS!</p>
         <a href="https://apps.apple.com/us/app/id1518862133">
           <img id="apple-app-store-button" alt="apple-app-store-button" src={appStoreImage}></img>
+        </a>
+
+        <h1>Support</h1>
+        <p>
+          Supoprt Stereodose by supporting yourself. Stop sending Apple and Google all of your personal information. 
+          <a href="https://brave.com/ste942"> Download the Brave web browser.</a>
+        </p>
+        <p>
+          Brave has a fork of Google Chrome with privacy and security central to it's design. It blocks ads and third
+          party trackers by default. If you choose to view adds, <strong>Brave will pay you in crypto currency!</strong>
+        </p>
+        <a href="https://brave.com/ste942">
+          <img id="brave-browser-button" alt="brave-browser-button" src={braveImage}></img>
         </a>
 
         <h1>Legal</h1>
