@@ -52,7 +52,7 @@ export default function About() {
 
         <h1>Support</h1>
         <p>
-          Supoprt Stereodose by supporting yourself. Stop sending Apple and Google all of your personal information.
+          Support Stereodose by supporting yourself. Stop sending Apple and Google all of your personal information.
           <a href="https://brave.com/ste942" rel="noopener noreferrer" target="_blank">
             {' '}
             Download the Brave web browser.
