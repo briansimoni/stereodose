@@ -2,10 +2,19 @@ import React from 'react';
 import Feedback from './Feedback';
 import appStoreImage from '../images/Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg';
 import braveImage from '../images/brave_logo_2color_reversed.svg';
+import Helmet from 'react-helmet';
 
 export default function About() {
   return (
     <div className="row">
+      <Helmet>
+        <title>Stereodose - Music Inspired By Drugs</title>
+        <meta
+          name="Description"
+          content="Stereodose is the psychedelic music discovery app that you never knew you needed. Elevate your musical taste as you achieve a new level auditory experience."
+        ></meta>
+      </Helmet>
+
       <div className="col">
         <h1 className="about-header">About</h1>
         <p>

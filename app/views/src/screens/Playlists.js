@@ -40,7 +40,7 @@ class Playlists extends React.Component {
 
     if (playlists) {
       const match = this.props.match;
-      // reduce a large array into multidimensinal array
+      // reduce a large array into multidimensional array
       // where we have m x 3 matrix (m rows of 3 columns)
       // this makes it way easier to render with react
       // With Bootstrap remember total row width is 12 columns.
