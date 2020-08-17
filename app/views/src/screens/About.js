@@ -11,7 +11,7 @@ export default function About() {
         <title>Stereodose - Music Inspired By Drugs</title>
         <meta
           name="Description"
-          content="Stereodose is the psychedelic music discovery app that you never knew you needed. Elevate your musical taste as you achieve a new level auditory experience."
+          content="Stereodose is the psychedelic music discovery app that you never knew you needed. Elevate your musical taste as you achieve a new level in auditory experience."
         ></meta>
       </Helmet>
 
