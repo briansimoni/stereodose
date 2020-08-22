@@ -492,15 +492,10 @@ func checkState(r *http.Request, s *sessions.Session) error {
 }
 
 func (a *AuthController) saveUserData(token *oauth2.Token, u *spotify.PrivateUser) (*models.User, error) {
-	log.Println(token.RefreshToken)
 	user := &models.User{
-		Birthdate:    u.Birthdate,
-		DisplayName:  u.DisplayName,
-		Email:        u.Email,
-		SpotifyID:    u.ID,
-		Product:      u.Product,
-		AccessToken:  token.AccessToken,
-		RefreshToken: token.RefreshToken,
+		DisplayName: u.DisplayName,
+		Email:       u.Email,
+		SpotifyID:   u.ID,
 	}
 
 	user, err := a.DB.Users.FirstOrCreate(user, token)
@@ -533,7 +528,12 @@ func (a *AuthController) saveUserData(token *oauth2.Token, u *spotify.PrivateUse
 		}
 
 	}
-	// make sure that the tokens are up to date
+
+	// make sure that everything is saved and up to date
+	user.Birthdate = u.Birthdate
+	user.DisplayName = u.DisplayName
+	user.Product = u.Product
+	user.Email = u.Email
 	user.RefreshToken = token.RefreshToken
 	user.AccessToken = token.AccessToken
 
