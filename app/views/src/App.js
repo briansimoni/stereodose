@@ -12,6 +12,7 @@ import Header from './user/Header';
 import NoMatch from './404';
 import ChoosePlaylistType from './screens/ChoosePlaylistType';
 import RandomPlaylist from './screens/RandomPlaylist';
+import SpotifyWebApi from 'spotify-web-api-js';
 
 // App is the top level component for Stereodose.
 // A reference to itself is passed to child components for an inversion of control.
@@ -77,9 +78,23 @@ class App extends React.Component {
   async componentDidMount() {
     try {
       await this.getCategories();
+      if (this.userLoggedIn()) {
+        this.getSpotifyUser();
+      }
     } catch (err) {
       alert(err.message);
     }
+  }
+
+  async getSpotifyUser() {
+    const spotify = new SpotifyWebApi();
+    const accessToken = await this.getAccessToken();
+    spotify.setAccessToken(accessToken);
+
+    const spotifyUser = await spotify.getMe();
+    this.setState({
+      spotifyUser
+    });
   }
 
   getCategories = async () => {

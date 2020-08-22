@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
+import SpotifyWebApi from 'spotify-web-api-js';
 
 // Playlist is the parent component that controls the entire display for a particular playlist.
 // It is a composite of likes, comments, tracks, and playlist image.
@@ -36,7 +37,7 @@ class Playlist extends React.Component {
   }
 
   render() {
-    let { loading, showComments, playlist, error } = this.state;
+    let { loading, showComments, playlist, spotifyPlaylist, error } = this.state;
     if (loading) {
       return (
         <div className="row justify-content-md-center">
@@ -88,17 +89,17 @@ class Playlist extends React.Component {
           {/* Conditionally render either the comments or playlist tracks */}
           {!showComments ? (
             <ul className="list-group playlist">
-              {playlist.tracks &&
-                playlist.tracks.map((track) => {
+              {spotifyPlaylist &&
+                spotifyPlaylist.tracks.map((track, index) => {
                   return (
-                    <li className="list-group-item" key={track.spotifyID}>
+                    <li className="list-group-item" key={index}>
                       <Track
                         currentlyPlayingTrack={this.props.app.state.currentTrack}
-                        track={track}
-                        playlist={playlist}
+                        track={track.track}
+                        playlist={spotifyPlaylist}
                         paused={this.props.app.state.paused}
                         onPlay={() => {
-                          this.playSong(playlist, track.URI);
+                          this.playSong(track, index);
                         }}
                       />
                     </li>
@@ -122,80 +123,42 @@ class Playlist extends React.Component {
     this.setState({ visualizerShown: !this.state.visualizerShown });
   };
 
-  // getContextURIs is designed so that we get an array of track URIs
-  // For very large playlists, we need to get just a slice relative to the selected track
-  // so that we can avoid HTTP 413 (request too large) errors
-  getContextURIs(playlist, trackURI) {
-    const trackURIs = playlist.tracks.map((track) => track.URI);
-    // Taking a guess at the payload maximum size
-    // With trial and error, length of 500 seems to be pretty safe
-    // Only use slices in the case where the playlist is very large
-    if (playlist.tracks.length < 500) {
-      return trackURIs;
-    }
-    const trackIndex = trackURIs.indexOf(trackURI);
-    return this.getSlice(trackURIs, trackIndex, 500);
-  }
-
-  // a is the array
-  // i is the index of the selected element
-  // l is the length of the desired slice
-  getSlice = (a, i, l) => {
-    const lowerDistance = Math.floor(l / 2);
-    const upperDistance = Math.ceil(l / 2);
-
-    // beginning
-    if (i - lowerDistance < 0) {
-      const firstHalf = a.slice(i - lowerDistance);
-      const secondHalf = a.slice(0, l - firstHalf.length);
-      return firstHalf.concat(secondHalf);
-    }
-
-    // end
-    if (i + upperDistance > a.length) {
-      const firstHalf = a.slice(i - lowerDistance, a.length);
-      const secondHalf = a.slice(0, l - firstHalf.length);
-      return firstHalf.concat(secondHalf);
-    }
-
-    // middle
-    return a.slice(i - lowerDistance, i + upperDistance);
-  };
-
   // playSong makes an API call directly to Spotify
   // playlist can simply be the playlist object from component state
-  async playSong(playlist, selectedTrack) {
+  async playSong(selectedTrack) {
+    const playlistId = this.props.match.params.playlist;
     // first, if the selectedTrack is currently playing, we actually need to pause instead
     if (this.props.app.state.currentTrack) {
       const currentTrackId = this.props.app.state.currentTrack.linked_from.id || this.props.app.state.currentTrack.id;
-      if (selectedTrack.includes(currentTrackId)) {
+      if (selectedTrack.track.id.includes(currentTrackId)) {
         await this.props.app.player.togglePlay();
         return;
       }
     }
 
-    const uris = this.getContextURIs(playlist, selectedTrack);
-    let data = {
-      uris: uris,
-      offset: {
-        uri: selectedTrack
-      }
-    };
+    const accessToken = await this.props.app.getAccessToken();
+    const spotify = new SpotifyWebApi();
+    spotify.setAccessToken(accessToken);
+
+    const deviceID = this.props.app.state.deviceID;
+    if (!deviceID) {
+      return;
+    }
+
+    let selectedTrackId;
+    if (selectedTrack.track.linked_from) {
+      selectedTrackId = selectedTrack.track.linked_from.id;
+    } else {
+      selectedTrackId = selectedTrack.track.id;
+    }
 
     try {
-      const deviceID = this.props.app.state.deviceID;
-      if (!deviceID) {
-        return;
-      }
-      const accessToken = await this.props.app.getAccessToken();
-
-      const response = await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceID}`, {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
+      await spotify.play({
+        device_id: deviceID,
+        context_uri: `spotify:playlist:${playlistId}`,
+        offset: {
+          uri: `spotify:track:${selectedTrackId}`
+        }
       });
 
       // When the user clicks play, it has to be from some kind of playlist
@@ -203,13 +166,9 @@ class Playlist extends React.Component {
       // create links. In this way, users can come back to the playlist that contains
       // the currently playing track.
       this.props.app.setState({ currentPlaylist: this.props.location.pathname });
-
-      if (response.status < 200 || response.status >= 300) {
-        const errorMessage = await response.text();
-        throw new Error(`${errorMessage}, ${response.status}, ${response.statusText}`);
-      }
     } catch (err) {
-      alert(err.message);
+      alert('Something went wrong. Try refreshing the page.');
+      console.error(err.message);
     }
   }
 
@@ -378,15 +337,58 @@ class Playlist extends React.Component {
     });
 
     this.setState({
-      loading: false,
       playlist: playlist
     });
   };
 
+  /**
+   * gets the full spotify playlists including all of the tracks
+   * and then adds it to component state
+   */
+  async getSpotifyPlaylist() {
+    const playlistId = this.props.match.params.playlist;
+
+    const spotify = new SpotifyWebApi();
+    const accessToken = await this.props.app.getAccessToken();
+    spotify.setAccessToken(accessToken);
+
+    let country = 'US';
+    if (this.props.app.userLoggedIn()) {
+      if (!this.props.app.state.spotifyUser) {
+        await this.props.app.getSpotifyUser();
+        country = this.props.app.state.spotifyUser.country || 'US';
+      }
+    }
+
+    const spotifyPlaylist = await spotify.getPlaylist(playlistId);
+
+    let tracks = [];
+    let trackPage = await spotify.getPlaylistTracks(playlistId, {
+      market: country
+    });
+
+    tracks = tracks.concat(trackPage.items);
+    while (tracks.length < trackPage.total) {
+      trackPage = await spotify.getPlaylistTracks(playlistId, {
+        offset: tracks.length,
+        market: country
+      });
+      tracks = tracks.concat(trackPage.items);
+    }
+
+    tracks = tracks.filter((track) => track.track.is_playable);
+    spotifyPlaylist.tracks = tracks;
+
+    this.setState({
+      spotifyPlaylist
+    });
+  }
+
   async componentDidMount() {
     try {
       // updating the playlist state and user state can occur in parallel
-      await Promise.all([this.updatePlaylistState(), this.updateUserState()]);
+      await Promise.all([this.updatePlaylistState(), this.updateUserState(), this.getSpotifyPlaylist()]);
+      this.setState({ loading: false });
     } catch (err) {
       this.setState({
         loading: false,

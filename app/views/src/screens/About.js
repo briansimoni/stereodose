@@ -60,7 +60,7 @@ export default function About() {
         </p>
         <p>
           Brave is a fork of Google Chrome with privacy and security central to it's design. It blocks ads and third
-          party trackers by default. If you choose to view adds, <strong>Brave will pay you in crypto currency!</strong>
+          party trackers by default. If you choose to view ads, <strong>Brave will pay you in crypto currency!</strong>
         </p>
         <a href="https://brave.com/ste942" rel="noopener noreferrer" target="_blank">
           <img id="brave-browser-button" alt="brave-browser-button" src={braveImage}></img>
