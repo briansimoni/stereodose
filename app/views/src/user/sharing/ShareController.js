@@ -77,7 +77,10 @@ class ShareController extends React.Component {
       offset = offset + 50;
     }
 
-    const response = await fetch('/api/playlists/me', { credentials: 'same-origin' });
+    const spotifyPlaylistIds = spotifyPlaylists.map((playlist) => playlist.id);
+    const idQueryString = spotifyPlaylistIds.join(' ');
+
+    const response = await fetch(`/api/playlists/?spotify-ids=${idQueryString}`, { credentials: 'same-origin' });
     if (response.status !== 200) {
       throw new Error(`${response.status} Unable to fetch user profile`);
     }

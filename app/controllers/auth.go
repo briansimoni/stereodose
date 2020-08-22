@@ -473,10 +473,6 @@ func refreshToken(c *oauth2.Config, refreshToken string) (*refreshTokenResponse,
 	return &tok, nil
 }
 
-func Test() string {
-	return "lol"
-}
-
 func checkState(r *http.Request, s *sessions.Session) error {
 	responseState := r.URL.Query().Get("state")
 	if responseState == "" {
