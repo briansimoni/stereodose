@@ -1,5 +1,5 @@
 import React from 'react';
-import Track from './Track';
+import RandomTrack from './RandomTrack';
 import Visualizer2 from './Visualizer2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
@@ -86,7 +86,7 @@ class RandomPlaylist extends React.Component {
               playlist.tracks.map((track, index) => {
                 return (
                   <li className="list-group-item" key={index}>
-                    <Track
+                    <RandomTrack
                       currentlyPlayingTrack={this.props.app.state.currentTrack}
                       track={track}
                       playlist={playlist}
