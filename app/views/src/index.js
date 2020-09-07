@@ -17,23 +17,42 @@ if (browser) {
     alert(notSupportedMessage);
   }
   if (browser.os === 'iOS') {
-    alert('Stereodose is coming soon to the app store. The web app is currently incompatible with iOS.');
+    window.location = 'https://apps.apple.com/us/app/id1518862133';
   }
 }
 
 ReactDOM.render(<App />, document.getElementById('root'));
 
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function () {
-    navigator.serviceWorker.register('/sw.js').then(
-      function (registration) {
-        // Registration was successful
-        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-      },
-      function (err) {
-        // registration failed :(
-        console.log('ServiceWorker registration failed: ', err);
+// Only set the service worker once the user has logged in.
+// This prevents certain login bugs where the PWA is switched to during the login process but doesn't receive auth cookies.
+// It also only asks the user to install the app if they're logged in
+isLoggedIn().then(loggedIn => {
+  if (loggedIn) {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/sw.js').then(
+          function (registration) {
+            // Registration was successful
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          },
+          function (err) {
+            // registration failed :(
+            console.log('ServiceWorker registration failed: ', err);
+          }
+        );
+      });
+    }
+  }
+})
+
+
+function isLoggedIn() {
+  return new Promise((resolve) => {
+    fetch('/api/users/me').then((response) => {
+      if (response.status === 200) {
+        resolve(true);
       }
-    );
+      resolve(false);
+    });
   });
 }

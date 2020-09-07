@@ -5,61 +5,39 @@ import './ProgressBar.css';
 // ProgressBar represents how far into the song you are
 // It displays visually like a loading bar
 export default class ProgressBar extends React.Component {
-  updatedValues = null;
+  values = [0];
 
-  constructor(props) {
-    super(props);
-
-    this.railRef = React.createRef();
-    this.trackRef = React.createRef();
-  }
-
-  componentDidMount() {
-    // for some reason with the compound-slider API and even the DOM mouseup API
-    // I couldn't get it to consistently fire. Maybe some kind of race condition...
-    // This isn't the most ideal experience but I think its pitfalls are hardly noticeable.
-    //  setTimeout with 0 defers seeking until the values have been updated
-    this.railRef.current.addEventListener('mousedown', e => {
-      setTimeout(() => {
-        this.props.onSeek(this.values, this.props.duration);
-      }, 0);
-    });
-
-    this.trackRef.current.addEventListener('mousedown', e => {
-      setTimeout(() => {
-        this.props.onSeek(this.values, this.props.duration);
-      }, 0);
-    });
-  }
-
-  // I'm storing updated values outside of state because I don't need this to trigger
-  // another render
-  onUpdate = values => {
-    this.values = values;
+  onChange = (values) => {
+    const changeAmount = Math.abs(this.values[0] - values[0]);
+    if (changeAmount > 3) {
+      this.props.onSeek(values, this.props.duration);
+    }
   };
 
   render() {
     const progress = this.props.position / this.props.duration;
     const percentage = Math.round(progress * 1000) / 10;
 
+    this.values = [percentage];
+
     return (
       <Slider
         disabled={this.props.disabled}
-        onUpdate={this.onUpdate}
+        onChange={this.onChange}
         className="progress-bar-slider"
         domain={[0, 100]}
-        values={[percentage]}
+        values={[this.values]}
       >
         <Rail>
           {(
             { getRailProps } // adding the rail props sets up events on the rail
-          ) => <div ref={this.railRef} className="progress-bar-rail" {...getRailProps()} />}
+          ) => <div className="progress-bar-rail" {...getRailProps()} />}
         </Rail>
 
         <Handles>
           {({ handles, getHandleProps }) => (
             <div className="slider-handles">
-              {handles.map(handle => (
+              {handles.map((handle) => (
                 <Handle key={handle.id} handle={handle} getHandleProps={getHandleProps} />
               ))}
             </div>
@@ -67,7 +45,7 @@ export default class ProgressBar extends React.Component {
         </Handles>
         <Tracks right={false}>
           {({ tracks, getTrackProps }) => (
-            <div ref={this.trackRef} className="slider-tracks">
+            <div className="slider-tracks">
               {tracks.map(({ id, source, target }) => (
                 <Track key={id} source={source} target={target} getTrackProps={getTrackProps} />
               ))}

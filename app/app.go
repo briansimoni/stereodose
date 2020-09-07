@@ -31,7 +31,7 @@ var (
 )
 
 // InitApp puts together the Router to use as the app's main HTTP handler
-func InitApp(c *config.Config, db *gorm.DB) *util.AppRouter {
+func InitApp(c *config.Config) (*util.AppRouter, *models.StereoDoseDB) {
 	authKey, err := base64.StdEncoding.DecodeString(c.AuthKey)
 	if err != nil {
 		log.Fatal("Unable to obtain auth key", err.Error())
@@ -47,8 +47,8 @@ func InitApp(c *config.Config, db *gorm.DB) *util.AppRouter {
 		log.Fatal("Unable to setup cloud bucket storage", err.Error())
 	}
 
-	stereoDoseDB = models.NewStereodoseDB(db, store)
-	return createRouter(c)
+	stereoDoseDB = models.NewStereodoseDB(c, store)
+	return createRouter(c), stereoDoseDB
 }
 
 func createRouter(c *config.Config) *util.AppRouter {
@@ -71,6 +71,8 @@ func createRouter(c *config.Config) *util.AppRouter {
 	app.HandleFunc("/robots.txt", serveFile(fileCache["/robots.txt"], nil))
 	app.HandleFunc("/manifest.json", serveFile(fileCache["/manifest.json"], nil))
 	app.HandleFunc("/sw.js", serveFile(fileCache["/sw.js"], map[string]string{"Content-Type": "application/javascript"}))
+	app.HandleFunc("/terms-and-conditions", serveFile(fileCache["/terms-and-conditions.html"], nil))
+	app.HandleFunc("/privacy-policy", serveFile(fileCache["/privacy-policy.html"], nil))
 
 	healthRouter := util.AppRouter{Router: app.PathPrefix("/api/health").Subrouter()}
 	healthRouter.AppHandler("/", health.CheckHealth).Methods(http.MethodGet)
@@ -109,12 +111,13 @@ func createRouter(c *config.Config) *util.AppRouter {
 			"order", "{order:[a-zA-Z]").
 		Methods(http.MethodGet)
 
-	protectedPlaylistsRouter.AppHandler("/me", playlists.GetMyPlaylists).Methods(http.MethodGet)
-	protectedPlaylistsRouter.AppHandler("/random", playlists.GetRandomPlaylist).
+	playlistsRouter.AppHandler("/random", playlists.GetRandomPlaylist).
 		Queries(
 			"category", "{category:.+}",
 			"subcategory", "{subcategory:.+}",
 		).Methods(http.MethodGet)
+
+	protectedPlaylistsRouter.AppHandler("/me", playlists.GetMyPlaylists).Methods(http.MethodGet)
 	playlistsRouter.AppHandler("/{id}", playlists.GetPlaylistByID).Methods(http.MethodGet)
 	protectedPlaylistsRouter.AppHandler("/", playlists.CreatePlaylist).Methods(http.MethodPost)
 	protectedPlaylistsRouter.AppHandler("/image", playlists.UploadImage).Methods(http.MethodPost)
@@ -136,10 +139,24 @@ func createRouter(c *config.Config) *util.AppRouter {
 	// Could use the hash router for a looser coupling but /#/some/path is ugly
 	app.HandleFunc("/{page1}", serveFile(fileCache["/index.html"], nil))
 	app.HandleFunc("/{page1}/{page2}", serveFile(fileCache["/index.html"], nil))
+	app.HandleFunc("/{page1}/{page2}/type", serveFile(fileCache["/index.html"], nil))
+	app.HandleFunc("/{page1}/{page2}/{playlistID:[A-Za-z0-9]{22}}", dynamicStatusCodeHandler)
 	// app.NotFoundHandler = util.RequestLogger(app.NotFoundHandler)
 	app.NotFoundHandler = util.RequestLogger(http.HandlerFunc(serveReactApp404))
 
 	return app
+}
+
+func dynamicStatusCodeHandler(w http.ResponseWriter, r *http.Request) {
+	pathVars := mux.Vars(r)
+	playlistID := pathVars["playlistID"]
+	playlist, _ := stereoDoseDB.Playlists.GetByID(playlistID)
+
+	if playlist == nil {
+		w.WriteHeader(http.StatusNotFound)
+	}
+
+	fmt.Fprint(w, string(fileCache["/index.html"]))
 }
 
 func serveReactApp404(w http.ResponseWriter, r *http.Request) {
@@ -185,6 +202,8 @@ func init() {
 		"./app/views/public/robots.txt",
 		"./app/views/public/manifest.json",
 		"./app/views/build/sw.js",
+		"./app/views/public/terms-and-conditions.html",
+		"./app/views/public/privacy-policy.html",
 	}
 
 	for _, file := range files {

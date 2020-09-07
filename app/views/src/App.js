@@ -2,15 +2,17 @@ import React from 'react';
 import Drugs from './screens/Drugs';
 import Drug from './screens/Drug';
 import Playlists from './screens/Playlists';
-import Playlist from './screens/Playlist';
+import PlaylistController from './screens/PlaylistController';
 import Player from './player/Player';
 import About from './screens/About';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import ShareController from './user/sharing/ShareController';
 import Profile from './user/Profile';
 import Header from './user/Header';
 import NoMatch from './404';
 import ChoosePlaylistType from './screens/ChoosePlaylistType';
 import RandomPlaylist from './screens/RandomPlaylist';
+import SpotifyWebApi from 'spotify-web-api-js';
 
 // App is the top level component for Stereodose.
 // A reference to itself is passed to child components for an inversion of control.
@@ -44,9 +46,9 @@ class App extends React.Component {
             <Switch>
               <Route exact path="/profile" render={props => <Profile {...props} app={this} />} />
 
-              <Route exact path="/profile/shared" render={props => <Profile {...props} app={this} />} />
+              <Route exact path="/profile/shared" render={props => <ShareController {...props} app={this} />} />
 
-              <Route exact path="/profile/available" render={props => <Profile {...props} app={this} />} />
+              <Route exact path="/profile/available" render={props => <ShareController {...props} app={this} />} />
 
               <Route exact path="/" render={props => <Drugs {...props} app={this} />} />
 
@@ -60,7 +62,7 @@ class App extends React.Component {
 
               <Route exact path="/:drug/:subcategory/random" render={props => <RandomPlaylist {...props} app={this} />} />
 
-              <Route exact path="/:drug/:subcategory/:playlist" render={props => <Playlist {...props} app={this} />} />
+              <Route exact path="/:drug/:subcategory/:playlist" render={props => <PlaylistController {...props} app={this} />} />
 
               <Route component={NoMatch} />
             </Switch>
@@ -76,9 +78,23 @@ class App extends React.Component {
   async componentDidMount() {
     try {
       await this.getCategories();
+      if (this.userLoggedIn()) {
+        this.getSpotifyUser();
+      }
     } catch (err) {
       alert(err.message);
     }
+  }
+
+  async getSpotifyUser() {
+    const spotify = new SpotifyWebApi();
+    const accessToken = await this.getAccessToken();
+    spotify.setAccessToken(accessToken);
+
+    const spotifyUser = await spotify.getMe();
+    this.setState({
+      spotifyUser
+    });
   }
 
   getCategories = async () => {

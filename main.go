@@ -1,38 +1,22 @@
 package main
 
 import (
+	"context"
 	"encoding/gob"
 	"net/http"
+	"os"
 	"os/signal"
 	"syscall"
-	"os"
-	"context"
 	"time"
 
 	log "github.com/sirupsen/logrus"
 
 	"github.com/briansimoni/stereodose/app"
 	"github.com/briansimoni/stereodose/config"
-	"github.com/jinzhu/gorm"
 	"golang.org/x/oauth2"
 )
 
 func main() {
-	connectionString := os.Getenv("STEREODOSE_DB_STRING")
-	if connectionString == "" {
-		// docker-compose default
-		connectionString = "postgresql://postgres:development@db:5432/stereodose?sslmode=disable"
-		// localhost default
-		// connectionString = "postgresql://postgres:development@127.0.0.1:5432/stereodose?sslmode=disable"
-	}
-	db, err := gorm.Open("postgres", connectionString)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"Type": "AppLog",
-		}).Fatal("Unable to connect to the database", err.Error())
-	}
-	defer db.Close()
-
 	c := &config.Config{
 		ClientID:       os.Getenv("STEREODOSE_CLIENT_ID"),
 		ClientSecret:   os.Getenv("STEREODOSE_CLIENT_SECRET"),
@@ -41,7 +25,7 @@ func main() {
 		IOSRedirectURL: os.Getenv("STEREODOSE_IOS_REDIRECT_URL"),
 		EncryptionKey:  os.Getenv("STEREODOSE_ENCRYPTION_KEY"),
 	}
-	err = c.Verify()
+	err := c.Verify()
 
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -54,9 +38,9 @@ func main() {
 		port = "4000"
 	}
 
-	stereodose := app.InitApp(c, db)
+	stereodose, db := app.InitApp(c)
 	server := http.Server{
-		Addr: ":"+port,
+		Addr:    ":" + port,
 		Handler: stereodose,
 	}
 
@@ -94,6 +78,8 @@ func main() {
 			"Type": "AppLog",
 		}).Fatal("Server shutdown", err.Error())
 	}
+
+	db.DB.Close()
 
 	log.WithFields(log.Fields{
 		"Type": "AppLog",

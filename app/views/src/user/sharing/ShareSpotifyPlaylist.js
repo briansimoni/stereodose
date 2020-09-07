@@ -8,7 +8,7 @@ import SharePlaylistButton from './SharePlaylistButton';
 
 // ShareSpotifyPlaylist is the component that allows users to share Spotify Playlists to Stereodose
 // It will maintain the state of a particular playlist as a user selects different options before uploading
-// The parent component (Profile) is responsible for passing required information
+// The parent component (ShareController) is responsible for passing required information
 // e.g. access tokens, the set of playlists, moods, categories, update callbacks, etc...
 class ShareSpotifyPlaylist extends React.Component {
   constructor(props) {

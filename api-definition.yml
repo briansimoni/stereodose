@@ -10,6 +10,8 @@ info:
     url: 'https://github.com/briansimoni/stereodose/blob/master/LICENSE'
 servers:
   - url: 'https://stereodose.app'
+  - url: 'http://localhost:3000'
+  - url: 'http://localhost:4000'
 
 paths:
   '/auth/login':
@@ -327,6 +329,8 @@ paths:
                   type: string
                 Category:
                   type: string
+                Subcategory:
+                  type: string
                 ImageURL:
                   type: string
                 ThumbnailURL:
@@ -385,6 +389,7 @@ paths:
       tags:
         - playlists
       summary: delete a playlist
+      description: Deletes the playlist and associated likes and comments. Only admins may perform this operation
       security:
         - cookieAuth: []
       parameters:
@@ -586,9 +591,6 @@ paths:
                 otherComments:
                   type: string
                   
-externalDocs:
-  description: Find out more about Swagger
-  url: 'http://swagger.io'
 
 components:
   schemas:

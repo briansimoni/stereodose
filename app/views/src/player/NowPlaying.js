@@ -30,19 +30,23 @@ export default class NowPlaying extends Component {
       <Fragment>
         <div className="row">
           <div className="d-none d-md-block col-md-2 col-lg-1">
-            <Link to={this.props.app.state.currentPlaylist}>
-              <img id="album-image" src={album_image} alt={track_name} />
-            </Link>
+            {this.props.app.state.currentPlaylist && (
+              <Link to={this.props.app.state.currentPlaylist}>
+                <img id="album-image" src={album_image} alt={track_name} />
+              </Link>
+            )}
           </div>
           <div className="col-sm-3 col-md-2 col-lg-2">
             <div className="row">
               <div className="col text-center">
                 <span>
-                  <Link id="current-track-link" to={this.props.app.state.currentPlaylist}>
-                    <span>{track_name}</span>
-                    <span id="current-track-link-separator"> by </span>
-                    <span>{artist_name}</span>
-                  </Link>
+                  {this.props.app.state.currentPlaylist && (
+                    <Link id="current-track-link" to={this.props.app.state.currentPlaylist}>
+                      <span>{track_name}</span>
+                      <span id="current-track-link-separator"> by </span>
+                      <span>{artist_name}</span>
+                    </Link>
+                  )}
                 </span>
               </div>
             </div>

@@ -36,7 +36,7 @@
   border: 0px;
   text-align: center;
   border-radius: 50%;
-  background-color: green;
+  background-color: #aa52b0;
   color: #333;
 }
 
@@ -44,13 +44,13 @@
   position: absolute;
   height: 10px;
   z-index: 1;
-  background-color: #145814;
+  background-color: #aa52b0;
   border-radius: 5px;
 }
 
 
 .fa-volume-up {
-  color: green;
+  color: #aa52b0;
   position: absolute;
   right: -45px;
   top: -5px;

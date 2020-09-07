@@ -1,26 +1,50 @@
 body {
   /* Margin bottom by footer height plus the margin between other stuff*/
   /* margin-bottom: 175px; */
-  padding-bottom: 175px;
+  padding-bottom: 135px;
 }
 
 .footer {
   bottom: 0;
   width: 100%;
   /* Set the fixed height of the footer here */
-  height: 125px;
+  height: 100px;
   background-color: black;
   padding-top: 15px;
 }
 
+@media only screen and (max-width: 576px) {
+  .footer {
+    padding: 0;
+  }
+}
+
 #player-message-not-signed-in {
+  margin-top: -15px;
   text-align: center;
-  color: #008f0c;
+  color: white;
   cursor: pointer;
+  border: none;
+  border-radius: 20px;
+  padding: 8px;
+  background-color: #1DB954;
+}
+
+#player-message-not-signed-in > img {
+  height: 30px;
+  margin-right: 10px;
+}
+
+#player-message-not-signed-in > svg {
+  margin-left: 5px;
+}
+
+.sign-in-required-container {
+  text-align: center;
 }
 
 #album-image {
-  height: 100px;
+  height: 75px;
 }
 
 .controls {
@@ -32,13 +56,13 @@ body {
 
 .fa-pause {
   cursor: pointer;
-  color: green;
+  color: #aa52b0;
   font-size: 35px;
 }
 
 .fa-play {
   cursor: pointer;
-  color: green;
+  color: #aa52b0;
   font-size: 35px;
 }
 
@@ -50,7 +74,7 @@ body {
 
 .fa-step-forward {
   cursor: pointer;
-  color: green;
+  color: #aa52b0;
   margin-left: 30px;
   font-size: 35px;
 }
@@ -62,7 +86,7 @@ body {
 
 .fa-step-backward {
   cursor: pointer;
-  color: green;
+  color: #aa52b0;
   margin-right: 30px;
   font-size: 35px;
 }
@@ -87,7 +111,7 @@ body {
   text-align: 'center';
   cursor: 'pointer';
   border-radius: '50%';
-  background-color: 'green';
+  background-color: '#aa52b0';
   color: '#333';
 }
 
@@ -103,7 +127,7 @@ body {
   position: relative;
   margin-right: 10%;
   margin-left: -10%;
-  color: green;
+  color: #aa52b0;
 }
 
 .repeat-track-number {
@@ -116,11 +140,11 @@ body {
 }
 
 .fa-redo.repeat.context {
-  color: green;
+  color: #aa52b0;
 }
 
 .fa-redo.repeat.track {
-  color: green;
+  color: #aa52b0;
 }
 
 .fa-redo.repeat.disabled {
@@ -131,7 +155,7 @@ body {
 .fa-redo.repeat.track::after {
   position: absolute;
   content: '1';
-  color: green;
+  color: #aa52b0;
   font-size: 12px;
   font-weight: 700;
 }
@@ -162,7 +186,7 @@ body {
 }
 
 .fa-random.shuffle.on {
-  color: green;
+  color: #aa52b0;
 }
 
 #current-track-link > span {
@@ -171,10 +195,24 @@ body {
 
 @media only screen and (max-width: 767.98px) {
   #current-track-link > span {
-    color: green;
+    color: #aa52b0;
+  }
+}
+
+@media only screen and (max-width: 576px) {
+  #current-track-link {
+    white-space: nowrap;
+    overflow: hidden;
   }
 }
 
 #current-track-link > #current-track-link-separator {
   color: white;
+}
+
+@media only screen and (max-width: 576px) {
+  #disabled-player-row {
+    padding-top: 15px;
+  }
+  
 }

@@ -1,5 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Helmet from 'react-helmet';
+import { captializeFirstLetter } from '../util';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import Pagination from './Pagination';
@@ -25,7 +27,7 @@ class Playlists extends React.Component {
     if (loading) {
       return (
         <div className="row">
-          <div className="spinner-grow text-success" role="status">
+          <div className="spinner-grow" role="status">
             <span className="sr-only">Loading...</span>
           </div>
         </div>
@@ -38,7 +40,7 @@ class Playlists extends React.Component {
 
     if (playlists) {
       const match = this.props.match;
-      // reduce a large array into multidimensinal array
+      // reduce a large array into multidimensional array
       // where we have m x 3 matrix (m rows of 3 columns)
       // this makes it way easier to render with react
       // With Bootstrap remember total row width is 12 columns.
@@ -54,17 +56,30 @@ class Playlists extends React.Component {
         return accumulator;
       }, []);
 
+      const { subcategory, drug } = this.props.match.params;
       return (
         <div className="playlists">
+          <Helmet>
+            <title>
+              Stereodose | {captializeFirstLetter(drug)} {captializeFirstLetter(subcategory)} | Choose Playlist
+            </title>
+            <meta
+              name="Description"
+              content={`Find music for a ${subcategory} ${drug} vibe`}
+            ></meta>
+          </Helmet>
+
           <h2 id="choose-a-playlist">
-            <Link to={`/${this.props.match.params.drug}/${this.props.match.params.subcategory}/type`}><FontAwesomeIcon icon={faArrowLeft} /></Link>
+            <Link to={`/${this.props.match.params.drug}/${this.props.match.params.subcategory}/type`}>
+              <FontAwesomeIcon icon={faArrowLeft} />
+            </Link>
             Choose A Playlist
           </h2>
 
           {rows.map((row, index) => {
             return (
               <div className="row" key={index}>
-                {row.map(playlist => {
+                {row.map((playlist) => {
                   const thumbnailImageURL = playlist.bucketThumbnailURL
                     ? playlist.bucketThumbnailURL
                     : 'https://via.placeholder.com/250x200';
@@ -122,6 +137,7 @@ class Playlists extends React.Component {
         return;
       }
       this.setState({ playlists: newPlaylists });
+      window.scrollTo(0, 0);
     } catch (err) {
       this.setState({
         loading: false,

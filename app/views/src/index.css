@@ -6,7 +6,7 @@ body {
   background-repeat: no-repeat;
   background-attachment: fixed;
   color: white;
-  font-family: 'Hammersmith One', sans-serif;
+  font-family: 'Oxygen', sans-serif;
 }
 
 html {
@@ -18,5 +18,9 @@ html {
 }
 
 a {
-  color: #008f0c;
+  color: #aa52b0;
+}
+
+.spinner-grow {
+  color: #aa52b0;
 }

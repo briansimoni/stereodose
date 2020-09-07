@@ -4,6 +4,9 @@ import WebPlaybackReact from './WebPlaybackReact';
 import Spotify from 'spotify-web-api-js';
 import DisabledPlayer from './DisabledPlayer';
 import GlobalShareButton from '../user/sharing/GlobalShareButton';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSignInAlt } from '@fortawesome/free-solid-svg-icons';
+import spotifyIcon from '../images/Spotify_Icon_RGB_Black.png';
 
 import NowPlayingScreen from './NowPlaying';
 
@@ -85,9 +88,9 @@ export default class Player extends Component {
 
   // position is the desired percentage to seek to
   // duration is the total length in ms of the song.
-  seek = (position, duration) => {
+  seek = async (position, duration) => {
     const ms = Math.round((position / 100) * duration);
-    this.props.app.player.seek(ms);
+    await this.props.app.player.seek(ms);
   };
 
   getSDK = async () => {
@@ -112,7 +115,7 @@ export default class Player extends Component {
     let webPlaybackSdkProps = {
       app: this.props.app,
       playerName: 'Stereodose',
-      playerInitialVolume: 1.0,
+      playerInitialVolume: 0.5,
       playerRefreshRateMs: 100,
       playerAutoConnect: true,
       onPlayerRequestAccessToken: () => this.props.app.getAccessToken(),
@@ -148,15 +151,18 @@ export default class Player extends Component {
       <div>
         {authError && (
           <footer className="footer fixed-bottom">
-            <div className="container-fluid">
-              <h2
+            <div className="container-fluid sign-in-required-container">
+              <p>Spotify Premium is required to play music</p>
+              <button
                 onClick={() => {
                   window.location = `/auth/login?path=${window.location.pathname}`;
                 }}
                 id="player-message-not-signed-in"
               >
-                {authError.message}
-              </h2>
+                <img alt="spotify-logo" src={spotifyIcon}></img>
+                Sign In
+                <FontAwesomeIcon icon={faSignInAlt}/>
+              </button>
             </div>
           </footer>
         )}

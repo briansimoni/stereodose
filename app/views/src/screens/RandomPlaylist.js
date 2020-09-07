@@ -1,9 +1,10 @@
 import React from 'react';
-import Track from './Track';
-import Data2D from './Visualizer/Data2D'
+import RandomTrack from './RandomTrack';
+import Data2D from './playlist/Visualizer/Data2D'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faQuestion } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 
 // RandomPlaylist is almost a copy of Playlist
@@ -30,7 +31,7 @@ class RandomPlaylist extends React.Component {
     if (loading) {
       return (
         <div className="row justify-content-md-center">
-          <div className="spinner-grow text-success text-center" role="status">
+          <div className="spinner-grow text-center" role="status">
             <span className="sr-only">Loading...</span>
           </div>
         </div>
@@ -55,11 +56,17 @@ class RandomPlaylist extends React.Component {
           <div id="playlist-heading">
             <h2>
               {/* The header contains the playlist name and a back button*/}
-              <Link to={`/${this.props.match.params.drug}/${this.props.match.params.subcategory}/type`}><FontAwesomeIcon icon={faArrowLeft} /></Link>
+              <Link to={`/${this.props.match.params.drug}/${this.props.match.params.subcategory}/type`}>
+                <FontAwesomeIcon icon={faArrowLeft} />
+              </Link>
               {`${drug}: ${subcategory}`}
             </h2>
             {albumImageUrl && <img src={albumImageUrl} alt="playlist-artwork" />}
-            {!albumImageUrl && <div id="random-playlist-image-placeholder" alt="playlist-artwork" />}
+            {!albumImageUrl && (
+              <div id="random-playlist-image-placeholder" alt="playlist-artwork">
+                <FontAwesomeIcon icon={faQuestion} />
+              </div>
+            )}
           </div>
           <span>
             {!this.state.visualizerLoading && (
@@ -81,7 +88,7 @@ class RandomPlaylist extends React.Component {
               playlist.tracks.map((track, index) => {
                 return (
                   <li className="list-group-item" key={index}>
-                    <Track
+                    <RandomTrack
                       currentlyPlayingTrack={this.props.app.state.currentTrack}
                       track={track}
                       playlist={playlist}
@@ -107,7 +114,7 @@ class RandomPlaylist extends React.Component {
   // For very large playlists, we need to get just a slice relative to the selected track
   // so that we can avoid HTTP 413 (request too large) errors
   getContextURIs(playlist, trackURI) {
-    const trackURIs = playlist.tracks.map(track => track.URI);
+    const trackURIs = playlist.tracks.map((track) => track.URI);
     // Taking a guess at the payload maximum size
     // With trial and error, length of 500 seems to be pretty safe
     // Only use slices in the case where the playlist is very large
@@ -149,9 +156,7 @@ class RandomPlaylist extends React.Component {
     // first, if the selectedTrack is currently playing, we actually need to pause instead
     if (this.props.app.state.currentTrack) {
       const currentTrackId = this.props.app.state.currentTrack.linked_from.id || this.props.app.state.currentTrack.id;
-      if (
-        selectedTrack.includes(currentTrackId)
-      ) {
+      if (selectedTrack.includes(currentTrackId)) {
         await this.props.app.player.togglePlay();
         return;
       }
@@ -200,9 +205,12 @@ class RandomPlaylist extends React.Component {
     const { drug, subcategory } = this.props.match.params;
     // if the user hasn't selected a different drug/mood combination, reuse the random playlist that was already downloaded
     // this makes the links back to the random playlist (e.g. the track name in the player) bring you back to the same set
-    // of tracks that you were looking at before 
+    // of tracks that you were looking at before
     if (this.props.app.state.randomPlaylistData) {
-      if (this.props.app.state.randomPlaylistData.drug === drug && this.props.app.state.randomPlaylistData.subcategory === subcategory) {
+      if (
+        this.props.app.state.randomPlaylistData.drug === drug &&
+        this.props.app.state.randomPlaylistData.subcategory === subcategory
+      ) {
         this.setState({
           loading: false,
           playlist: this.props.app.state.randomPlaylistData.playlist
@@ -210,7 +218,9 @@ class RandomPlaylist extends React.Component {
         return;
       }
     }
-    const response = await fetch(`/api/playlists/random?category=${drug}&subcategory=${subcategory}`, { credentials: 'same-origin' });
+    const response = await fetch(`/api/playlists/random?category=${drug}&subcategory=${subcategory}`, {
+      credentials: 'same-origin'
+    });
     if (response.status !== 200) {
       const errorMessage = await response.text();
       throw new Error(`${errorMessage}, ${response.status}, ${response.statusText}`);

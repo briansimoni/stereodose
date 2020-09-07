@@ -12,7 +12,9 @@ main {
 }
 
 .playlists img {
-  max-width: 250px;
+  height: 250px;
+  width: 250px;
+  border: 2px solid black;
 }
 
 #choose-a-playlist {
@@ -49,19 +51,26 @@ ul.drugs li {
 }
 
 #playlist-heading > img {
+  border: 2px solid black;
   height: 40vh;
 }
 
 #random-playlist-image-placeholder {
-  /* max-width: 300px; */
   width: 40vh;
   height: 40vh;
   margin: 0 auto;
   background-color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#random-playlist-image-placeholder svg{
+  font-size: 72px;
 }
 
 .track-play-button {
-  background-color: #008f0c;
+  background-color: #aa52b0;
 }
 
 .track-play-button > .fa-play {
@@ -120,7 +129,7 @@ ul.drugs li {
 
 #visualizer {
   position: fixed;
-  top: 0;
+  top: -100px;
   left: 0;
   z-index: 2000;
 }
@@ -164,10 +173,24 @@ ul.drugs li {
 }
 
 .pagination .page-item.active .page-link {
-  background-color: green;
-  border-color: green;
+  background-color: #aa52b0;
+  border-color: #aa52b0;
 }
 
 .pagination .page-link {
-  color: green;
+  color: #aa52b0;
+}
+
+#visualizer > canvas {
+  background: black;
+}
+
+#apple-app-store-button {
+  width: 200px;
+  margin-bottom: 30px;
+}
+
+#brave-browser-button {
+  width: 200px;
+  margin-bottom: 30px;
 }

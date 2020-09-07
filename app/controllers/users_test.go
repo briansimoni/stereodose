@@ -52,6 +52,10 @@ func (f *fakeUserService) Update(user *models.User) error {
 	return nil
 }
 
+func (f *fakeUserService) UpdateAccessToken(user *models.User) error {
+	return nil
+}
+
 var userTestDB = &models.StereoDoseDB{
 	Users: &fakeUserService{},
 }

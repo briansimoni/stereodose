@@ -264,6 +264,10 @@ func TestPlaylistsController_CreatePlaylist(t *testing.T) {
 		Category:    "weed",
 		SubCategory: "chill",
 	}
+
+	testUser := models.User{}
+	testUser.ID = 1
+
 	var testRouter = &util.AppRouter{Router: mux.NewRouter()}
 	tt := []struct {
 		name   string
@@ -271,11 +275,11 @@ func TestPlaylistsController_CreatePlaylist(t *testing.T) {
 		user   interface{}
 		data   interface{}
 	}{
-		{name: "Valid ID", status: 201, user: models.User{}, data: validData},
-		// {name: "Invalid Categories", status: 400, user: nil, data: postBody{"test", "Fake", "Category"}},
-		// {name: "Invalid User Context", status: 500, user: nil, data: validData},
-		// {name: "Invalid POST body", status: 400, user: models.User{}, data: 69},
-		{name: "Database Error", status: 409, user: models.User{}, data: postBody{
+		{name: "Valid ID", status: 201, user: testUser, data: validData},
+		{name: "Invalid Categories", status: 400, user: nil, data: postBody{"test", "Fake", "Category"}},
+		{name: "Invalid User Context", status: 500, user: nil, data: validData},
+		{name: "Invalid POST body", status: 400, user: models.User{}, data: 69},
+		{name: "Database Error", status: 409, user: testUser, data: postBody{
 			SpotifyID:   "alreadyExists",
 			Category:    "weed",
 			SubCategory: "chill",
@@ -347,6 +351,7 @@ func TestPlaylistsController_DeletePlaylist(t *testing.T) {
 	user1 := models.User{}
 	user1.ID = 1
 	user1.DisplayName = "HasPlaylistsUser1"
+	user1.Admin = true
 
 	user2 := models.User{}
 	user2.ID = 2
@@ -357,7 +362,7 @@ func TestPlaylistsController_DeletePlaylist(t *testing.T) {
 		statusCode int
 	}{
 		{name: "authorized delete", user: user1, playlistID: "10", statusCode: 200},
-		{name: "unauthorized delete", user: user1, playlistID: "20", statusCode: 401},
+		{name: "unauthorized delete", user: user2, playlistID: "20", statusCode: 401},
 		{name: "noexistent playlist", user: user1, playlistID: "9000", statusCode: 404},
 		{name: "bad session cookie", user: nil, playlistID: "10", statusCode: 500},
 		{name: "empty playlist id", user: user1, playlistID: "error-condition", statusCode: 500},

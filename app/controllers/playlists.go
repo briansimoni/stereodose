@@ -12,6 +12,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/jinzhu/gorm"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 
@@ -136,6 +137,9 @@ func (p *PlaylistsController) GetPlaylistByID(w http.ResponseWriter, r *http.Req
 	vars := mux.Vars(r)
 	ID := vars["id"]
 	playlist, err := p.DB.Playlists.GetByID(ID)
+	if gorm.IsRecordNotFoundError(err) {
+		w.WriteHeader(http.StatusNotFound)
+	}
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -228,7 +232,23 @@ func (p *PlaylistsController) CreatePlaylist(w http.ResponseWriter, r *http.Requ
 		}
 	}
 
-	playlist, err := p.DB.Playlists.CreatePlaylistBySpotifyID(user, data.SpotifyID, data.Category, data.SubCategory, data.ImageURL, data.ThumbnailURL)
+	// Making sure we have the full user data set from the DB here
+	fullUser, err := p.DB.Users.ByID(user.ID)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	// Making sure that we have an up-to-date access token for making the playlist
+	// while the web app often calls this API's endpoints for refreshing the access tokens
+	// iOS and potentially other platforms can connect into the Spotify app to obtain access tokens.
+	// If we aren't using the server to update the access tokens, the server will never be aware of
+	// new access token!
+	err = p.DB.Users.UpdateAccessToken(fullUser)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	playlist, err := p.DB.Playlists.CreatePlaylistBySpotifyID(*fullUser, data.SpotifyID, data.Category, data.SubCategory, data.ImageURL, data.ThumbnailURL)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -245,13 +265,20 @@ func (p *PlaylistsController) CreatePlaylist(w http.ResponseWriter, r *http.Requ
 }
 
 // DeletePlaylist takes the id variable from the url path
-// It performs a hard delete of the playlist from the DB
+// It performs a hard delete of the playlist from the DB, but a soft delete on likes and comments
+// Only admins may perform this operation
 func (p *PlaylistsController) DeletePlaylist(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
 	ID := vars["id"]
 	user, ok := r.Context().Value("User").(models.User)
 	if !ok {
 		return errors.New("Unable to obtain user from session")
+	}
+	if !user.Admin {
+		return &util.StatusError{
+			Message: fmt.Sprintf("Unauthorized"),
+			Code:    http.StatusUnauthorized,
+		}
 	}
 	targetPlaylist, err := p.DB.Playlists.GetByID(ID)
 	if err != nil {
@@ -261,23 +288,6 @@ func (p *PlaylistsController) DeletePlaylist(w http.ResponseWriter, r *http.Requ
 		return &util.StatusError{
 			Message: fmt.Sprintf("Playlist does not exist"),
 			Code:    http.StatusNotFound,
-		}
-	}
-	userPlaylists, err := p.DB.Playlists.GetMyPlaylists(user)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	authorized := false
-	for _, playlist := range userPlaylists {
-		if playlist.SpotifyID == ID {
-			authorized = true
-			break
-		}
-	}
-	if !authorized {
-		return &util.StatusError{
-			Message: fmt.Sprintf("Unauthorized to remove this playlist"),
-			Code:    http.StatusUnauthorized,
 		}
 	}
 
@@ -328,7 +338,7 @@ func (p *PlaylistsController) UploadImage(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	resizedImage := imaging.Resize(imageCopy, 250, 200, imaging.Lanczos)
+	resizedImage := imaging.Resize(imageCopy, 250, 250, imaging.Lanczos)
 	imageDataCopy := new(bytes.Buffer)
 	err = jpeg.Encode(imageDataCopy, resizedImage, nil)
 	if err != nil {

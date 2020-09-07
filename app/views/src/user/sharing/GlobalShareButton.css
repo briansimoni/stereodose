@@ -1,5 +1,11 @@
 #global-share-button {
     position: absolute;
     right: 20px;
-    bottom: 150px;
+    bottom: 125px;
+    background-color: #aa52b0
+}
+
+#global-share-button button {
+    background-color: #aa52b0;
+    border-color: #aa52b0;
 }

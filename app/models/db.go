@@ -1,8 +1,11 @@
 package models
 
 import (
-	"log"
+	"os"
 
+	log "github.com/sirupsen/logrus"
+
+	"github.com/briansimoni/stereodose/config"
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
 )
@@ -20,9 +23,24 @@ type StereoDoseDB struct {
 
 // NewStereodoseDB takes a reference to gorm and returns
 // an abstraction for use throughout the app
-func NewStereodoseDB(db *gorm.DB, s *sessions.CookieStore) *StereoDoseDB {
-	// db = db.Debug()
-	err := db.AutoMigrate(
+func NewStereodoseDB(c *config.Config, s *sessions.CookieStore) *StereoDoseDB {
+
+	connectionString := os.Getenv("STEREODOSE_DB_STRING")
+	if connectionString == "" {
+		// docker-compose default
+		connectionString = "postgresql://postgres:development@db:5432/stereodose?sslmode=disable"
+		// localhost default
+		// connectionString = "postgresql://postgres:development@127.0.0.1:5432/stereodose?sslmode=disable"
+	}
+
+	db, err := gorm.Open("postgres", connectionString)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"Type": "AppLog",
+		}).Fatal("Unable to connect to the database", err.Error())
+	}
+
+	err = db.AutoMigrate(
 		User{},
 		Playlist{},
 		UserImage{},
@@ -39,10 +57,10 @@ func NewStereodoseDB(db *gorm.DB, s *sessions.CookieStore) *StereoDoseDB {
 	database := &StereoDoseDB{}
 	database.DB = db
 	database.store = s
-	database.Users = &StereodoseUserService{db: db}
+	database.Users = &StereodoseUserService{db: db, config: c}
 	database.Playlists = &StereodosePlaylistService{db: db}
 	database.Comments = &StereodoseCommentService{db: db}
-	database.Feedback = &StereodoseFeedbackService{db: db}
+	database.Feedback = NewFeedbackService(db)
 	//test
 	// u, _ := database.Users.ByID(1)
 	// _, err = database.Playlists.Like("6DRd1s2Hx7VEWWV85GYx6S", *u)

@@ -10,7 +10,7 @@ import ShuffleButton from './ShuffleButton';
 
 export default function DisabledPlayer(props) {
   return (
-    <div className="row">
+    <div className="row" id="disabled-player-row">
       <div className="d-none d-md-block col-md-2 col-lg-1"></div>
       <div className="col-sm-3 col-md-2 col-lg-2">
         <div className="row text-center">

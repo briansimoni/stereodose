@@ -21,7 +21,7 @@ class UserNavItems extends React.Component {
     if (this.state.loggedIn === null) {
       return (
         <div className="row justify-content-md-center">
-          <div className="spinner-grow text-success text-center" role="status">
+          <div className="spinner-grow text-center" role="status">
             <span className="sr-only">Loading...</span>
           </div>
         </div>
@@ -54,7 +54,7 @@ class UserNavItems extends React.Component {
           {/* Logout is a special case. Need to use a plain <a> tag instead of <Link>*/}
           <li className="nav-item">
             <a href="/auth/logout" className="nav-link">
-              logout
+              Logout
             </a>
           </li>
         </Fragment>
