@@ -6,7 +6,7 @@ import Likes from './Likes';
 // import ExampleComponent from './spotify-viz/Example'
 import Visualizer2 from './Visualizer2';
 import Helmet from 'react-helmet';
-import { captializeFirstLetter } from '../util';
+import { captializeFirstLetter } from '../../util';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';

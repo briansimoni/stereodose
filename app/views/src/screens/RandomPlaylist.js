@@ -1,6 +1,6 @@
 import React from 'react';
 import RandomTrack from './RandomTrack';
-import Visualizer2 from './Visualizer2';
+import Visualizer2 from './playlist/Visualizer2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';

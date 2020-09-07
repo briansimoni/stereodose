@@ -2,7 +2,7 @@ import React from 'react';
 import Drugs from './screens/Drugs';
 import Drug from './screens/Drug';
 import Playlists from './screens/Playlists';
-import Playlist from './screens/Playlist';
+import PlaylistController from './screens/PlaylistController';
 import Player from './player/Player';
 import About from './screens/About';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
@@ -62,7 +62,7 @@ class App extends React.Component {
 
               <Route exact path="/:drug/:subcategory/random" render={props => <RandomPlaylist {...props} app={this} />} />
 
-              <Route exact path="/:drug/:subcategory/:playlist" render={props => <Playlist {...props} app={this} />} />
+              <Route exact path="/:drug/:subcategory/:playlist" render={props => <PlaylistController {...props} app={this} />} />
 
               <Route component={NoMatch} />
             </Switch>
