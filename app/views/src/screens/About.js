@@ -1,6 +1,6 @@
 import React from 'react';
 import Feedback from './Feedback';
-import appStoreImage from '../images/Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg';
+// import appStoreImage from '../images/Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg';
 import braveImage from '../images/brave_logo_2color_reversed.svg';
 import Helmet from 'react-helmet';
 
@@ -45,10 +45,6 @@ export default function About() {
             https://developer.spotify.com/documentation/web-playback-sdk/#supported-browsers
           </a>
         </p>
-        <p>Stereodose is now available for iOS!</p>
-        <a href="https://apps.apple.com/us/app/id1518862133">
-          <img id="apple-app-store-button" alt="apple-app-store-button" src={appStoreImage}></img>
-        </a>
 
         <h1>Support</h1>
         <p>
