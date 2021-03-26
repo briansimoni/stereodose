@@ -1,7 +1,22 @@
-# multistage dockerfile for lightweight production images
+# Inspired by https://chemidy.medium.com/create-the-smallest-and-secured-golang-docker-image-based-on-scratch-4752223b7324
 
 # first, build the go binary
-FROM golang:1.14 as go
+FROM golang:1.16.2-alpine as go
+
+RUN apk update && apk add --no-cache git ca-certificates && update-ca-certificates
+
+# Create appuser.
+ENV USER=appuser
+ENV UID=10001
+# See https://stackoverflow.com/a/55757473/12429735RUN
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid "${UID}" \
+    "${USER}"
 
 COPY . /go/src/github.com/briansimoni/stereodose
 
@@ -11,7 +26,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -mod=vendor -a -installsuffix cgo -o stere
 
 
 # next, install node_modules and run a build for react
-FROM node:12 as node
+FROM node:14-alpine as node
 
 WORKDIR /stereodose/
 
@@ -23,13 +38,20 @@ RUN npm install
 RUN npm run build
 RUN rm -rf node_modules
 
+FROM scratch
 
-# Finally, take both artifacts and copy to a small, production ready image
-FROM alpine:latest  
-RUN apk --no-cache add ca-certificates && apk --no-cache add curl
+# Import the user and group files from the builder.
+COPY --from=go /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=go /etc/passwd /etc/passwd
+COPY --from=go /etc/group /etc/group
 WORKDIR /stereodose/
+# Copy our static executable.
 COPY --from=node /stereodose/ .
-HEALTHCHECK CMD curl --fail localhost:${PORT}/api/health/ || exit 1
+# Use an unprivileged user.
+USER appuser:appuser
+
 CMD ["./stereodose"]
+
+
 
 
