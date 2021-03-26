@@ -3,7 +3,7 @@
 # This is used with docker-compose in dev environments for hot reloading
 # It watches the files
 
-FROM golang:1.14
+FROM golang:1.16
 
 RUN apt-get update -y && apt-get install psmisc
 
