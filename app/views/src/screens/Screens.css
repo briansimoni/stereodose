@@ -182,3 +182,8 @@ ul.drugs li {
   width: 200px;
   margin-bottom: 30px;
 }
+
+#buy-me-a-coffee-button {
+  height: 60px;
+  display: block;
+}

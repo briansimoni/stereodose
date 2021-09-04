@@ -45,8 +45,13 @@ export default function About() {
             https://developer.spotify.com/documentation/web-playback-sdk/#supported-browsers
           </a>
         </p>
-
         <h1>Support</h1>
+        <p>
+          Buy me a coffee or a beer, or whatever. There is just one person maintaining the whole website and servers aren't free.
+          <a href="https://www.buymeacoffee.com/stereodose" target="_blank">
+            <img id="buy-me-a-coffee-button" src="https://cdn.buymeacoffee.com/buttons/v2/default-violet.png" alt="Buy Me A Coffee"></img>
+          </a>
+        </p>
         <p>
           Support Stereodose by supporting yourself. Stop sending Apple and Google all of your personal information.
           <a href="https://brave.com/ste942" rel="noopener noreferrer" target="_blank">
