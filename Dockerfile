@@ -1,7 +1,7 @@
 # Inspired by https://chemidy.medium.com/create-the-smallest-and-secured-golang-docker-image-based-on-scratch-4752223b7324
 
 # first, build the go binary
-FROM golang:1.16.2-alpine as go
+FROM 502859415194.dkr.ecr.us-east-1.amazonaws.com/golang:1.16.2-alpine as go
 
 RUN apk update && apk add --no-cache git ca-certificates && update-ca-certificates
 
