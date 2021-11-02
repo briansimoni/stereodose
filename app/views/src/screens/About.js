@@ -2,6 +2,7 @@ import React from 'react';
 import Feedback from './Feedback';
 // import appStoreImage from '../images/Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg';
 import braveImage from '../images/brave_logo_2color_reversed.svg';
+import qrCode from '../images/btc-qr-code.png'
 import Helmet from 'react-helmet';
 
 export default function About() {
@@ -45,9 +46,13 @@ export default function About() {
             https://developer.spotify.com/documentation/web-playback-sdk/#supported-browsers
           </a>
         </p>
-        <h1>Support</h1>
+        <h1>Support Stereodose</h1>
+        <p>There is just one person maintaining the whole website and servers aren't free.</p>
+        <p>I accept Bitcoin donations.</p>
+        <img id="qr-code" alt="bitcoin-QR-code" src={qrCode}></img>
+        <p>35YJZMv1QBkLdhFVEqTYtoMu8jk7CnXfC7</p>
         <p>
-          Buy me a coffee or a beer, or whatever. There is just one person maintaining the whole website and servers aren't free.
+          You can also send me cash that I will inevitably use on beer or coffee or whatever.
           <a href="https://www.buymeacoffee.com/stereodose" target="_blank">
             <img id="buy-me-a-coffee-button" src="https://cdn.buymeacoffee.com/buttons/v2/default-violet.png" alt="Buy Me A Coffee"></img>
           </a>
