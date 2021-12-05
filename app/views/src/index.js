@@ -17,8 +17,7 @@ if (browser) {
     alert(notSupportedMessage);
   }
   if (browser.os === 'iOS') {
-    alert('We are currently working on supporting iOS 14. Check back soon.');
-    window.location = 'https://apps.apple.com/us/app/id1518862133';
+    alert(notSupportedMessage);
   }
 }
 
