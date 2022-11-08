@@ -19,7 +19,7 @@
         "react-helmet": "^6.1.0",
         "react-image-crop": "^6.0.12",
         "react-router-dom": "^5.1.2",
-        "react-scripts": "^4.0.3",
+        "react-scripts": "^5.0.1",
         "react-test-renderer": "^16.11.0",
         "spotify-web-api-js": "^1.2.0",
         "three": "^0.126.1"
