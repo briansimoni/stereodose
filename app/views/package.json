@@ -7,7 +7,7 @@
         "@fortawesome/free-solid-svg-icons": "^5.14.0",
         "@fortawesome/react-fontawesome": "^0.1.11",
         "d3-array": "^2.4.0",
-        "d3-color": "^1.4.0",
+        "d3-color": "^3.1.0",
         "d3-interpolate": "^1.4.0",
         "d3-scale": "^3.2.1",
         "detect-browser": "^4.0.3",
